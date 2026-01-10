@@ -1,0 +1,2468 @@
+STRATAXIS — EXECUTION BLUEPRINT
+
+1. REPOSITORY STRUCTURE
+
+1.1. Root Directory
+    strataxis/
+        README.md
+        .gitignore
+        LICENSE
+        docker-compose.yml (development only)
+        
+1.2. Backend Service
+    backend/
+        src/
+            config/
+                database.js
+                env.js
+                constants.js
+            models/
+                User.js
+                Property.js
+                Listing.js
+                Booking.js
+                DataSource.js
+                MLModel.js
+                PricePrediction.js
+            routes/
+                auth.js
+                users.js
+                properties.js
+                listings.js
+                bookings.js
+                analytics.js
+                predictions.js
+                admin.js
+            middleware/
+                auth.js
+                rbac.js
+                validation.js
+                errorHandler.js
+                rateLimiter.js
+            controllers/
+                authController.js
+                userController.js
+                propertyController.js
+                listingController.js
+                bookingController.js
+                analyticsController.js
+                predictionController.js
+                adminController.js
+            services/
+                emailService.js
+                paymentService.js (stub for MVP)
+            utils/
+                logger.js
+                helpers.js
+        tests/
+            unit/
+            integration/
+        server.js
+        package.json
+        
+1.3. Frontend Service
+    frontend/
+        src/
+            components/
+                common/
+                    Header.jsx
+                    Footer.jsx
+                    Navigation.jsx
+                    Loading.jsx
+                    ErrorBoundary.jsx
+                auth/
+                    Login.jsx
+                    Register.jsx
+                    ForgotPassword.jsx
+                dashboard/
+                    Dashboard.jsx
+                    StatsCards.jsx
+                    QuickFilters.jsx
+                analytics/
+                    PriceChart.jsx
+                    TrendChart.jsx
+                    MapView.jsx
+                    TableView.jsx
+                booking/
+                    BookingForm.jsx
+                    BookingList.jsx
+                    BookingCalendar.jsx
+                admin/
+                    UserManagement.jsx
+                    DataSourceManagement.jsx
+                    ModelManagement.jsx
+            pages/
+                Home.jsx
+                Analytics.jsx
+                Insights.jsx
+                Booking.jsx
+                Profile.jsx
+                Admin.jsx
+            services/
+                api.js
+                auth.js
+            hooks/
+                useAuth.js
+                useProperties.js
+                useBookings.js
+            utils/
+                constants.js
+                formatters.js
+                validators.js
+            contexts/
+                AuthContext.jsx
+            assets/
+                images/
+                styles/
+            App.jsx
+            index.jsx
+        public/
+            index.html
+            favicon.ico
+        package.json
+        tailwind.config.js
+        
+1.4. Data Pipeline Service
+    data-pipeline/
+        src/
+            scrapers/
+                base_scraper.py
+                site1_scraper.py
+                site2_scraper.py
+                scraper_factory.py
+            ocr/
+                pdf_processor.py
+                text_extractor.py
+                data_parser.py
+            etl/
+                extractor.py
+                transformer.py
+                loader.py
+                pipeline.py
+            validation/
+                schema_validator.py
+                data_quality.py
+                outlier_detection.py
+            ml/
+                feature_engineering.py
+                model_trainer.py
+                model_evaluator.py
+                predictor.py
+            utils/
+                logger.py
+                config.py
+                helpers.py
+            main.py
+        tests/
+            unit/
+            integration/
+        requirements.txt
+        config.yaml
+        
+1.5. Infrastructure
+    infrastructure/
+        nginx/
+            nginx.conf
+            ssl/
+        scripts/
+            deploy.sh
+            backup.sh
+            monitor.sh
+        docker/
+            Dockerfile.backend
+            Dockerfile.frontend
+            Dockerfile.pipeline
+            
+1.6. Documentation
+    docs/
+        api/
+            endpoints.md
+            schemas.md
+        deployment/
+            setup.md
+            environment.md
+        ml/
+            models.md
+            evaluation.md
+        data/
+            sources.md
+            pipeline.md
+
+2. EXECUTION PLAN — PHASE-BY-PHASE (42 DAYS)
+
+2.1. Phase 1: Foundation and Setup (Days 1-3)
+
+2.1.1. Day 1: Project Initialization
+    1. Initialize Git repository
+    2. Create directory structure (all folders from section 1)
+    3. Initialize Node.js project (backend)
+    4. Initialize React project (frontend)
+    5. Initialize Python project (data-pipeline)
+    6. Configure .gitignore for all three projects
+    7. Set up GitHub repository with initial commit
+    8. Create README.md with project overview
+    9. Install core dependencies (backend: express, mongoose, dotenv, cors, helmet, bcrypt, jsonwebtoken)
+    10. Install core dependencies (frontend: react, react-router-dom, axios, tailwindcss, chart.js, react-chartjs-2)
+    11. Install core dependencies (data-pipeline: pandas, numpy, scikit-learn, beautifulsoup4, selenium, pytesseract, pdf2image, pymongo)
+    12. Configure ESLint and Prettier (backend, frontend)
+    13. Configure Black and flake8 (data-pipeline)
+    14. Set up environment variable templates (.env.example files)
+
+2.1.2. Day 2: Database Design and Connection
+    1. Design MongoDB collections schema (User, Property, Listing, Booking, DataSource, MLModel, PricePrediction)
+    2. Create Mongoose schemas for all models
+    3. Implement database connection module (backend/src/config/database.js)
+    4. Create index scripts for database collections
+    5. Set up local MongoDB instance or MongoDB Atlas account
+    6. Test database connection from backend
+    7. Create seed script for test users (admin, free user, paid user)
+    8. Document schema decisions in docs/api/schemas.md
+
+2.1.3. Day 3: Backend Foundation
+    1. Set up Express.js server with basic middleware (cors, helmet, body-parser, morgan)
+    2. Implement environment configuration module
+    3. Create error handling middleware
+    4. Implement logger utility (Winston or similar)
+    5. Create API route structure (empty route files)
+    6. Set up basic health check endpoint (GET /api/health)
+    7. Implement request validation middleware structure
+    8. Configure rate limiting middleware
+    9. Test server startup and basic endpoint
+    10. Commit Phase 1 completion
+
+2.2. Phase 2: Authentication and Authorization (Days 4-6)
+
+2.2.1. Day 4: Authentication Implementation
+    1. Implement password hashing utility (bcrypt)
+    2. Create JWT token generation and verification utilities
+    3. Implement User model with password hashing pre-save hook
+    4. Create registration endpoint (POST /api/auth/register)
+    5. Create login endpoint (POST /api/auth/login)
+    6. Create token refresh endpoint (POST /api/auth/refresh)
+    7. Create logout endpoint (POST /api/auth/logout)
+    8. Implement authentication middleware (verify JWT)
+    9. Create password reset request endpoint (POST /api/auth/forgot-password)
+    10. Create password reset confirmation endpoint (POST /api/auth/reset-password)
+    11. Test authentication flow with Postman/curl
+    12. Document authentication endpoints in docs/api/endpoints.md
+
+2.2.2. Day 5: RBAC Implementation
+    1. Define roles: FREE_USER, PAID_USER, ADMIN
+    2. Implement role assignment in User model
+    3. Create RBAC middleware (checkRole, checkPermission)
+    4. Define permission matrix:
+       - FREE_USER: read properties, read listings, view analytics (public)
+       - PAID_USER: all FREE_USER permissions + create booking, view insights, download reports
+       - ADMIN: all permissions + user management, data source management, model management
+    5. Implement role-based route protection
+    6. Create test users with different roles
+    7. Test RBAC with Postman (unauthorized access attempts)
+    8. Document RBAC structure in docs/api/endpoints.md
+
+2.2.3. Day 6: Frontend Auth Integration
+    1. Install and configure React Router
+    2. Create AuthContext for global auth state
+    3. Implement useAuth hook
+    4. Create Login component (form, validation, error handling)
+    5. Create Register component (form, validation, error handling)
+    6. Create ForgotPassword component
+    7. Implement protected route wrapper component
+    8. Create auth service (api calls to backend)
+    9. Implement token storage (localStorage/sessionStorage decision)
+    10. Implement automatic token refresh logic
+    11. Test complete auth flow (register → login → protected routes)
+    12. Commit Phase 2 completion
+
+2.3. Phase 3: Data Pipeline Foundation (Days 7-10)
+
+2.3.1. Day 7: Scraper Infrastructure
+    1. Identify target scraping sites (minimum 2 Cameroonian real estate sites)
+    2. Create base_scraper.py with common functionality (requests, retries, headers)
+    3. Implement site-specific scraper for Site 1 (Yaoundé and Douala listings)
+    4. Extract: title, price, location, property type, size (m²), bedrooms, images URL
+    5. Implement data structure normalization (common schema)
+    6. Add rate limiting and respectful scraping (robots.txt, delays)
+    7. Implement error handling and logging for scrapers
+    8. Test scraper on sample pages
+    9. Create scraper_factory.py for dynamic scraper selection
+    10. Document scraping targets and schema in docs/data/sources.md
+
+2.3.2. Day 8: OCR Implementation
+    1. Identify government PDF sources (land registry, property records for Yaoundé/Douala)
+    2. Install and configure Tesseract OCR and pdf2image
+    3. Create pdf_processor.py for PDF loading and page extraction
+    4. Implement text_extractor.py with OCR processing
+    5. Create data_parser.py for structured data extraction from OCR text (regex patterns for price, location, date)
+    6. Implement error handling for corrupted PDFs and low-quality scans
+    7. Add image preprocessing (contrast, noise reduction) before OCR
+    8. Test OCR on sample PDFs from identified sources
+    9. Normalize OCR output to match scraper schema
+    10. Document OCR sources and parsing rules in docs/data/sources.md
+
+2.3.3. Day 9: ETL Pipeline Implementation
+    1. Create extractor.py to unify scraper and OCR outputs
+    2. Implement transformer.py with data normalization rules:
+       - Currency normalization (XAF to standard format)
+       - Location standardization (neighborhood names, city validation)
+       - Property type categorization (apartment, house, land, commercial)
+       - Unit conversion (acres to m² where needed)
+       - Date parsing and standardization
+    3. Create data cleaning functions (remove duplicates, handle missing values)
+    4. Implement loader.py for MongoDB insertion (batch operations)
+    5. Create pipeline.py orchestrator (extract → transform → validate → load)
+    6. Add pipeline state tracking (start time, records processed, errors)
+    7. Test end-to-end ETL flow with sample data
+    8. Implement retry logic for transient failures
+    9. Commit Phase 3 completion
+
+2.3.4. Day 10: Data Validation System
+    1. Create schema_validator.py with JSON schema definitions for properties and listings
+    2. Implement validation rules:
+       - Required fields check
+       - Data type validation
+       - Range validation (price > 0, size > 0, valid coordinates)
+       - Format validation (phone numbers, emails, dates)
+    3. Create data_quality.py for quality metrics:
+       - Completeness score (non-null fields / total fields)
+       - Consistency checks (city matches location, price matches property type)
+       - Accuracy indicators (confidence scores from OCR/scraping)
+    4. Implement outlier_detection.py:
+       - Statistical outliers (Z-score > 3 for prices per m²)
+       - Business logic outliers (price/m² < XAF 1000 or > XAF 500000 in target cities)
+       - Flag suspicious records for manual review
+    5. Create validation report generator (quality metrics per batch)
+    6. Set up data quality dashboard (backlog for admin interface)
+    7. Implement automatic rejection threshold (reject records below 70% quality score)
+    8. Test validation with synthetic edge cases
+    9. Document validation rules in docs/data/pipeline.md
+
+2.4. Phase 4: Database and Backend APIs (Days 11-15)
+
+2.4.1. Day 11: Property and Listing APIs
+    1. Implement Property controller (CRUD operations)
+    2. Create GET /api/properties endpoint (list with pagination, filtering, sorting)
+    3. Filter parameters: city (Yaoundé/Douala), property type, price range, size range
+    4. Sort parameters: price, size, date_added, price_per_m2
+    5. Create GET /api/properties/:id endpoint (single property details)
+    6. Implement Listing controller (aggregated data from properties)
+    7. Create GET /api/listings endpoint (public, no auth required for MVP)
+    8. Add geospatial queries for location-based filtering (MongoDB geospatial indexes)
+    9. Implement search endpoint (text search on title, location, description)
+    10. Add response caching for public endpoints (Redis or in-memory for MVP)
+    11. Test endpoints with Postman
+    12. Document property endpoints in docs/api/endpoints.md
+
+2.4.2. Day 12: Analytics API Implementation
+    1. Create analyticsController.js with aggregation queries
+    2. Implement GET /api/analytics/overview endpoint:
+       - Total properties count (by city, type)
+       - Average price per m² (by city, type, neighborhood)
+       - Price distribution statistics (min, max, median, quartiles)
+       - Trend data (price changes over time periods)
+    3. Implement GET /api/analytics/trends endpoint:
+       - Monthly/quarterly price trends
+       - Volume trends (number of listings over time)
+       - Comparison between Yaoundé and Douala
+    4. Implement GET /api/analytics/neighborhoods endpoint:
+       - Average prices per neighborhood
+       - Property availability by neighborhood
+       - Price per m² rankings
+    5. Add date range filtering to all analytics endpoints
+    6. Optimize aggregation queries with proper indexes
+    7. Implement data sampling for large datasets (if > 10k records)
+    8. Test analytics endpoints with sample data
+    9. Document analytics endpoints in docs/api/endpoints.md
+
+2.4.3. Day 13: Prediction API Implementation
+    1. Create predictionController.js (stub initially, will connect to ML model)
+    2. Implement GET /api/predictions/price endpoint:
+       - Input: city, property type, size, location (optional)
+       - Output: predicted price, confidence interval, feature importance
+    3. Implement GET /api/predictions/trend endpoint:
+       - Input: city, property type, time horizon (1, 3, 6, 12 months)
+       - Output: forecasted prices, trend direction, confidence bands
+    4. Add rate limiting for prediction endpoints (more restrictive than read endpoints)
+    5. Implement caching for common prediction queries (same inputs within 24h)
+    6. Add input validation for prediction requests
+    7. Create error handling for model not ready scenarios
+    8. Test prediction endpoints with mock responses
+    9. Document prediction endpoints in docs/api/endpoints.md
+
+2.4.4. Day 14: Booking API Implementation
+    1. Implement Booking model with schema:
+       - User reference (paid users only)
+       - Consultation type (market analysis, investment advice, property valuation)
+       - Preferred date/time
+       - Status (pending, confirmed, completed, cancelled)
+       - Notes/requirements from user
+    2. Create bookingController.js
+    3. Implement POST /api/bookings endpoint (create booking, PAID_USER only)
+    4. Implement GET /api/bookings endpoint (user's bookings, authenticated)
+    5. Implement GET /api/bookings/:id endpoint (single booking details)
+    6. Implement PUT /api/bookings/:id endpoint (update booking, own bookings only)
+    7. Implement DELETE /api/bookings/:id endpoint (cancel booking, own bookings only)
+    8. Create GET /api/bookings/admin endpoint (all bookings, ADMIN only)
+    9. Implement PUT /api/bookings/:id/status endpoint (update status, ADMIN only)
+    10. Add booking availability validation (no overlapping admin bookings)
+    11. Implement email notifications (booking created, confirmed, cancelled) - stub email service
+    12. Test booking flow with different user roles
+    13. Document booking endpoints in docs/api/endpoints.md
+
+2.4.5. Day 15: Admin APIs
+    1. Create adminController.js
+    2. Implement GET /api/admin/users endpoint (list users, pagination, filtering by role)
+    3. Implement PUT /api/admin/users/:id/role endpoint (change user role)
+    4. Implement DELETE /api/admin/users/:id endpoint (deactivate user)
+    5. Implement GET /api/admin/data-sources endpoint (list configured scrapers/OCR sources)
+    6. Implement POST /api/admin/data-sources endpoint (add new data source)
+    7. Implement PUT /api/admin/data-sources/:id endpoint (update data source config)
+    8. Implement POST /api/admin/data-sources/:id/trigger endpoint (manual pipeline trigger)
+    9. Implement GET /api/admin/models endpoint (list ML models, versions, metrics)
+    10. Implement POST /api/admin/models/retrain endpoint (trigger model retraining)
+    11. Implement GET /api/admin/stats endpoint (system statistics: users, properties, bookings, data quality)
+    12. Add RBAC checks to all admin endpoints (ADMIN role required)
+    13. Test admin endpoints with admin test user
+    14. Document admin endpoints in docs/api/endpoints.md
+    15. Commit Phase 4 completion
+
+3. DATABASE SCHEMA AND DATA VERSIONING
+
+3.1. MongoDB Collections Schema
+
+3.1.1. User Collection
+    {
+        _id: ObjectId,
+        email: String (unique, indexed, required),
+        password: String (hashed, required),
+        role: String (enum: ['FREE_USER', 'PAID_USER', 'ADMIN'], default: 'FREE_USER', indexed),
+        firstName: String,
+        lastName: String,
+        phone: String,
+        createdAt: Date (indexed),
+        updatedAt: Date,
+        lastLogin: Date,
+        isActive: Boolean (default: true),
+        resetPasswordToken: String,
+        resetPasswordExpires: Date,
+        subscriptionExpires: Date (for PAID_USER)
+    }
+
+3.1.2. Property Collection
+    {
+        _id: ObjectId,
+        title: String (required, indexed for text search),
+        description: String,
+        city: String (enum: ['Yaoundé', 'Douala'], required, indexed),
+        neighborhood: String (indexed),
+        location: {
+            type: String (enum: ['Point'], default: 'Point'),
+            coordinates: [Number] (longitude, latitude, indexed geospatial)
+        },
+        propertyType: String (enum: ['apartment', 'house', 'land', 'commercial'], required, indexed),
+        price: Number (required, > 0),
+        currency: String (default: 'XAF'),
+        size: Number (m², required, > 0),
+        pricePerM2: Number (computed, indexed),
+        bedrooms: Number,
+        bathrooms: Number,
+        images: [String] (URLs),
+        dataSource: ObjectId (reference to DataSource, indexed),
+        dataSourceRecordId: String (original ID from source),
+        qualityScore: Number (0-100, validation score),
+        validationStatus: String (enum: ['pending', 'validated', 'rejected'], default: 'pending'),
+        createdAt: Date (indexed),
+        updatedAt: Date,
+        scrapedAt: Date (when data was collected),
+        version: Number (default: 1)
+    }
+
+3.1.3. Listing Collection (aggregated/processed data)
+    {
+        _id: ObjectId,
+        city: String (required, indexed),
+        neighborhood: String (indexed),
+        propertyType: String (required, indexed),
+        period: String (enum: ['daily', 'weekly', 'monthly'], default: 'monthly'),
+        periodStart: Date (indexed),
+        periodEnd: Date,
+        avgPrice: Number,
+        medianPrice: Number,
+        minPrice: Number,
+        maxPrice: Number,
+        avgPricePerM2: Number,
+        propertyCount: Number,
+        trendDirection: String (enum: ['up', 'down', 'stable']),
+        trendPercentage: Number,
+        createdAt: Date
+    }
+
+3.1.4. Booking Collection
+    {
+        _id: ObjectId,
+        user: ObjectId (reference to User, required, indexed),
+        consultationType: String (enum: ['market_analysis', 'investment_advice', 'property_valuation'], required),
+        preferredDate: Date (required),
+        preferredTime: String,
+        status: String (enum: ['pending', 'confirmed', 'completed', 'cancelled'], default: 'pending', indexed),
+        notes: String,
+        adminNotes: String,
+        createdAt: Date (indexed),
+        updatedAt: Date,
+        confirmedAt: Date,
+        completedAt: Date
+    }
+
+3.1.5. DataSource Collection
+    {
+        _id: ObjectId,
+        name: String (required, unique),
+        type: String (enum: ['scraper', 'ocr', 'manual'], required),
+        sourceUrl: String (for scrapers),
+        sourcePath: String (for OCR, file path),
+        isActive: Boolean (default: true),
+        lastRunAt: Date,
+        lastRunStatus: String (enum: ['success', 'failed', 'partial']),
+        recordsCollected: Number,
+        recordsValidated: Number,
+        recordsRejected: Number,
+        config: Object (source-specific configuration),
+        createdAt: Date,
+        updatedAt: Date
+    }
+
+3.1.6. MLModel Collection
+    {
+        _id: ObjectId,
+        name: String (required, e.g., 'price_prediction_v1'),
+        version: String (required, semantic versioning),
+        type: String (enum: ['price_prediction', 'trend_forecast'], required),
+        algorithm: String (e.g., 'random_forest', 'prophet', 'xgboost'),
+        status: String (enum: ['training', 'active', 'archived'], default: 'training', indexed),
+        metrics: {
+            mse: Number,
+            mae: Number,
+            r2: Number,
+            rmse: Number
+        },
+        featureImportance: Object (feature names and importance scores),
+        trainingDataRange: {
+            startDate: Date,
+            endDate: Date,
+            recordCount: Number
+        },
+        trainedAt: Date,
+        deployedAt: Date,
+        modelPath: String (file path to serialized model),
+        config: Object (hyperparameters, feature list)
+    }
+
+3.1.7. PricePrediction Collection (prediction cache/history)
+    {
+        _id: ObjectId,
+        model: ObjectId (reference to MLModel),
+        input: {
+            city: String,
+            propertyType: String,
+            size: Number,
+            neighborhood: String (optional)
+        },
+        prediction: Number (predicted price),
+        confidenceInterval: {
+            lower: Number,
+            upper: Number
+        },
+        createdAt: Date (indexed, TTL: 30 days)
+    }
+
+3.2. Indexes
+
+3.2.1. Property Collection Indexes
+    1. city, propertyType (compound index)
+    2. price (ascending)
+    3. pricePerM2 (ascending)
+    4. createdAt (descending)
+    5. location (2dsphere, geospatial)
+    6. title (text index for search)
+    7. city, neighborhood (compound index)
+    8. dataSource, validationStatus (compound index)
+
+3.2.2. Listing Collection Indexes
+    1. city, propertyType, periodStart (compound index)
+    2. city, neighborhood, periodStart (compound index)
+    3. periodStart (descending)
+
+3.2.3. User Collection Indexes
+    1. email (unique)
+    2. role (for RBAC queries)
+    3. createdAt (for user analytics)
+
+3.2.4. Booking Collection Indexes
+    1. user (for user's bookings)
+    2. status, preferredDate (for admin queries)
+    3. preferredDate (for availability checks)
+
+3.3. Data Versioning Strategy
+
+3.3.1. Property Versioning
+    1. New properties: version = 1
+    2. Updates from re-scraping: increment version, keep previous version in history collection
+    3. History collection: PropertyHistory (same schema + version field, no indexes on version)
+    4. Current properties: only latest version (version field in Property collection for tracking)
+    5. Historical analysis: query PropertyHistory for trend analysis
+
+3.3.2. ML Model Versioning
+    1. Semantic versioning: major.minor.patch (e.g., 1.2.3)
+    2. Major: breaking changes to API or significant algorithm change
+    3. Minor: new features, improved accuracy
+    4. Patch: bug fixes, parameter tuning
+    5. Only one active model per type (price_prediction, trend_forecast)
+    6. Archive previous models (status = 'archived'), keep for comparison
+
+3.3.3. Listing Aggregation Versioning
+    1. Listings are time-period snapshots (not versioned)
+    2. Recalculate monthly (previous month's data becomes historical)
+    3. Keep last 24 months of listing aggregates for trend analysis
+    4. Delete older aggregates (or archive to cold storage if needed)
+
+4. DATA ENGINEERING PIPELINE STEPS
+
+4.1. Scraping Pipeline
+    1. Scheduler triggers scraper (cron: daily at 02:00 UTC)
+    2. Scraper factory selects active scrapers from DataSource collection
+    3. For each scraper:
+       a. Load scraper configuration (base URL, selectors, rate limits)
+       b. Fetch listing pages (respect robots.txt, delays between requests)
+       c. Parse HTML with BeautifulSoup/Selenium
+       d. Extract property data (title, price, location, type, size, bedrooms, images)
+       e. Normalize data format (common schema)
+       f. Log extraction results (records found, errors)
+    4. Save raw scraped data to temporary JSON files
+    5. Return extracted records to ETL pipeline
+
+4.2. OCR Pipeline
+    1. Scheduler triggers OCR processor (cron: weekly, Sunday 03:00 UTC)
+    2. Load active OCR sources from DataSource collection
+    3. For each PDF source:
+       a. Load PDF file from configured path
+       b. Convert PDF pages to images (pdf2image)
+       c. Preprocess images (contrast, noise reduction, deskew)
+       d. Run Tesseract OCR on each page
+       e. Extract text from OCR output
+       f. Parse structured data using regex patterns (price, location, date, property details)
+       g. Normalize extracted data (currency, dates, locations)
+       h. Log extraction results (pages processed, data extracted, errors)
+    4. Save parsed OCR data to temporary JSON files
+    5. Return extracted records to ETL pipeline
+
+4.3. ETL Pipeline Orchestration
+    1. Pipeline orchestrator (pipeline.py) receives data from scrapers/OCR
+    2. Extract phase:
+       a. Load data from scrapers (JSON files)
+       b. Load data from OCR (JSON files)
+       c. Merge all extracted records
+       d. Tag each record with source type and ID
+    3. Transform phase:
+       a. Currency normalization (XAF to standard, handle currency symbols)
+       b. Location standardization (neighborhood name mapping, city validation)
+       c. Property type categorization (map variations to standard types)
+       d. Unit conversion (acres/feet to m², handle missing units)
+       e. Date parsing (multiple formats → ISO 8601)
+       f. Price per m² calculation (price / size)
+       g. Geocoding (location names → coordinates, API or static mapping)
+       h. Data enrichment (add metadata: source, extraction date)
+    4. Validation phase (see section 4.4)
+    5. Load phase:
+       a. Check for duplicates (compare dataSource + dataSourceRecordId)
+       b. If duplicate: compare versions, update if newer or higher quality
+       c. If new: insert into Property collection
+       d. Update DataSource collection (records collected, validated, rejected)
+       e. Log pipeline execution metrics
+    6. Post-load:
+       a. Trigger listing aggregation recalculation
+       b. Trigger ML model retraining flag (if significant new data)
+
+4.4. Validation Pipeline
+    1. Schema validation (schema_validator.py):
+       a. Check required fields present
+       b. Validate data types (price is number, size is number, dates are dates)
+       c. Validate ranges (price > 0, size > 0, coordinates within Cameroon bounds)
+       d. Validate enums (city in ['Yaoundé', 'Douala'], propertyType in allowed list)
+       e. Reject if schema validation fails
+    2. Quality scoring (data_quality.py):
+       a. Completeness: count non-null fields / total fields (weight: 30%)
+       b. Consistency: check logical consistency (weight: 40%)
+          - Price matches property type (apartments < 100M XAF in target cities)
+          - Size matches property type (apartments typically 30-200 m²)
+          - Location matches city (neighborhood belongs to city)
+          - Price per m² within reasonable range (1,000 - 500,000 XAF/m²)
+       c. Accuracy indicators (weight: 30%):
+          - OCR confidence score (if from OCR source)
+          - Scraper extraction quality (if from scraper, check field completeness)
+       d. Calculate quality score: (completeness * 0.3) + (consistency * 0.4) + (accuracy * 0.3)
+       e. Reject if quality score < 70%
+    3. Outlier detection (outlier_detection.py):
+       a. Statistical outliers: Z-score > 3 for price per m² (by city, property type)
+       b. Business logic outliers:
+          - Price per m² < 1,000 XAF (likely data error)
+          - Price per m² > 500,000 XAF (likely luxury/commercial, flag for review)
+          - Size > 1,000 m² for apartments (likely house mislabeled)
+          - Price > 1,000,000,000 XAF (likely data entry error)
+       c. Flag outliers (validationStatus = 'pending', qualityScore reduced by 10 points)
+       d. Do not auto-reject outliers (require manual review)
+    4. Validation result:
+       a. validationStatus: 'validated' (qualityScore >= 70%, no critical outliers)
+       b. validationStatus: 'pending' (qualityScore >= 70%, but outliers detected)
+       c. validationStatus: 'rejected' (qualityScore < 70%)
+    5. Generate validation report:
+       a. Total records processed
+       b. Validated count
+       c. Pending count (requires review)
+       d. Rejected count
+       e. Average quality score
+       f. Common rejection reasons
+       g. Top outlier properties (for review)
+
+5. MACHINE LEARNING WORKFLOW
+
+5.1. Feature Engineering
+
+5.1.1. Data Preparation
+    1. Load validated properties from MongoDB (validationStatus = 'validated')
+    2. Filter by date range (last 24 months minimum, all historical if available)
+    3. Filter by cities: Yaoundé, Douala only
+    4. Remove properties with missing critical features (price, size, propertyType, city)
+    5. Handle missing values:
+       a. bedrooms: impute with median by propertyType and city
+       b. bathrooms: impute with bedrooms * 0.75 (typical ratio)
+       c. neighborhood: use 'unknown' category
+       d. location coordinates: geocode neighborhood center if missing
+
+5.1.2. Feature Extraction
+    1. Numerical features:
+       a. size (m²)
+       b. bedrooms
+       c. bathrooms
+       d. pricePerM2 (target variable for price prediction)
+       e. age (years since scrapedAt if available, else 0)
+    2. Categorical features (one-hot encoded):
+       a. city (Yaoundé, Douala)
+       b. propertyType (apartment, house, land, commercial)
+       c. neighborhood (top 20 by frequency, rest as 'other')
+    3. Temporal features:
+       a. year (extracted from scrapedAt)
+       b. month (1-12, cyclical encoding: sin/cos)
+       c. quarter (1-4, cyclical encoding)
+    4. Derived features:
+       a. size_category (small: < 50m², medium: 50-150m², large: > 150m²)
+       b. bedrooms_per_m2 (bedrooms / size)
+       c. neighborhood_price_avg (average price per m² in neighborhood, grouped)
+       d. city_property_type_avg (average price per m² by city and property type)
+    5. Geospatial features (if coordinates available):
+       a. distance_to_city_center (km, approximate centers: Yaoundé 3.87°N 11.52°E, Douala 4.05°N 9.70°E)
+       b. latitude
+       c. longitude
+
+5.1.3. Feature Selection
+    1. Remove features with > 50% missing values
+    2. Remove low-variance features (variance < 0.01)
+    3. Remove highly correlated features (correlation > 0.95, keep one)
+    4. Use feature importance from Random Forest (initial model) to rank features
+    5. Select top 15-20 features for final model (balance accuracy vs complexity)
+
+5.2. Model Selection
+
+5.2.1. Price Prediction Model Candidates
+    1. Random Forest Regressor (baseline, handles non-linearity, feature importance)
+    2. XGBoost Regressor (gradient boosting, good for tabular data)
+    3. Linear Regression with regularization (Lasso/Ridge, interpretable baseline)
+    4. Decision Tree Regressor (simple baseline)
+    5. Evaluation criteria:
+       a. Primary: RMSE (root mean squared error), MAE (mean absolute error)
+       b. Secondary: R² (coefficient of determination)
+       c. Business metric: percentage of predictions within 20% of actual price
+
+5.2.2. Trend Forecasting Model Candidates
+    1. Prophet (Facebook, handles seasonality, holidays, trend changes)
+    2. ARIMA (AutoRegressive Integrated Moving Average, classical time series)
+    3. Exponential Smoothing (simple baseline)
+    4. Evaluation criteria:
+       a. Primary: RMSE, MAE on test set (last 3-6 months)
+       b. Secondary: MAPE (mean absolute percentage error)
+       c. Visual inspection of forecast vs actual (trend direction accuracy)
+
+5.2.3. Model Selection Process
+    1. Split data: 70% train, 15% validation, 15% test
+    2. Train all candidate models on training set
+    3. Evaluate on validation set
+    4. Select best model based on evaluation criteria
+    5. Final evaluation on held-out test set
+    6. Document model selection rationale (metrics, trade-offs)
+
+5.3. Training
+
+5.3.1. Price Prediction Model Training
+    1. Load preprocessed features (from feature engineering)
+    2. Split into train/validation/test (70/15/15)
+    3. Hyperparameter tuning (GridSearchCV or RandomizedSearchCV):
+       a. Random Forest: n_estimators (50-500), max_depth (5-20), min_samples_split (2-10)
+       b. XGBoost: n_estimators (50-500), max_depth (3-10), learning_rate (0.01-0.3)
+    4. Train best model with optimal hyperparameters on training set
+    5. Evaluate on validation set, adjust if needed
+    6. Final training on train + validation combined (after validation confirms good performance)
+    7. Save model artifact (joblib or pickle)
+    8. Calculate feature importance
+    9. Store model metadata in MLModel collection:
+       a. Algorithm name
+       b. Hyperparameters
+       c. Feature list
+       d. Training date range
+       e. Training record count
+       f. Metrics (MSE, MAE, RMSE, R²)
+
+5.3.2. Trend Forecasting Model Training
+    1. Aggregate data by time period (monthly averages by city and property type)
+    2. Prepare time series data (date, average_price_per_m2)
+    3. Split into train/test (last 3 months as test set)
+    4. Train Prophet model:
+       a. Configure seasonality (yearly, monthly)
+       b. Set changepoint_prior_scale (0.05-0.5, controls trend flexibility)
+       c. Add custom seasonalities if needed (quarterly, semi-annual)
+    5. Generate forecasts for test period
+    6. Evaluate forecast accuracy (RMSE, MAE, MAPE)
+    7. If satisfactory, train final model on all data
+    8. Save model artifact
+    9. Store model metadata in MLModel collection
+
+5.4. Evaluation
+
+5.4.1. Price Prediction Evaluation
+    1. Test set evaluation:
+       a. Generate predictions for all test set properties
+       b. Calculate RMSE, MAE, R²
+       c. Calculate percentage within 10%, 20%, 30% of actual price
+       d. Analyze errors by property type, city, price range
+    2. Business metrics:
+       a. Median absolute percentage error (MAPE)
+       b. Prediction accuracy by city (Yaoundé vs Douala)
+       c. Prediction accuracy by property type
+       d. Prediction accuracy by price range (low, medium, high)
+    3. Feature importance analysis:
+       a. Extract feature importance from trained model
+       b. Rank features by importance
+       c. Document which features contribute most to predictions
+    4. Error analysis:
+       a. Identify properties with highest prediction errors
+       b. Analyze common characteristics of poorly predicted properties
+       c. Document insights for future feature engineering
+
+5.4.2. Trend Forecasting Evaluation
+    1. Test set evaluation:
+       a. Generate forecasts for last 3-6 months
+       b. Calculate RMSE, MAE, MAPE
+       c. Check if forecasted trend direction matches actual (up/down/stable)
+       d. Calculate trend direction accuracy percentage
+    2. Visual evaluation:
+       a. Plot forecast vs actual time series
+       b. Plot confidence intervals
+       c. Identify periods with large forecast errors
+    3. Business metrics:
+       a. Forecast accuracy by city
+       b. Forecast accuracy by property type
+       c. Forecast accuracy by forecast horizon (1 month, 3 months, 6 months)
+
+5.5. Deployment
+
+5.5.1. Model Deployment Pipeline
+    1. Model validation threshold:
+       a. Price prediction: R² > 0.6, RMSE < 20% of mean price
+       b. Trend forecast: MAPE < 15%, trend direction accuracy > 70%
+       c. If thresholds not met: retrain with more data or different features
+    2. Model promotion:
+       a. Archive current active model (status = 'archived')
+       b. Set new model as active (status = 'active')
+       c. Update MLModel collection
+       d. Move model artifact to production path
+    3. API integration:
+       a. Load model artifact in prediction service
+       b. Implement prediction function (input → feature engineering → model.predict → output)
+       c. Add caching layer (cache predictions for identical inputs, 24h TTL)
+       d. Add monitoring (log prediction requests, response times, errors)
+
+5.5.2. Model Retraining Strategy
+    1. Trigger conditions:
+       a. Scheduled: monthly retraining with new data
+       b. On-demand: admin triggers via API
+       c. Automatic: if new validated properties > 1000 since last training
+    2. Retraining process:
+       a. Load all validated properties (updated dataset)
+       b. Re-run feature engineering
+       c. Retrain model with same hyperparameters (or re-tune if performance degraded)
+       d. Evaluate new model vs current active model
+       e. If new model performs better: deploy (A/B testing not required for MVP)
+       f. If performance similar or worse: keep current model, log for review
+
+6. BACKEND API DESIGN
+
+6.1. Authentication Endpoints
+
+6.1.1. POST /api/auth/register
+    Request body: { email, password, firstName, lastName, phone? }
+    Response: { user: { id, email, firstName, lastName, role }, token }
+    Status codes: 201 (created), 400 (validation error), 409 (email exists)
+    Public endpoint (no auth required)
+
+6.1.2. POST /api/auth/login
+    Request body: { email, password }
+    Response: { user: { id, email, firstName, lastName, role }, token, refreshToken }
+    Status codes: 200 (success), 401 (invalid credentials)
+    Public endpoint
+
+6.1.3. POST /api/auth/refresh
+    Request body: { refreshToken }
+    Response: { token, refreshToken }
+    Status codes: 200 (success), 401 (invalid token)
+    Public endpoint
+
+6.1.4. POST /api/auth/logout
+    Headers: Authorization: Bearer <token>
+    Response: { message: "Logged out" }
+    Status codes: 200 (success), 401 (unauthorized)
+    Requires authentication
+
+6.1.5. POST /api/auth/forgot-password
+    Request body: { email }
+    Response: { message: "Password reset email sent" }
+    Status codes: 200 (always returns success for security)
+    Public endpoint
+
+6.1.6. POST /api/auth/reset-password
+    Request body: { token, newPassword }
+    Response: { message: "Password reset successful" }
+    Status codes: 200 (success), 400 (invalid token)
+    Public endpoint
+
+6.2. Property Endpoints
+
+6.2.1. GET /api/properties
+    Query parameters: city?, propertyType?, minPrice?, maxPrice?, minSize?, maxSize?, neighborhood?, page?, limit?, sort?
+    Response: { properties: [...], pagination: { page, limit, total, pages } }
+    Status codes: 200 (success)
+    Public endpoint (no auth required)
+
+6.2.2. GET /api/properties/:id
+    Response: { property: {...} }
+    Status codes: 200 (success), 404 (not found)
+    Public endpoint
+
+6.2.3. GET /api/properties/search
+    Query parameters: q (search query), page?, limit?
+    Response: { properties: [...], pagination: {...} }
+    Status codes: 200 (success)
+    Public endpoint
+
+6.3. Listing Endpoints
+
+6.3.1. GET /api/listings
+    Query parameters: city?, propertyType?, neighborhood?, period? (daily/weekly/monthly), startDate?, endDate?
+    Response: { listings: [...] }
+    Status codes: 200 (success)
+    Public endpoint
+
+6.4. Analytics Endpoints
+
+6.4.1. GET /api/analytics/overview
+    Query parameters: city?, propertyType?, startDate?, endDate?
+    Response: { totalCount, avgPrice, medianPrice, minPrice, maxPrice, avgPricePerM2, byCity: {...}, byType: {...} }
+    Status codes: 200 (success)
+    Public endpoint (FREE_USER+)
+
+6.4.2. GET /api/analytics/trends
+    Query parameters: city?, propertyType?, period? (monthly/quarterly), startDate?, endDate?
+    Response: { trends: [{ date, avgPrice, medianPrice, count }] }
+    Status codes: 200 (success)
+    Public endpoint (FREE_USER+)
+
+6.4.3. GET /api/analytics/neighborhoods
+    Query parameters: city?, limit? (top N neighborhoods)
+    Response: { neighborhoods: [{ name, avgPrice, medianPrice, avgPricePerM2, count }] }
+    Status codes: 200 (success)
+    Public endpoint (FREE_USER+)
+
+6.5. Prediction Endpoints
+
+6.5.1. GET /api/predictions/price
+    Query parameters: city (required), propertyType (required), size (required), neighborhood?, bedrooms?, bathrooms?
+    Response: { predictedPrice, confidenceInterval: { lower, upper }, featureImportance: {...} }
+    Status codes: 200 (success), 400 (missing parameters), 503 (model not available)
+    Rate limit: 100 requests/hour per user
+    Requires authentication (FREE_USER+)
+
+6.5.2. GET /api/predictions/trend
+    Query parameters: city (required), propertyType (required), horizon (1/3/6/12 months)
+    Response: { forecast: [{ date, predictedPrice, lower, upper }], trendDirection, confidence }
+    Status codes: 200 (success), 400 (missing parameters), 503 (model not available)
+    Rate limit: 50 requests/hour per user
+    Requires authentication (PAID_USER+)
+
+6.6. Booking Endpoints
+
+6.6.1. POST /api/bookings
+    Request body: { consultationType, preferredDate, preferredTime, notes? }
+    Response: { booking: {...} }
+    Status codes: 201 (created), 400 (validation error), 403 (insufficient permissions)
+    Requires authentication (PAID_USER+)
+
+6.6.2. GET /api/bookings
+    Query parameters: status?, page?, limit?
+    Response: { bookings: [...], pagination: {...} }
+    Status codes: 200 (success)
+    Requires authentication (returns own bookings for regular users)
+
+6.6.3. GET /api/bookings/:id
+    Response: { booking: {...} }
+    Status codes: 200 (success), 403 (not own booking), 404 (not found)
+    Requires authentication
+
+6.6.4. PUT /api/bookings/:id
+    Request body: { preferredDate?, preferredTime?, notes? }
+    Response: { booking: {...} }
+    Status codes: 200 (success), 403 (not own booking), 404 (not found)
+    Requires authentication (own bookings only, or ADMIN)
+
+6.6.5. DELETE /api/bookings/:id
+    Response: { message: "Booking cancelled" }
+    Status codes: 200 (success), 403 (not own booking), 404 (not found)
+    Requires authentication (own bookings only)
+
+6.7. Admin Endpoints
+
+6.7.1. GET /api/admin/users
+    Query parameters: role?, page?, limit?, search?
+    Response: { users: [...], pagination: {...} }
+    Status codes: 200 (success), 403 (forbidden)
+    Requires authentication (ADMIN)
+
+6.7.2. PUT /api/admin/users/:id/role
+    Request body: { role }
+    Response: { user: {...} }
+    Status codes: 200 (success), 400 (invalid role), 403 (forbidden), 404 (not found)
+    Requires authentication (ADMIN)
+
+6.7.3. DELETE /api/admin/users/:id
+    Response: { message: "User deactivated" }
+    Status codes: 200 (success), 403 (forbidden), 404 (not found)
+    Requires authentication (ADMIN)
+
+6.7.4. GET /api/admin/data-sources
+    Response: { dataSources: [...] }
+    Status codes: 200 (success), 403 (forbidden)
+    Requires authentication (ADMIN)
+
+6.7.5. POST /api/admin/data-sources
+    Request body: { name, type, sourceUrl?, sourcePath?, config }
+    Response: { dataSource: {...} }
+    Status codes: 201 (created), 400 (validation error), 403 (forbidden)
+    Requires authentication (ADMIN)
+
+6.7.6. PUT /api/admin/data-sources/:id
+    Request body: { name?, type?, sourceUrl?, sourcePath?, config?, isActive? }
+    Response: { dataSource: {...} }
+    Status codes: 200 (success), 403 (forbidden), 404 (not found)
+    Requires authentication (ADMIN)
+
+6.7.7. POST /api/admin/data-sources/:id/trigger
+    Response: { message: "Pipeline triggered", jobId }
+    Status codes: 200 (success), 403 (forbidden), 404 (not found)
+    Requires authentication (ADMIN)
+
+6.7.8. GET /api/admin/models
+    Response: { models: [...] }
+    Status codes: 200 (success), 403 (forbidden)
+    Requires authentication (ADMIN)
+
+6.7.9. POST /api/admin/models/retrain
+    Request body: { modelType? (price_prediction/trend_forecast) }
+    Response: { message: "Training started", jobId }
+    Status codes: 200 (success), 503 (training in progress), 403 (forbidden)
+    Requires authentication (ADMIN)
+
+6.7.10. GET /api/admin/stats
+    Response: { users: { total, free, paid, admin }, properties: { total, validated, pending, rejected }, bookings: { total, pending, confirmed, completed }, dataQuality: { avgScore, validatedRate } }
+    Status codes: 200 (success), 403 (forbidden)
+    Requires authentication (ADMIN)
+
+6.8. API Response Format
+    1. Success response: { data: {...} } or { data: [...] }
+    2. Error response: { error: { code, message, details? } }
+    3. Pagination: { pagination: { page, limit, total, pages } }
+    4. Standard HTTP status codes: 200, 201, 400, 401, 403, 404, 500, 503
+
+2.5. Phase 5: Frontend Implementation (Days 16-22)
+
+2.5.1. Day 16: Frontend Foundation and Common Components
+    1. Set up Tailwind CSS configuration
+    2. Create base layout components (Header, Footer, Navigation)
+    3. Implement responsive navigation (mobile menu, desktop menu)
+    4. Create Loading component (spinner, skeleton loaders)
+    5. Create ErrorBoundary component (React error boundary)
+    6. Implement API service layer (axios instance with interceptors)
+    7. Create formatters utility (currency, dates, numbers)
+    8. Create validators utility (email, phone, required fields)
+    9. Set up route structure in App.jsx
+    10. Create basic Home page (hero section, features overview)
+    11. Test routing and navigation
+
+2.5.2. Day 17: Dashboard Implementation
+    1. Create Dashboard page layout
+    2. Implement StatsCards component:
+       - Total properties count
+       - Average price per m²
+       - Cities covered (Yaoundé, Douala)
+       - Data last updated timestamp
+    3. Create QuickFilters component:
+       - City selector (Yaoundé/Douala)
+       - Property type filter (apartment, house, land, commercial)
+       - Price range slider
+       - Size range input
+    4. Integrate filters with API calls (debounced search)
+    5. Add filter state management (URL query parameters)
+    6. Implement loading states for dashboard data
+    7. Test dashboard with mock data
+
+2.5.3. Day 18: Analytics Visualizations
+    1. Install and configure Chart.js and react-chartjs-2
+    2. Create PriceChart component:
+       - Line chart for price trends over time
+       - Configurable date range (1 month, 3 months, 6 months, 1 year)
+       - Multiple series (average, median, min, max)
+       - Interactive tooltips
+    3. Create TrendChart component:
+       - Area chart for trend forecasting
+       - Confidence intervals visualization
+       - Future predictions overlay
+    4. Create neighborhood comparison chart (bar chart)
+    5. Create property type distribution chart (pie/donut chart)
+    6. Implement chart filtering (by city, property type, date range)
+    7. Add export chart functionality (PNG/PDF - stub for MVP)
+    8. Test charts with sample data
+
+2.5.4. Day 19: Analytics and Insights Pages
+    1. Create Analytics page:
+       - Price trends section (PriceChart)
+       - Neighborhood rankings section
+       - Property type distribution section
+       - Filter panel (city, property type, date range)
+    2. Create Insights page (PAID_USER only):
+       - Market overview summary
+       - Investment opportunity highlights
+       - Price prediction tool (form + results)
+       - Trend forecast visualization
+       - Downloadable report (stub - returns JSON for MVP)
+    3. Implement insights API integration
+    4. Add role-based access control (hide insights for FREE_USER)
+    5. Test analytics and insights pages
+
+2.5.5. Day 20: Property Search and Listing
+    1. Create property search interface:
+       - Search input with autocomplete
+       - Advanced filters panel (expandable)
+       - Sort options (price, size, date, price/m²)
+       - View toggle (list view, grid view)
+    2. Create TableView component:
+       - Sortable columns
+       - Pagination controls
+       - Property row with key details
+      3. Create MapView component (stub - show markers if coordinates available):
+       - Property markers on map (Google Maps or Leaflet)
+       - Click marker to show property details
+       - Filter by map bounds
+    4. Implement property detail modal/page:
+       - Property images carousel
+       - Full property details
+       - Price per m² calculation
+       - Share functionality (copy link)
+    5. Integrate search with backend API
+    6. Test search and listing functionality
+
+2.5.6. Day 21: Booking System Frontend
+    1. Create Booking page (PAID_USER only)
+    2. Implement BookingForm component:
+       - Consultation type selector (market analysis, investment advice, property valuation)
+       - Date picker (preferred date)
+       - Time slot selector (preferred time)
+       - Notes textarea
+       - Form validation
+    3. Create BookingList component:
+       - User's bookings table/cards
+       - Status badges (pending, confirmed, completed, cancelled)
+       - Actions (view, edit, cancel)
+    4. Create BookingCalendar component (for admin view - backlog):
+       - Calendar view of bookings
+       - Availability visualization
+    5. Implement booking API integration
+    6. Add booking confirmation modal
+    7. Test booking flow (create, view, edit, cancel)
+
+2.5.7. Day 22: Admin Interface
+    1. Create Admin page (ADMIN only)
+    2. Implement UserManagement component:
+       - Users table with pagination
+       - Role filter and search
+       - Edit role action
+       - Deactivate user action
+    3. Implement DataSourceManagement component:
+       - Data sources list (scrapers, OCR sources)
+       - Add/edit data source form
+       - Trigger pipeline button
+       - Last run status and metrics
+    4. Implement ModelManagement component:
+       - Active models list (price prediction, trend forecast)
+       - Model metrics display (R², RMSE, MAE)
+       - Retrain model button
+       - Model version history
+    5. Create system stats dashboard:
+       - User statistics (total, by role)
+       - Property statistics (total, validated, pending, rejected)
+       - Booking statistics
+       - Data quality metrics
+    6. Implement admin API integrations
+    7. Test admin interface with admin user
+    8. Commit Phase 5 completion
+
+2.6. Phase 6: ML Model Development (Days 23-28)
+
+2.6.1. Day 23: Initial Data Collection and Preparation
+    1. Run scraping pipeline manually (collect initial dataset)
+    2. Process OCR sources if available (collect PDFs, run OCR)
+    3. Run ETL pipeline with collected data
+    4. Validate and load initial properties (target: minimum 500 validated properties)
+    5. If insufficient data: create synthetic data generator for development/testing
+    6. Export validated properties to CSV for ML pipeline
+    7. Document data collection process and initial dataset characteristics
+
+2.6.2. Day 24: Feature Engineering Implementation
+    1. Implement feature_engineering.py:
+       - Data loading from MongoDB or CSV
+       - Missing value imputation functions
+       - Feature extraction functions (numerical, categorical, temporal, derived, geospatial)
+       - Feature normalization/scaling
+    2. Test feature engineering on sample data
+    3. Generate feature engineering report (feature counts, missing value percentages, distributions)
+    4. Implement feature selection logic
+    5. Save processed features to CSV/pickle for model training
+    6. Document feature engineering decisions
+
+2.6.3. Day 25: Price Prediction Model Training
+    1. Implement model_trainer.py:
+       - Load preprocessed features
+       - Train/validation/test split (70/15/15)
+       - Hyperparameter tuning for Random Forest (GridSearchCV)
+       - Hyperparameter tuning for XGBoost (RandomizedSearchCV)
+       - Train Linear Regression baseline
+       - Train Decision Tree baseline
+    2. Evaluate all models on validation set
+    3. Select best model based on RMSE, MAE, R²
+    4. Final evaluation on test set
+    5. Calculate feature importance
+    6. Save best model artifact
+    7. Store model metadata in MongoDB (MLModel collection)
+    8. Document model selection rationale
+
+2.6.4. Day 26: Trend Forecasting Model Training
+    1. Aggregate property data by time period (monthly averages by city and property type)
+    2. Prepare time series data for Prophet
+    3. Train Prophet model:
+       - Configure seasonality (yearly, monthly)
+       - Tune changepoint_prior_scale
+       - Generate forecasts for test period (last 3 months)
+    4. Evaluate Prophet model (RMSE, MAE, MAPE, trend direction accuracy)
+    5. Train ARIMA baseline (if time permits)
+    6. Compare Prophet vs ARIMA
+    7. Select best trend forecasting model
+    8. Save model artifact
+    9. Store model metadata in MongoDB
+    10. Document trend forecasting model selection
+
+2.6.5. Day 27: Model Integration with Backend
+    1. Implement predictor.py:
+       - Load price prediction model artifact
+       - Load trend forecasting model artifact
+       - Prediction function (input → feature engineering → model.predict → output)
+       - Trend forecast function (input → model.forecast → output)
+    2. Create Python API endpoint (Flask/FastAPI) or integrate directly with Node.js:
+       - Option A: Python microservice with REST API (recommended for MVP)
+       - Option B: Use child_process in Node.js to call Python scripts
+    3. Update predictionController.js to call ML service
+    4. Implement prediction caching (store in PricePrediction collection)
+    5. Add error handling for model not ready scenarios
+    6. Test prediction endpoints with sample inputs
+    7. Test trend forecast endpoints with sample inputs
+    8. Document ML service integration
+
+2.6.6. Day 28: Model Evaluation and Documentation
+    1. Generate model evaluation reports:
+       - Price prediction: RMSE, MAE, R², error distribution, accuracy by property type/city
+       - Trend forecast: RMSE, MAE, MAPE, trend direction accuracy
+    2. Create visualization of model performance:
+       - Prediction vs actual scatter plots
+       - Residual plots
+       - Feature importance charts
+       - Forecast vs actual time series plots
+    3. Document model limitations and assumptions
+    4. Document retraining procedure
+    5. Create model versioning documentation
+    6. Update ML documentation in docs/ml/models.md and docs/ml/evaluation.md
+    7. Commit Phase 6 completion
+
+7. FRONTEND IMPLEMENTATION STEPS
+
+7.1. Component Development Order
+    1. Common components (Header, Footer, Loading, ErrorBoundary)
+    2. Authentication components (Login, Register, ForgotPassword)
+    3. Dashboard components (StatsCards, QuickFilters)
+    4. Analytics components (PriceChart, TrendChart, TableView, MapView)
+    5. Booking components (BookingForm, BookingList, BookingCalendar)
+    6. Admin components (UserManagement, DataSourceManagement, ModelManagement)
+    7. Page components (Home, Analytics, Insights, Booking, Profile, Admin)
+
+7.2. State Management
+    1. Use React Context API for global state (AuthContext)
+    2. Use React hooks (useState, useEffect, useCallback, useMemo) for local state
+    3. Implement custom hooks (useAuth, useProperties, useBookings) for API calls
+    4. No Redux (not needed for MVP scope)
+
+7.3. Styling Approach
+    1. Tailwind CSS utility classes for all styling
+    2. Responsive design: mobile-first approach
+    3. Breakpoints: sm (640px), md (768px), lg (1024px), xl (1280px)
+    4. Color scheme: define in tailwind.config.js (brand colors, semantic colors)
+    5. Typography: define font families and sizes in tailwind.config.js
+    6. No CSS-in-JS libraries (Tailwind only)
+
+7.4. Chart Implementation
+    1. Use Chart.js with react-chartjs-2 wrapper
+    2. Chart types: Line (trends), Bar (comparisons), Pie/Donut (distributions), Area (forecasts)
+    3. Responsive charts (resize with container)
+    4. Interactive features: tooltips, legends, zoom (if applicable)
+    5. Chart data fetching: use custom hooks that call analytics APIs
+    6. Loading states: skeleton loaders while chart data loads
+
+7.5. Form Handling
+    1. Use controlled components (React state)
+    2. Form validation: client-side validation with custom validators
+    3. Error display: inline error messages below form fields
+    4. Submit handling: prevent default, validate, call API, handle success/error
+    5. Form libraries: no external libraries (use native React for MVP)
+
+7.6. API Integration
+    1. Create axios instance in services/api.js:
+       - Base URL from environment variable
+       - Request interceptor: add auth token to headers
+       - Response interceptor: handle 401 (refresh token or redirect to login)
+       - Error handling: transform API errors to user-friendly messages
+    2. Create service functions for each API endpoint group:
+       - authService (login, register, logout, etc.)
+       - propertyService (getProperties, getProperty, searchProperties)
+       - analyticsService (getOverview, getTrends, getNeighborhoods)
+       - predictionService (getPricePrediction, getTrendForecast)
+       - bookingService (createBooking, getBookings, updateBooking, cancelBooking)
+       - adminService (getUsers, updateUserRole, getDataSources, etc.)
+    3. Use async/await for all API calls
+    4. Handle loading states (show spinners)
+    5. Handle error states (show error messages)
+
+7.7. Routing
+    1. React Router v6 (BrowserRouter)
+    2. Route structure:
+       - / (Home, public)
+       - /login (Login, public)
+       - /register (Register, public)
+       - /dashboard (Dashboard, authenticated)
+       - /analytics (Analytics, authenticated)
+       - /insights (Insights, PAID_USER+)
+       - /booking (Booking, PAID_USER+)
+       - /profile (Profile, authenticated)
+       - /admin (Admin, ADMIN only)
+    3. Protected routes: use route wrapper component that checks authentication
+    4. Role-based routes: check user role in route wrapper
+    5. 404 page: catch-all route for unknown paths
+
+8. SECURITY CONSIDERATIONS
+
+8.1. Authentication Security
+    1. Password requirements: minimum 8 characters, at least one letter and one number
+    2. Password hashing: bcrypt with salt rounds = 10
+    3. JWT tokens: 
+       - Access token: 15 minutes expiry
+       - Refresh token: 7 days expiry, stored in httpOnly cookie (if possible) or secure storage
+       - Token signing: use strong secret (environment variable, min 32 characters)
+    4. Password reset: 
+       - Generate secure random token (crypto.randomBytes)
+       - Token expiry: 1 hour
+       - Store hashed token in database
+       - Send reset link via email (stub email service for MVP)
+    5. Account lockout: after 5 failed login attempts, lock account for 30 minutes (implement in middleware)
+
+8.2. API Security
+    1. Input validation: validate all request parameters and body fields
+    2. SQL injection prevention: not applicable (MongoDB with parameterized queries)
+    3. NoSQL injection prevention: sanitize user inputs, use Mongoose schema validation
+    4. XSS prevention: sanitize user inputs, use helmet.js middleware
+    5. CSRF protection: use CSRF tokens for state-changing operations (POST, PUT, DELETE)
+    6. Rate limiting:
+       - Public endpoints: 100 requests/minute per IP
+       - Authenticated endpoints: 200 requests/minute per user
+       - Prediction endpoints: 100 requests/hour per user
+       - Admin endpoints: 500 requests/minute per admin
+    7. CORS: configure allowed origins (frontend domain only in production)
+    8. API versioning: /api/v1/ prefix for future compatibility
+
+8.3. Data Protection
+    1. Sensitive data encryption:
+       - Passwords: hashed (bcrypt)
+       - JWT tokens: signed, not encrypted (no sensitive data in payload)
+       - Database connection: use TLS/SSL for MongoDB connection
+    2. Environment variables: never commit .env files, use .env.example template
+    3. API keys: store in environment variables, never in code
+    4. User data: 
+       - Do not expose password hashes in API responses
+       - Limit user data returned to necessary fields only
+       - Implement data access controls (users can only access their own data)
+    5. Logging: do not log sensitive data (passwords, tokens, credit card numbers)
+
+8.4. Scraping Ethics and Legal
+    1. robots.txt compliance: check and respect robots.txt before scraping
+    2. Rate limiting: implement delays between requests (1-2 seconds minimum)
+    3. User-Agent: identify scraper in User-Agent header ("StratAxis-Bot/1.0")
+    4. Terms of Service: review and comply with target website terms
+    5. Data usage: only use scraped data for analytics, not republish full listings
+    6. Attribution: acknowledge data sources in documentation (if required)
+    7. Contact information: provide contact email in User-Agent for website owners
+    8. Government PDFs: public domain or fair use, but verify local regulations
+    9. Data retention: follow data retention policies (delete outdated data)
+
+8.5. Infrastructure Security
+    1. HTTPS: enable SSL/TLS certificates (Let's Encrypt free certificates)
+    2. Server hardening: 
+       - Disable unnecessary services
+       - Keep OS and software updated
+       - Use firewall (UFW or iptables)
+       - Allow only necessary ports (80, 443, 22 for SSH)
+    3. Database security:
+       - Use MongoDB authentication (username/password)
+       - Restrict database access to application server IP only
+       - Use MongoDB Atlas network whitelist (if using Atlas)
+    4. Environment separation: separate development, staging, production environments
+    5. Secrets management: use environment variables, consider secret management service for production
+
+8.6. RBAC Security
+    1. Role validation: check user role on every protected endpoint
+    2. Permission checks: implement fine-grained permissions within roles
+    3. Admin actions audit: log all admin actions (user role changes, data source changes, model deployments)
+    4. Principle of least privilege: users get minimum required permissions
+    5. Role escalation prevention: prevent users from modifying their own roles
+
+9. DEPLOYMENT STEPS
+
+9.1. Pre-Deployment Preparation
+    1. Choose hosting provider (VPS: DigitalOcean, Linode, AWS EC2, or equivalent)
+    2. Select server specifications: minimum 2GB RAM, 1 CPU, 20GB SSD (scalable)
+    3. Choose domain name and configure DNS
+    4. Set up MongoDB: MongoDB Atlas (cloud) or self-hosted on VPS
+    5. Prepare environment variables for production (.env files)
+    6. Set up GitHub repository (private or public, as required)
+
+9.2. Server Setup
+    1. Initialize VPS: Ubuntu 20.04 LTS or 22.04 LTS
+    2. Create non-root user with sudo privileges
+    3. Update system packages: apt update && apt upgrade
+    4. Install Node.js (v18 LTS): use NodeSource repository
+    5. Install Python 3.9+: apt install python3 python3-pip
+    6. Install MongoDB (if self-hosting): use MongoDB official repository
+    7. Install Nginx: apt install nginx
+    8. Install PM2 (Node.js process manager): npm install -g pm2
+    9. Configure firewall: ufw allow 22 (SSH), 80 (HTTP), 443 (HTTPS), ufw enable
+    10. Set up SSH key authentication (disable password authentication)
+
+9.3. SSL Certificate Setup
+    1. Install Certbot: apt install certbot python3-certbot-nginx
+    2. Configure Nginx for initial HTTP setup
+    3. Obtain SSL certificate: certbot --nginx -d yourdomain.com -d www.yourdomain.com
+    4. Configure automatic renewal: certbot renew --dry-run (test)
+    5. Set up cron job for certificate renewal: 0 0 * * * certbot renew --quiet
+
+9.4. MongoDB Setup
+    9.4.1. MongoDB Atlas (Cloud - Recommended)
+        1. Create MongoDB Atlas account
+        2. Create cluster (free tier: M0, or paid for production)
+        3. Configure network access (whitelist VPS IP)
+        4. Create database user (admin user, strong password)
+        5. Get connection string
+        6. Update backend .env with connection string
+
+    9.4.2. Self-Hosted MongoDB
+        1. Install MongoDB on VPS
+        2. Configure MongoDB authentication (create admin user)
+        3. Configure MongoDB bind address (127.0.0.1 or specific IP)
+        4. Enable MongoDB service: systemctl enable mongod, systemctl start mongod
+        5. Create application database and user
+        6. Update backend .env with connection string
+
+9.5. Backend Deployment
+    1. Clone repository on VPS: git clone <repo-url>
+    2. Navigate to backend directory: cd backend
+    3. Install dependencies: npm install --production
+    4. Create .env file with production environment variables:
+       - NODE_ENV=production
+       - PORT=3000
+       - MONGODB_URI=<connection-string>
+       - JWT_SECRET=<strong-secret>
+       - JWT_EXPIRES_IN=15m
+       - JWT_REFRESH_EXPIRES_IN=7d
+       - FRONTEND_URL=<frontend-url>
+    5. Build application (if TypeScript): npm run build
+    6. Start application with PM2: pm2 start server.js --name strataxis-backend
+    7. Configure PM2 to start on boot: pm2 startup, pm2 save
+    8. Set up PM2 monitoring: pm2 monit
+    9. Test backend health endpoint: curl http://localhost:3000/api/health
+
+9.6. Data Pipeline Deployment
+    1. Navigate to data-pipeline directory: cd data-pipeline
+    2. Create Python virtual environment: python3 -m venv venv
+    3. Activate virtual environment: source venv/bin/activate
+    4. Install dependencies: pip install -r requirements.txt
+    5. Create config.yaml with production settings (MongoDB URI, paths)
+    6. Set up cron jobs for scheduled execution:
+       - Scraping: 0 2 * * * (daily at 02:00 UTC)
+       - OCR: 0 3 * * 0 (weekly, Sunday at 03:00 UTC)
+    7. Test pipeline manually: python src/main.py
+    8. If using Python ML service: deploy similar to backend (separate PM2 process or systemd service)
+
+9.7. Frontend Deployment
+    1. Build React application: npm run build (creates build/ directory)
+    2. Copy build/ directory to server: scp -r build/ user@server:/var/www/strataxis-frontend
+    3. On server, configure Nginx to serve static files:
+       - Location: /var/www/strataxis-frontend
+       - Nginx configuration: proxy API requests to backend, serve static files for frontend routes
+    4. Configure Nginx reverse proxy for API:
+       - /api/* → proxy to http://localhost:3000
+       - / → serve React build/index.html (SPA routing)
+    5. Test frontend: access https://yourdomain.com
+
+9.8. Nginx Configuration
+    1. Create Nginx config file: /etc/nginx/sites-available/strataxis
+    2. Configuration structure:
+       - Server block for HTTP (redirect to HTTPS)
+       - Server block for HTTPS (SSL certificates, proxy to backend, serve frontend)
+    3. Enable site: ln -s /etc/nginx/sites-available/strataxis /etc/nginx/sites-enabled/
+    4. Test Nginx configuration: nginx -t
+    5. Reload Nginx: systemctl reload nginx
+
+9.9. Post-Deployment Verification
+    1. Test all API endpoints (health check, auth, properties, analytics)
+    2. Test frontend pages (Home, Login, Register, Dashboard, Analytics)
+    3. Test authentication flow (register, login, protected routes)
+    4. Test RBAC (different user roles accessing different endpoints)
+    5. Test data pipeline (trigger manual run, verify data in MongoDB)
+    6. Test ML predictions (trigger prediction endpoint, verify response)
+    7. Verify SSL certificate (HTTPS works, certificate valid)
+    8. Check server logs (PM2 logs, Nginx logs, MongoDB logs)
+    9. Monitor server resources (CPU, memory, disk usage)
+
+10. MONITORING, LOGGING, AND MAINTENANCE
+
+10.1. Application Logging
+    1. Backend logging (Winston or similar):
+       - Log levels: error, warn, info, debug
+       - Log format: JSON (structured logging)
+       - Log destinations: console (development), file (production)
+       - Log rotation: daily log files, keep last 30 days
+       - Log location: /var/log/strataxis/backend.log
+    2. Frontend logging:
+       - Console logging (development only)
+       - Error logging: send errors to backend logging endpoint
+       - Error boundary: log React errors to backend
+    3. Data pipeline logging:
+       - Python logging module
+       - Log levels: DEBUG, INFO, WARNING, ERROR, CRITICAL
+       - Log format: timestamp, level, message, context
+       - Log file: /var/log/strataxis/pipeline.log
+       - Log pipeline execution metrics (records processed, errors, duration)
+
+10.2. Monitoring
+    1. Server monitoring:
+       - CPU usage monitoring (top, htop)
+       - Memory usage monitoring
+       - Disk usage monitoring (df -h)
+       - Network monitoring (iftop)
+    2. Application monitoring:
+       - PM2 monitoring: pm2 monit (CPU, memory per process)
+       - Response time monitoring (log API response times)
+       - Error rate monitoring (count errors per hour/day)
+       - Uptime monitoring (external service: UptimeRobot free tier)
+    3. Database monitoring:
+       - MongoDB connection pool monitoring
+       - Query performance monitoring (slow queries)
+       - Database size monitoring
+    4. ML model monitoring:
+       - Prediction request count
+       - Prediction latency
+       - Model accuracy degradation (compare predictions vs actuals over time)
+
+10.3. Alerting
+    1. Set up email alerts for:
+       - Server downtime (UptimeRobot)
+       - High CPU usage (> 80% for 5 minutes)
+       - High memory usage (> 90%)
+       - Disk space low (< 20% free)
+       - Application errors (error rate spike)
+       - Database connection failures
+       - Data pipeline failures
+    2. Alert thresholds (configurable):
+       - Critical: immediate email notification
+       - Warning: email notification, daily digest
+
+10.4. Backup Strategy
+    1. Database backups:
+       - Frequency: daily (automated)
+       - Retention: last 7 daily backups, last 4 weekly backups
+       - Backup location: separate server or cloud storage (AWS S3, Backblaze)
+       - Backup verification: test restore monthly
+    2. Application code backups:
+       - Git repository (primary backup)
+       - Tag releases before deployment
+    3. Configuration backups:
+       - Backup .env files (encrypted, stored securely)
+       - Backup Nginx configuration
+       - Backup SSL certificates
+
+10.5. Maintenance Tasks
+    1. Daily:
+       - Check application logs for errors
+       - Check data pipeline execution status
+       - Monitor server resources
+    2. Weekly:
+       - Review error logs and fix issues
+       - Check disk space
+       - Review user feedback and support requests
+    3. Monthly:
+       - Update system packages (security patches)
+       - Update application dependencies (npm audit, pip check)
+       - Review and optimize database indexes
+       - Retrain ML models (if new data available)
+       - Review and update documentation
+    4. Quarterly:
+       - Security audit (review access logs, check for suspicious activity)
+       - Performance optimization (review slow queries, optimize APIs)
+       - Capacity planning (review usage trends, plan scaling)
+
+2.7. Phase 7: Integration and Testing (Days 29-35)
+
+2.7.1. Day 29: End-to-End Integration Testing
+    1. Test complete user flows:
+       - Register → Login → Browse properties → View analytics
+       - Register → Upgrade to paid → Book consultation → View booking
+       - Admin: Login → Manage users → Trigger pipeline → View stats
+    2. Test API integrations (frontend → backend → database)
+    3. Test data pipeline end-to-end (scrape → OCR → ETL → validate → load)
+    4. Test ML predictions (frontend → backend → ML service → response)
+    5. Fix integration issues found during testing
+    6. Document integration issues and resolutions
+
+2.7.2. Day 30: Performance Optimization
+    1. Backend optimization:
+       - Optimize database queries (add missing indexes, fix slow queries)
+       - Implement response caching (Redis or in-memory for MVP)
+       - Optimize API response times (target: < 200ms for read endpoints)
+       - Enable compression (gzip middleware)
+    2. Frontend optimization:
+       - Code splitting (React lazy loading)
+       - Image optimization (compress images, use WebP format)
+       - Bundle size optimization (remove unused dependencies)
+       - Enable caching for static assets
+    3. Database optimization:
+       - Review and optimize indexes
+       - Add compound indexes for common queries
+       - Review aggregation queries performance
+    4. Load testing: test with 100 concurrent users (use Apache Bench or similar)
+    5. Fix performance bottlenecks
+
+2.7.3. Day 31: Security Audit and Hardening
+    1. Security audit checklist:
+       - Review authentication implementation (password hashing, JWT security)
+       - Review API security (input validation, rate limiting, CORS)
+       - Review data protection (environment variables, sensitive data handling)
+       - Review RBAC implementation (role checks, permission checks)
+       - Review scraping ethics compliance
+    2. Fix security vulnerabilities found
+    3. Implement security best practices (helmet.js, sanitization)
+    4. Test security (attempt SQL injection, XSS, CSRF attacks)
+    5. Update security documentation
+
+2.7.4. Day 32: Error Handling and Edge Cases
+    1. Backend error handling:
+       - Implement comprehensive error handling middleware
+       - Create user-friendly error messages
+       - Log errors with context (user, request, stack trace)
+       - Handle edge cases (invalid inputs, missing data, database errors)
+    2. Frontend error handling:
+       - Implement error boundaries for all pages
+       - Display user-friendly error messages
+       - Handle API errors gracefully (network errors, 500 errors, 404 errors)
+       - Implement retry logic for failed API calls
+    3. Data pipeline error handling:
+       - Handle scraper failures gracefully (continue with other scrapers)
+       - Handle OCR failures gracefully (skip corrupted PDFs)
+       - Handle validation failures (log and continue)
+       - Implement retry logic for transient failures
+    4. Test error scenarios (network failures, invalid inputs, missing data)
+
+2.7.5. Day 33: User Experience Refinement
+    1. UI/UX improvements:
+       - Review and improve form layouts (spacing, alignment)
+       - Review and improve chart readability (colors, labels, legends)
+       - Review and improve mobile responsiveness
+       - Review and improve loading states (skeletons, spinners)
+       - Review and improve error messages (clarity, helpfulness)
+    2. Accessibility improvements (basic):
+       - Add alt text to images
+       - Ensure keyboard navigation works
+       - Check color contrast (basic WCAG compliance)
+    3. User feedback collection: set up basic feedback mechanism (email or form)
+    4. Fix UX issues identified
+
+2.7.6. Day 34: Documentation Completion
+    1. API documentation:
+       - Complete API endpoint documentation (request/response formats, examples)
+       - Create API documentation file (OpenAPI/Swagger or markdown)
+       - Document error codes and messages
+    2. Setup documentation:
+       - Complete deployment documentation (step-by-step guide)
+       - Document environment variables (description, example values)
+       - Document database setup (connection, indexes, seed data)
+    3. Developer documentation:
+       - Document code structure (architecture overview)
+       - Document development setup (local environment, dependencies)
+       - Document testing procedures
+    4. User documentation (for defense):
+       - Create user guide (how to use the platform)
+       - Create admin guide (how to manage system)
+    5. Project documentation:
+       - Update README.md with project overview, setup, deployment
+       - Create architecture diagram (system components, data flow)
+       - Document technology choices and rationale
+
+2.7.7. Day 35: Pre-Deployment Testing
+    1. Full system testing:
+       - Test all user roles (FREE_USER, PAID_USER, ADMIN)
+       - Test all major features (authentication, properties, analytics, predictions, bookings, admin)
+       - Test data pipeline (manual trigger, verify data in database)
+       - Test ML predictions (verify predictions are reasonable)
+    2. Cross-browser testing (Chrome, Firefox, Safari, Edge)
+    3. Mobile responsiveness testing (iOS, Android browsers)
+    4. Performance testing (response times, load handling)
+    5. Security testing (authentication, authorization, input validation)
+    6. Fix critical bugs found during testing
+    7. Commit Phase 7 completion
+
+2.8. Phase 8: Deployment and Launch (Days 36-42)
+
+2.8.1. Day 36: Production Environment Setup
+    1. Provision VPS server (if not done earlier)
+    2. Set up server infrastructure (Node.js, Python, MongoDB, Nginx)
+    3. Configure domain and DNS
+    4. Set up SSL certificates (Let's Encrypt)
+    5. Configure environment variables for production
+    6. Test server connectivity and basic services
+    7. Document production environment configuration
+
+2.8.2. Day 37: Production Deployment
+    1. Deploy backend:
+       - Clone repository on server
+       - Install dependencies
+       - Configure environment variables
+       - Start with PM2
+       - Test health endpoint
+    2. Deploy frontend:
+       - Build React application
+       - Configure Nginx to serve static files
+       - Configure Nginx reverse proxy for API
+       - Test frontend access
+    3. Deploy data pipeline:
+       - Set up Python environment
+       - Install dependencies
+       - Configure config.yaml
+       - Test pipeline manually
+       - Set up cron jobs
+    4. Deploy ML models:
+       - Upload model artifacts to server
+       - Configure ML service
+       - Test prediction endpoints
+    5. Verify all services are running
+
+2.8.3. Day 38: Production Testing and Monitoring Setup
+    1. Production testing:
+       - Test all features in production environment
+       - Test with production database
+       - Verify SSL certificates
+       - Test monitoring and logging
+    2. Set up monitoring:
+       - Configure PM2 monitoring
+       - Set up uptime monitoring (UptimeRobot)
+       - Configure log aggregation
+       - Set up alerting (email alerts for errors)
+    3. Set up backups:
+       - Configure database backups (automated daily)
+       - Test backup restoration
+       - Configure backup retention
+    4. Fix production issues found during testing
+
+2.8.4. Day 39: Initial Data Population
+    1. Run data collection:
+       - Trigger scraping pipeline manually (collect initial dataset)
+       - Process OCR sources if available
+       - Run ETL pipeline
+       - Validate and load properties (target: minimum 1000 validated properties for demo)
+    2. If insufficient real data: supplement with synthetic data (document this for defense)
+    3. Generate initial analytics aggregations
+    4. Train initial ML models on collected data
+    5. Verify data quality and model performance
+    6. Populate seed users (admin, test free user, test paid user)
+
+2.8.5. Day 40: User Onboarding Preparation
+    1. Create user onboarding materials:
+       - Welcome email template (stub, actual email service later)
+       - User guide (how to browse, how to upgrade, how to book)
+       - FAQ document (common questions)
+    2. Set up early user recruitment:
+       - Create landing page with registration form
+       - Share with local real estate groups (Facebook, WhatsApp groups)
+       - Contact potential early users (real estate agents, investors)
+       - Prepare demo account for potential users to try
+    3. Set up Google Ads account (if planning to use ads):
+       - Create account
+       - Set up initial campaigns (stub, can launch after MVP)
+    4. Prepare launch announcement (for social media, local communities)
+
+2.8.6. Day 41: Final Testing and Bug Fixes
+    1. Final system testing in production:
+       - Test all user flows end-to-end
+       - Test with real users (friends, family, early adopters)
+       - Collect feedback from test users
+       - Fix critical bugs reported by test users
+    2. Performance verification:
+       - Verify response times are acceptable (< 500ms for most endpoints)
+       - Verify system can handle expected initial load (50-100 concurrent users)
+       - Fix performance issues if any
+    3. Security verification:
+       - Final security check (no exposed secrets, proper authentication)
+       - Verify SSL is working correctly
+       - Verify backups are working
+    4. Documentation finalization:
+       - Final review of all documentation
+       - Ensure all documentation is complete and accurate
+       - Create presentation slides for defense (if required)
+
+2.8.7. Day 42: Launch and Monitoring
+    1. Soft launch:
+       - Announce to early users (social media, local communities)
+       - Monitor system for issues
+       - Collect initial user feedback
+    2. Monitor system:
+       - Watch server resources (CPU, memory, disk)
+       - Monitor application logs for errors
+       - Monitor user registrations and activity
+       - Monitor data pipeline execution
+    3. Address launch issues:
+       - Fix any bugs found during launch
+       - Respond to user feedback quickly
+       - Make hotfixes if necessary
+    4. Prepare defense materials:
+       - Finalize project documentation
+       - Prepare demonstration (record demo video or prepare live demo)
+       - Prepare presentation (if required)
+       - Prepare project report (if required)
+    5. Commit final version to repository
+    6. Tag release: git tag v1.0.0
+
+11. USER ONBOARDING AND EARLY TRACTION STEPS
+
+11.1. User Onboarding Flow
+    1. Registration:
+       - Simple registration form (email, password, name)
+       - Email verification (stub for MVP, can implement later)
+       - Welcome message after registration
+    2. First login:
+       - Show dashboard with sample data
+       - Quick tour (tooltip overlays for key features)
+       - Guide to upgrade to paid tier (show benefits)
+    3. First analytics view:
+       - Pre-select filters (show Yaoundé apartments as default)
+       - Highlight key metrics (average price, trends)
+       - Guide to explore different cities and property types
+
+11.2. Early User Acquisition
+    1. Target audience:
+       - Real estate agents in Yaoundé and Douala
+       - Property investors (local and diaspora)
+       - Property developers
+       - Government agencies (urban planning, housing)
+    2. Acquisition channels:
+       - Facebook groups (Cameroon real estate groups)
+       - WhatsApp groups (real estate groups)
+       - Local real estate forums and websites
+       - Direct outreach to potential users (email, phone)
+       - University networks (BSc project promotion)
+    3. Value proposition:
+       - Free access to real estate data and analytics
+       - Affordable consultation booking for paid users
+       - Data-driven insights for investment decisions
+    4. Incentives for early users:
+       - First 100 users: free upgrade to paid tier for 1 month
+       - Referral program: refer a friend, both get 1 month free paid tier
+       - Early feedback rewards: active feedback providers get extended free trial
+
+11.3. User Engagement Strategies
+    1. Email notifications (stub for MVP, implement after launch):
+       - Weekly digest: market trends, new insights
+       - Price alerts: notify when property prices change significantly
+       - New features announcements
+    2. In-app notifications:
+       - New data available (properties, analytics updates)
+       - Booking confirmations and reminders
+       - System announcements
+    3. Content marketing (post-MVP):
+       - Blog posts about real estate market trends
+       - Case studies of successful investments
+       - Market reports (monthly/quarterly)
+
+11.4. Feedback Collection
+    1. In-app feedback form:
+       - Quick feedback button (satisfaction rating)
+       - Detailed feedback form (features, issues, suggestions)
+       - Bug report form
+    2. Direct outreach:
+       - Email survey to early users (after 1 week of use)
+       - Phone interviews with select users (if possible)
+    3. Analytics:
+       - Track user behavior (which features are used most)
+       - Track user retention (daily active users, weekly active users)
+       - Track conversion (free to paid tier)
+
+12. DOCUMENTATION ARTIFACTS TO PRODUCE
+
+12.1. Technical Documentation
+    1. API Documentation (docs/api/endpoints.md):
+       - All API endpoints with request/response formats
+       - Authentication requirements
+       - Error codes and messages
+       - Examples (curl commands, JSON examples)
+    2. Database Schema Documentation (docs/api/schemas.md):
+       - All MongoDB collections and their schemas
+       - Indexes and their purposes
+       - Data relationships
+    3. Architecture Documentation (docs/architecture.md):
+       - System architecture diagram
+       - Component descriptions (backend, frontend, data pipeline, ML service)
+       - Data flow diagrams
+       - Technology stack rationale
+    4. Deployment Documentation (docs/deployment/setup.md):
+       - Server setup instructions
+       - Application deployment steps
+       - Environment configuration
+       - SSL certificate setup
+       - Monitoring and backup setup
+    5. Development Documentation (docs/development.md):
+       - Local development setup
+       - Code structure and conventions
+       - Testing procedures
+       - Contribution guidelines (if applicable)
+
+12.2. ML Documentation
+    1. Model Documentation (docs/ml/models.md):
+       - Model descriptions (price prediction, trend forecast)
+       - Algorithms used and rationale
+       - Feature engineering process
+       - Hyperparameters and tuning process
+       - Model performance metrics
+    2. Evaluation Documentation (docs/ml/evaluation.md):
+       - Evaluation methodology
+       - Test results (RMSE, MAE, R², MAPE)
+       - Error analysis
+       - Model limitations and assumptions
+    3. Data Documentation (docs/data/sources.md):
+       - Data sources (scraping sites, OCR sources)
+       - Data collection frequency
+       - Data schema and format
+       - Data quality metrics
+    4. Pipeline Documentation (docs/data/pipeline.md):
+       - ETL pipeline flow
+       - Validation rules and thresholds
+       - Data quality scoring methodology
+       - Pipeline execution schedule
+
+12.3. User Documentation
+    1. User Guide (docs/user-guide.md):
+       - How to register and login
+       - How to browse properties and analytics
+       - How to use insights (paid users)
+       - How to book consultations (paid users)
+       - How to upgrade account
+    2. Admin Guide (docs/admin-guide.md):
+       - How to manage users
+       - How to manage data sources
+       - How to trigger data pipeline
+       - How to manage ML models
+       - How to view system statistics
+
+12.4. Project Documentation
+    1. README.md:
+       - Project overview and goals
+       - Technology stack
+       - Features list
+       - Installation and setup instructions
+       - Deployment instructions
+       - License information
+    2. Project Report (for defense):
+       - Executive summary
+       - Problem statement and motivation
+       - System requirements and design
+       - Implementation details
+       - Testing and evaluation
+       - Results and achievements
+       - Challenges and lessons learned
+       - Future work
+    3. Presentation Slides (if required):
+       - Problem statement
+       - Solution overview
+       - Architecture and design
+       - Key features demonstration
+       - Results and metrics
+       - Future enhancements
+
+13. WHAT NOT TO BUILD (EXPLICIT EXCLUSIONS)
+
+13.1. Payment Processing
+    1. No payment gateway integration (Stripe, PayPal, etc.)
+    2. No subscription management system
+    3. No invoice generation
+    4. Paid tier upgrade: manual process (admin upgrades users)
+    5. Booking payment: not required for MVP (consultation booking is free for MVP users)
+
+13.2. Advanced Features
+    1. No mobile apps (iOS, Android) - web-only for MVP
+    2. No real-time notifications (push notifications, WebSocket)
+    3. No live chat support
+    4. No user reviews or ratings system
+    5. No property favorites or wishlist
+    6. No property comparison tool
+    7. No export to Excel/PDF (basic download of JSON data only)
+    8. No property alerts (email notifications for price changes)
+
+13.3. Data Sources
+    1. No manual data entry interface (only scraping and OCR)
+    2. No partner data integration (future work)
+    3. No social media data collection
+    4. No macroeconomic data integration (future work)
+    5. No business data integration (future work)
+
+13.4. Advanced ML Features
+    1. No A/B testing framework for models
+    2. No model explainability dashboard (basic feature importance only)
+    3. No automated hyperparameter tuning (manual tuning only)
+    4. No ensemble models (single best model only)
+    5. No deep learning models (traditional ML only)
+
+13.5. Advanced Analytics
+    1. No predictive analytics beyond price prediction and trend forecasting
+    2. No investment ROI calculators
+    3. No property valuation reports (basic predictions only)
+    4. No market segmentation analysis
+    5. No competitor analysis
+
+13.6. Infrastructure
+    1. No Kubernetes or container orchestration (simple VPS deployment)
+    2. No CI/CD pipeline (manual deployment for MVP)
+    3. No load balancer (single server for MVP)
+    4. No CDN (serve static files directly from server)
+    5. No Redis cluster (in-memory caching or simple Redis for MVP)
+
+13.7. Multi-language Support
+    1. No French translation (English only for MVP)
+    2. No localization (Cameroon-specific but English interface)
+
+13.8. Advanced Security
+    1. No 2FA (two-factor authentication)
+    2. No OAuth social login (email/password only)
+    3. No IP whitelisting for admin access (password authentication only)
+    4. No audit logging dashboard (basic logging only)
+
+14. FINAL READINESS CHECKLIST FOR DEFENSE AND REAL USERS
+
+14.1. Functional Requirements
+    1. Authentication and authorization working (register, login, logout, password reset)
+    2. RBAC implemented and tested (FREE_USER, PAID_USER, ADMIN roles)
+    3. Property browsing working (search, filter, sort, pagination)
+    4. Analytics working (overview, trends, neighborhoods)
+    5. Price predictions working (input form, predictions returned)
+    6. Trend forecasts working (forecasts displayed in charts)
+    7. Booking system working (create, view, edit, cancel bookings)
+    8. Admin interface working (user management, data source management, model management, stats)
+    9. Data pipeline working (scraping, OCR, ETL, validation, loading)
+    10. ML models trained and deployed (price prediction, trend forecast)
+
+14.2. Data Requirements
+    1. Minimum 500 validated properties in database (1000+ preferred for demo)
+    2. Data covers both cities (Yaoundé and Douala)
+    3. Data covers multiple property types (apartment, house, land, commercial)
+    4. Data quality score average > 70%
+    5. Historical data available for trend analysis (minimum 3 months)
+    6. ML models trained on validated data
+    7. Sample users created (admin, free user, paid user)
+
+14.3. Performance Requirements
+    1. API response times < 500ms for most endpoints
+    2. Frontend page load times < 3 seconds
+    3. System can handle 50-100 concurrent users
+    4. Database queries optimized (indexes in place, no slow queries)
+    5. Images optimized (compressed, appropriate sizes)
+
+14.4. Security Requirements
+    1. HTTPS enabled and working (SSL certificate valid)
+    2. Passwords hashed (bcrypt)
+    3. JWT tokens implemented securely
+    4. Input validation on all endpoints
+    5. Rate limiting implemented
+    6. CORS configured correctly
+    7. Environment variables secured (no secrets in code)
+    8. SQL injection prevention (parameterized queries)
+    9. XSS prevention (input sanitization)
+
+14.5. Deployment Requirements
+    1. Application deployed and accessible via domain
+    2. All services running (backend, frontend, database, data pipeline)
+    3. SSL certificate installed and valid
+    4. Monitoring set up (PM2, uptime monitoring)
+    5. Logging configured (application logs, error logs)
+    6. Backups configured (database backups automated)
+    7. Environment variables configured for production
+    8. DNS configured correctly
+
+14.6. Documentation Requirements
+    1. README.md complete and accurate
+    2. API documentation complete
+    3. Database schema documented
+    4. Deployment documentation complete
+    5. ML model documentation complete (models, evaluation, performance)
+    6. User guide created (if required for defense)
+    7. Architecture diagram created
+    8. Project report completed (if required for defense)
+
+14.7. Testing Requirements
+    1. All major user flows tested end-to-end
+    2. All user roles tested (FREE_USER, PAID_USER, ADMIN)
+    3. Error handling tested (network errors, invalid inputs, missing data)
+    4. Security tested (authentication, authorization, input validation)
+    5. Performance tested (response times, load handling)
+    6. Cross-browser tested (Chrome, Firefox, Safari, Edge)
+    7. Mobile responsiveness tested (iOS, Android browsers)
+    8. Data pipeline tested (end-to-end execution)
+    9. ML predictions tested (reasonable predictions, error handling)
+
+14.8. User Experience Requirements
+    1. User interface is functional and usable
+    2. Navigation is intuitive
+    3. Forms are validated and provide helpful error messages
+    4. Loading states are displayed (spinners, skeletons)
+    5. Error messages are user-friendly
+    6. Mobile responsive design works (key features accessible on mobile)
+    7. Charts are readable and informative
+    8. Data is displayed in clear, understandable format
+
+14.9. Legal and Ethical Requirements
+    1. Scraping respects robots.txt
+    2. Scraping implements rate limiting and delays
+    3. User-Agent identifies scraper appropriately
+    4. Terms of service reviewed and complied with (for scraping targets)
+    5. Privacy policy created (basic, covers data collection and usage)
+    6. Data usage is ethical (not republishing full listings, using for analytics only)
+
+14.10. Launch Readiness
+    1. System is stable (no critical bugs)
+    2. Monitoring is active and alerts configured
+    3. Backup system is tested and working
+    4. Initial data is populated
+    5. Sample users are created for demonstration
+    6. User onboarding materials are prepared
+    7. Early user recruitment strategy is in place
+    8. Demo account credentials are ready for presentation
+    9. Demo video or live demo is prepared (if required for defense)
+    10. Project presentation is prepared (if required for defense)
+
+14.11. Post-Launch Support
+    1. Contact email for user support is set up
+    2. Feedback collection mechanism is in place
+    3. Issue tracking system is ready (GitHub issues or similar)
+    4. Plan for addressing user feedback and bugs is documented
+    5. Plan for data pipeline maintenance is documented
+    6. Plan for ML model retraining is documented
+
+15. OPERATIONAL CONFIGURATION DETAILS
+
+15.1. Environment Variables Specification
+
+15.1.1. Backend Environment Variables (.env)
+    NODE_ENV=production (or development)
+    PORT=3000
+    MONGODB_URI=mongodb://user:password@host:port/database or mongodb+srv://...
+    JWT_SECRET=<32+ character random string>
+    JWT_EXPIRES_IN=15m
+    JWT_REFRESH_SECRET=<32+ character random string, different from JWT_SECRET>
+    JWT_REFRESH_EXPIRES_IN=7d
+    FRONTEND_URL=https://yourdomain.com (or http://localhost:3001 for development)
+    CORS_ORIGIN=https://yourdomain.com (or http://localhost:3001 for development)
+    RATE_LIMIT_WINDOW_MS=60000
+    RATE_LIMIT_MAX_REQUESTS=100
+    LOG_LEVEL=info (or debug, warn, error)
+    LOG_FILE_PATH=/var/log/strataxis/backend.log
+    EMAIL_SERVICE_URL=<stub for MVP>
+    EMAIL_SERVICE_API_KEY=<stub for MVP>
+    ML_SERVICE_URL=http://localhost:5000 (if using separate ML service)
+    ML_SERVICE_TIMEOUT=30000
+    REDIS_URL=<optional, for caching>
+    BACKUP_SCHEDULE_CRON=0 2 * * * (daily at 02:00 UTC)
+
+15.1.2. Frontend Environment Variables (.env)
+    REACT_APP_API_URL=http://localhost:3000/api (or https://yourdomain.com/api)
+    REACT_APP_ENV=production (or development)
+    REACT_APP_VERSION=1.0.0
+
+15.1.3. Data Pipeline Environment Variables (config.yaml or .env)
+    MONGODB_URI=mongodb://user:password@host:port/database
+    LOG_LEVEL=INFO
+    LOG_FILE_PATH=/var/log/strataxis/pipeline.log
+    SCRAPER_DELAY_SECONDS=2
+    SCRAPER_RETRY_ATTEMPTS=3
+    SCRAPER_TIMEOUT_SECONDS=30
+    OCR_PREPROCESSING=True
+    OCR_LANGUAGE=fra+eng (French and English for Cameroon)
+    VALIDATION_QUALITY_THRESHOLD=70
+    VALIDATION_OUTLIER_Z_SCORE=3
+    DATA_PIPELINE_WORKING_DIR=/tmp/strataxis-pipeline
+    MODEL_STORAGE_PATH=/var/strataxis/models
+
+15.2. Cron Job Configurations
+
+15.2.1. Data Pipeline Cron Jobs
+    1. Scraping pipeline (daily at 02:00 UTC):
+       0 2 * * * cd /path/to/data-pipeline && /usr/bin/python3 src/main.py scraper >> /var/log/strataxis/cron-scraper.log 2>&1
+    2. OCR pipeline (weekly, Sunday at 03:00 UTC):
+       0 3 * * 0 cd /path/to/data-pipeline && /usr/bin/python3 src/main.py ocr >> /var/log/strataxis/cron-ocr.log 2>&1
+    3. ETL pipeline (daily at 04:00 UTC, after scraping):
+       0 4 * * * cd /path/to/data-pipeline && /usr/bin/python3 src/main.py etl >> /var/log/strataxis/cron-etl.log 2>&1
+    4. Listing aggregation (daily at 05:00 UTC, after ETL):
+       0 5 * * * cd /path/to/data-pipeline && /usr/bin/python3 src/main.py aggregate >> /var/log/strataxis/cron-aggregate.log 2>&1
+    5. Database backup (daily at 01:00 UTC):
+       0 1 * * * /path/to/infrastructure/scripts/backup.sh >> /var/log/strataxis/backup.log 2>&1
+    6. Model retraining check (monthly, 1st day at 06:00 UTC):
+       0 6 1 * * cd /path/to/data-pipeline && /usr/bin/python3 src/ml/model_trainer.py --check-retrain >> /var/log/strataxis/cron-retrain.log 2>&1
+
+15.2.2. System Maintenance Cron Jobs
+    1. Log rotation (weekly, Sunday at 00:00 UTC):
+       0 0 * * 0 /usr/sbin/logrotate /etc/logrotate.d/strataxis
+    2. SSL certificate renewal check (daily):
+       0 0 * * * /usr/bin/certbot renew --quiet
+    3. System updates (weekly, Sunday at 01:00 UTC):
+       0 1 * * 0 apt update && apt upgrade -y >> /var/log/strataxis/system-updates.log 2>&1
+
+15.3. Error Code Standardization
+
+15.3.1. API Error Codes
+    1000: VALIDATION_ERROR (request validation failed)
+    1001: MISSING_REQUIRED_FIELD
+    1002: INVALID_FIELD_FORMAT
+    1003: INVALID_FIELD_VALUE
+    2000: AUTHENTICATION_ERROR
+    2001: INVALID_CREDENTIALS
+    2002: TOKEN_EXPIRED
+    2003: TOKEN_INVALID
+    2004: ACCOUNT_LOCKED
+    2005: ACCOUNT_INACTIVE
+    3000: AUTHORIZATION_ERROR
+    3001: INSUFFICIENT_PERMISSIONS
+    3002: ROLE_REQUIRED
+    4000: NOT_FOUND
+    4001: USER_NOT_FOUND
+    4002: PROPERTY_NOT_FOUND
+    4003: BOOKING_NOT_FOUND
+    5000: SERVER_ERROR
+    5001: DATABASE_ERROR
+    5002: EXTERNAL_SERVICE_ERROR
+    5003: ML_SERVICE_ERROR
+    5004: DATA_PIPELINE_ERROR
+    6000: RATE_LIMIT_EXCEEDED
+    6001: TOO_MANY_REQUESTS
+
+15.3.2. HTTP Status Code Mapping
+    200: Success
+    201: Created
+    400: Bad Request (validation errors, error codes 1000-1003)
+    401: Unauthorized (authentication errors, error codes 2000-2005)
+    403: Forbidden (authorization errors, error codes 3000-3002)
+    404: Not Found (resource not found, error codes 4000-4003)
+    409: Conflict (duplicate resource, e.g., email exists)
+    429: Too Many Requests (rate limit exceeded, error codes 6000-6001)
+    500: Internal Server Error (server errors, error codes 5000-5004)
+    503: Service Unavailable (ML service unavailable, pipeline unavailable)
+
+15.4. PM2 Ecosystem Configuration (ecosystem.config.js)
+    module.exports = {
+        apps: [{
+            name: 'strataxis-backend',
+            script: 'server.js',
+            cwd: '/var/www/strataxis/backend',
+            instances: 1,
+            exec_mode: 'fork',
+            env: {
+                NODE_ENV: 'production',
+                PORT: 3000
+            },
+            error_file: '/var/log/strataxis/backend-error.log',
+            out_file: '/var/log/strataxis/backend-out.log',
+            log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+            merge_logs: true,
+            autorestart: true,
+            max_restarts: 10,
+            min_uptime: '10s',
+            watch: false
+        }, {
+            name: 'strataxis-ml-service',
+            script: 'app.py',
+            interpreter: '/var/www/strataxis/data-pipeline/venv/bin/python3',
+            cwd: '/var/www/strataxis/data-pipeline',
+            instances: 1,
+            exec_mode: 'fork',
+            env: {
+                FLASK_ENV: 'production',
+                PORT: 5000
+            },
+            error_file: '/var/log/strataxis/ml-service-error.log',
+            out_file: '/var/log/strataxis/ml-service-out.log',
+            log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+            merge_logs: true,
+            autorestart: true,
+            max_restarts: 10,
+            min_uptime: '10s',
+            watch: false
+        }]
+    }
+
+15.5. Nginx Configuration Skeleton (/etc/nginx/sites-available/strataxis)
+    # HTTP server - redirect to HTTPS
+    server {
+        listen 80;
+        listen [::]:80;
+        server_name yourdomain.com www.yourdomain.com;
+        return 301 https://$server_name$request_uri;
+    }
+    
+    # HTTPS server
+    server {
+        listen 443 ssl http2;
+        listen [::]:443 ssl http2;
+        server_name yourdomain.com www.yourdomain.com;
+        
+        # SSL certificates (Let's Encrypt)
+        ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_ciphers HIGH:!aNULL:!MD5;
+        ssl_prefer_server_ciphers on;
+        
+        # Security headers
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+        
+        # Frontend static files
+        root /var/www/strataxis-frontend;
+        index index.html;
+        
+        # API proxy to backend
+        location /api {
+            proxy_pass http://localhost:3000;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_cache_bypass $http_upgrade;
+            proxy_read_timeout 300s;
+            proxy_connect_timeout 75s;
+        }
+        
+        # ML service proxy (if separate service)
+        location /ml-api {
+            proxy_pass http://localhost:5000;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_read_timeout 300s;
+        }
+        
+        # Frontend SPA routing
+        location / {
+            try_files $uri $uri/ /index.html;
+            expires 1h;
+            add_header Cache-Control "public, immutable";
+        }
+        
+        # Static assets caching
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+        }
+        
+        # Gzip compression
+        gzip on;
+        gzip_vary on;
+        gzip_min_length 1024;
+        gzip_types text/plain text/css text/xml text/javascript application/json application/javascript application/xml+rss;
+        
+        # File upload size limit
+        client_max_body_size 10M;
+    }
+
+15.6. Log Rotation Configuration (/etc/logrotate.d/strataxis)
+    /var/log/strataxis/*.log {
+        daily
+        rotate 30
+        compress
+        delaycompress
+        missingok
+        notifempty
+        create 0640 www-data www-data
+        sharedscripts
+        postrotate
+            pm2 reloadLogs
+        endscript
+    }
+
+15.7. Backup Script Configuration (infrastructure/scripts/backup.sh)
+    1. Database backup script structure:
+       - Connect to MongoDB
+       - Create backup dump (mongodump)
+       - Compress backup file
+       - Upload to cloud storage (AWS S3, Backblaze, or local backup server)
+       - Remove backups older than retention policy (7 daily, 4 weekly)
+       - Log backup status
+    2. Configuration variables:
+       - BACKUP_DIR=/var/backups/strataxis
+       - RETENTION_DAYS=7
+       - RETENTION_WEEKS=4
+       - CLOUD_STORAGE_BUCKET=<optional>
+       - MONGODB_URI=<connection string>

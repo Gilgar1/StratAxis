@@ -16,6 +16,12 @@ ENV/
 .idea/
 *.log
 
+# JavaScript
+node_modules/
+coverage/
+build/
+.npm/
+
 # Distribution
 dist/
 build/

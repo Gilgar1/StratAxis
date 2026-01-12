@@ -6,18 +6,20 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
+        brand: {
+          black: '#0B0D10',
+          charcoal: '#161A1F',
+          darkGrey: '#1F2933',
+          mediumGrey: '#6B7280',
+          lightGrey: '#D1D5DB',
+          gold: '#D4AF37',
         },
+      },
+      fontFamily: {
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+      },
+      borderWidth: {
+        '1': '1px',
       },
     },
   },

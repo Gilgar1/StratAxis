@@ -4,6 +4,29 @@
 
 @layer base {
   body {
-    @apply antialiased text-gray-900 bg-gray-50;
+    @apply antialiased text-white bg-brand-black font-sans;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  .container-custom {
+    @apply max-w-7xl mx-auto px-6 md:px-12;
+  }
+
+  .btn-outline-gold {
+    @apply border-1 border-brand-gold text-brand-gold px-6 py-2 transition-all duration-300 hover:bg-brand-gold hover:text-brand-black;
+  }
+
+  .nav-link {
+    @apply text-brand-lightGrey hover:text-white transition-colors duration-200 text-sm font-medium;
   }
 }

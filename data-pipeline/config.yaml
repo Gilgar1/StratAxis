@@ -1,0 +1,32 @@
+database:
+  url: "postgresql://postgres:postgres@localhost:5432/strataxis"
+  echo: false
+
+scraping:
+  sites:
+    - name: "site1"
+      base_url: "https://example-site1.cm"
+      delay: 2
+    - name: "site2"
+      base_url: "https://example-site2.cm"
+      delay: 2
+  user_agent: "StratAxis-Bot/1.0"
+
+ocr:
+  tesseract_path: "/usr/bin/tesseract"
+  temp_dir: "./temp/ocr"
+  sources_path: "./data/sources/pdf"
+
+validation:
+  min_quality_score: 70
+  outlier_z_score_threshold: 3.0
+
+ml:
+  model_dir: "./models"
+  test_size: 0.15
+  validation_size: 0.15
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "pipeline.log"

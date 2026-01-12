@@ -13,52 +13,51 @@ STRATAXIS — EXECUTION BLUEPRINT
     backend/
         src/
             config/
-                database.js
-                env.js
-                constants.js
+                database.py
+                env.py
+                constants.py
             models/
-                User.js
-                Property.js
-                Listing.js
-                Booking.js
-                DataSource.js
-                MLModel.js
-                PricePrediction.js
-            routes/
-                auth.js
-                users.js
-                properties.js
-                listings.js
-                bookings.js
-                analytics.js
-                predictions.js
-                admin.js
-            middleware/
-                auth.js
-                rbac.js
-                validation.js
-                errorHandler.js
-                rateLimiter.js
-            controllers/
-                authController.js
-                userController.js
-                propertyController.js
-                listingController.js
-                bookingController.js
-                analyticsController.js
-                predictionController.js
-                adminController.js
+                user.py
+                property.py
+                listing.py
+                booking.py
+                data_source.py
+                ml_model.py
+                price_prediction.py
+            routers/
+                auth.py
+                users.py
+                properties.py
+                listings.py
+                bookings.py
+                analytics.py
+                predictions.py
+                admin.py
+            dependencies/
+                auth.py
+                rbac.py
+                validation.py
+                rate_limiter.py
             services/
-                emailService.js
-                paymentService.js (stub for MVP)
+                email_service.py
+                payment_service.py (stub for MVP)
             utils/
-                logger.js
-                helpers.js
+                logger.py
+                helpers.py
+                exceptions.py
+            schemas/
+                user.py
+                property.py
+                listing.py
+                booking.py
+                analytics.py
+                prediction.py
+            main.py
         tests/
             unit/
             integration/
-        server.js
-        package.json
+        requirements.txt
+        alembic.ini (for database migrations if needed)
         
 1.3. Frontend Service
     frontend/
@@ -195,66 +194,66 @@ STRATAXIS — EXECUTION BLUEPRINT
 2.1.1. Day 1: Project Initialization
     1. Initialize Git repository
     2. Create directory structure (all folders from section 1)
-    3. Initialize Node.js project (backend)
+    3. Initialize Python FastAPI project (backend)
     4. Initialize React project (frontend)
     5. Initialize Python project (data-pipeline)
-    6. Configure .gitignore for all three projects
+    6. Configure .gitignore for all projects
     7. Set up GitHub repository with initial commit
     8. Create README.md with project overview
-    9. Install core dependencies (backend: express, mongoose, dotenv, cors, helmet, bcrypt, jsonwebtoken)
+    9. Install core dependencies (backend: fastapi, uvicorn[standard], sqlmodel, asyncpg, alembic, geoalchemy2, python-jose[cryptography], passlib[bcrypt], python-multipart, pydantic, pydantic-settings, slowapi)
     10. Install core dependencies (frontend: react, react-router-dom, axios, tailwindcss, chart.js, react-chartjs-2)
-    11. Install core dependencies (data-pipeline: pandas, numpy, scikit-learn, beautifulsoup4, selenium, pytesseract, pdf2image, pymongo)
-    12. Configure ESLint and Prettier (backend, frontend)
-    13. Configure Black and flake8 (data-pipeline)
+    11. Install core dependencies (data-pipeline: pandas, numpy, scikit-learn, beautifulsoup4, selenium, pytesseract, pdf2image, psycopg2-binary, sqlalchemy)
+    12. Configure ESLint and Prettier (frontend only)
+    13. Configure Black, flake8, and mypy (backend and data-pipeline)
     14. Set up environment variable templates (.env.example files)
 
-2.1.2. Day 2: Database Design and Connection
-    1. Design MongoDB collections schema (User, Property, Listing, Booking, DataSource, MLModel, PricePrediction)
-    2. Create Mongoose schemas for all models
-    3. Implement database connection module (backend/src/config/database.js)
-    4. Create index scripts for database collections
-    5. Set up local MongoDB instance or MongoDB Atlas account
-    6. Test database connection from backend
+2.1.2. Day 2: Database Design and Migrations
+    1. Design PostgreSQL relational schema (Users, Properties, Listings, Bookings, DataSources, MLModels, PricePredictions)
+    2. Create SQLModel classes for all tables with proper relationships and foreign keys
+    3. Implement database connection module (backend/src/config/database.py) using asyncpg
+    4. Initialize Alembic for database migrations
+    5. Set up local PostgreSQL instance with PostGIS extension
+    6. Test database connection from backend using SQLModel/SQLAlchemy async session
     7. Create seed script for test users (admin, free user, paid user)
     8. Document schema decisions in docs/api/schemas.md
 
 2.1.3. Day 3: Backend Foundation
-    1. Set up Express.js server with basic middleware (cors, helmet, body-parser, morgan)
-    2. Implement environment configuration module
-    3. Create error handling middleware
-    4. Implement logger utility (Winston or similar)
-    5. Create API route structure (empty route files)
+    1. Set up FastAPI application with CORS middleware, security headers, and request logging
+    2. Implement environment configuration module using Pydantic Settings
+    3. Create global exception handlers and error response schemas
+    4. Implement structured logging utility (using Python logging or structlog)
+    5. Create API router structure (empty router files)
     6. Set up basic health check endpoint (GET /api/health)
-    7. Implement request validation middleware structure
-    8. Configure rate limiting middleware
-    9. Test server startup and basic endpoint
+    7. Implement Pydantic request validation schemas
+    8. Configure rate limiting using slowapi dependency
+    9. Test server startup with Uvicorn and basic endpoint
     10. Commit Phase 1 completion
 
 2.2. Phase 2: Authentication and Authorization (Days 4-6)
 
 2.2.1. Day 4: Authentication Implementation
-    1. Implement password hashing utility (bcrypt)
-    2. Create JWT token generation and verification utilities
-    3. Implement User model with password hashing pre-save hook
-    4. Create registration endpoint (POST /api/auth/register)
-    5. Create login endpoint (POST /api/auth/login)
-    6. Create token refresh endpoint (POST /api/auth/refresh)
-    7. Create logout endpoint (POST /api/auth/logout)
-    8. Implement authentication middleware (verify JWT)
-    9. Create password reset request endpoint (POST /api/auth/forgot-password)
-    10. Create password reset confirmation endpoint (POST /api/auth/reset-password)
+    1. Implement password hashing utility using passlib with bcrypt
+    2. Create JWT token generation and verification utilities using python-jose
+    3. Implement User SQLModel with password hashing in service layer
+    4. Create registration endpoint (POST /api/auth/register) with Pydantic request schema
+    5. Create login endpoint (POST /api/auth/login) with Pydantic request schema
+    6. Create token refresh endpoint (POST /api/auth/refresh) with Pydantic request schema
+    7. Create logout endpoint (POST /api/auth/logout) with dependency injection
+    8. Implement authentication dependency (verify JWT) using FastAPI Depends
+    9. Create password reset request endpoint (POST /api/auth/forgot-password) with Pydantic schema
+    10. Create password reset confirmation endpoint (POST /api/auth/reset-password) with Pydantic schema
     11. Test authentication flow with Postman/curl
     12. Document authentication endpoints in docs/api/endpoints.md
 
 2.2.2. Day 5: RBAC Implementation
-    1. Define roles: FREE_USER, PAID_USER, ADMIN
-    2. Implement role assignment in User model
-    3. Create RBAC middleware (checkRole, checkPermission)
+    1. Define roles: FREE_USER, PAID_USER, ADMIN as Enum in constants
+    2. Implement role assignment in User SQLModel
+    3. Create RBAC dependencies (check_role, check_permission) using FastAPI Depends
     4. Define permission matrix:
        - FREE_USER: read properties, read listings, view analytics (public)
        - PAID_USER: all FREE_USER permissions + create booking, view insights, download reports
        - ADMIN: all permissions + user management, data source management, model management
-    5. Implement role-based route protection
+    5. Implement role-based router protection using dependency injection
     6. Create test users with different roles
     7. Test RBAC with Postman (unauthorized access attempts)
     8. Document RBAC structure in docs/api/endpoints.md
@@ -308,7 +307,7 @@ STRATAXIS — EXECUTION BLUEPRINT
        - Unit conversion (acres to m² where needed)
        - Date parsing and standardization
     3. Create data cleaning functions (remove duplicates, handle missing values)
-    4. Implement loader.py for MongoDB insertion (batch operations)
+    4. Implement loader.py for PostgreSQL insertion (batch operations using SQLAlchemy CORE)
     5. Create pipeline.py orchestrator (extract → transform → validate → load)
     6. Add pipeline state tracking (start time, records processed, errors)
     7. Test end-to-end ETL flow with sample data
@@ -339,275 +338,258 @@ STRATAXIS — EXECUTION BLUEPRINT
 2.4. Phase 4: Database and Backend APIs (Days 11-15)
 
 2.4.1. Day 11: Property and Listing APIs
-    1. Implement Property controller (CRUD operations)
-    2. Create GET /api/properties endpoint (list with pagination, filtering, sorting)
+    1. Implement Property router with CRUD operations using FastAPI router
+    2. Create GET /api/properties endpoint (list with pagination, filtering, sorting) with Pydantic query parameters
     3. Filter parameters: city (Yaoundé/Douala), property type, price range, size range
     4. Sort parameters: price, size, date_added, price_per_m2
-    5. Create GET /api/properties/:id endpoint (single property details)
-    6. Implement Listing controller (aggregated data from properties)
+    5. Create GET /api/properties/{id} endpoint (single property details) with path parameter
+    6. Implement Listing router (aggregated data from properties)
     7. Create GET /api/listings endpoint (public, no auth required for MVP)
-    8. Add geospatial queries for location-based filtering (MongoDB geospatial indexes)
-    9. Implement search endpoint (text search on title, location, description)
+    8. Add geospatial queries for location-based filtering (PostGIS geography types)
+    9. Implement search endpoint (full-text search using GIN indexes and to_tsvector)
     10. Add response caching for public endpoints (Redis or in-memory for MVP)
     11. Test endpoints with Postman
     12. Document property endpoints in docs/api/endpoints.md
 
 2.4.2. Day 12: Analytics API Implementation
-    1. Create analyticsController.js with aggregation queries
-    2. Implement GET /api/analytics/overview endpoint:
+    1. Create analytics router with complex SQL aggregation queries
+    2. Implement GET /api/analytics/overview endpoint with Pydantic response models:
        - Total properties count (by city, type)
        - Average price per m² (by city, type, neighborhood)
        - Price distribution statistics (min, max, median, quartiles)
        - Trend data (price changes over time periods)
-    3. Implement GET /api/analytics/trends endpoint:
+    3. Implement GET /api/analytics/trends endpoint with Pydantic query parameters:
        - Monthly/quarterly price trends
        - Volume trends (number of listings over time)
        - Comparison between Yaoundé and Douala
-    4. Implement GET /api/analytics/neighborhoods endpoint:
+    4. Implement GET /api/analytics/neighborhoods endpoint with Pydantic response schema:
        - Average prices per neighborhood
        - Property availability by neighborhood
        - Price per m² rankings
-    5. Add date range filtering to all analytics endpoints
+    5. Add date range filtering to all analytics endpoints using Pydantic query schemas
     6. Optimize aggregation queries with proper indexes
     7. Implement data sampling for large datasets (if > 10k records)
     8. Test analytics endpoints with sample data
     9. Document analytics endpoints in docs/api/endpoints.md
 
 2.4.3. Day 13: Prediction API Implementation
-    1. Create predictionController.js (stub initially, will connect to ML model)
-    2. Implement GET /api/predictions/price endpoint:
-       - Input: city, property type, size, location (optional)
-       - Output: predicted price, confidence interval, feature importance
-    3. Implement GET /api/predictions/trend endpoint:
-       - Input: city, property type, time horizon (1, 3, 6, 12 months)
-       - Output: forecasted prices, trend direction, confidence bands
-    4. Add rate limiting for prediction endpoints (more restrictive than read endpoints)
+    1. Create predictions router (stub initially, will connect to ML model)
+    2. Implement GET /api/predictions/price endpoint with Pydantic request/response schemas:
+       - Input: city, property type, size, location (optional) as query parameters
+       - Output: predicted price, confidence interval, feature importance as Pydantic model
+    3. Implement GET /api/predictions/trend endpoint with Pydantic schemas:
+       - Input: city, property type, time horizon (1, 3, 6, 12 months) as query parameters
+       - Output: forecasted prices, trend direction, confidence bands as Pydantic model
+    4. Add rate limiting for prediction endpoints using slowapi dependency (more restrictive than read endpoints)
     5. Implement caching for common prediction queries (same inputs within 24h)
-    6. Add input validation for prediction requests
-    7. Create error handling for model not ready scenarios
+    6. Add input validation for prediction requests using Pydantic validators
+    7. Create error handling for model not ready scenarios using FastAPI exception handlers
     8. Test prediction endpoints with mock responses
     9. Document prediction endpoints in docs/api/endpoints.md
 
 2.4.4. Day 14: Booking API Implementation
-    1. Implement Booking model with schema:
-       - User reference (paid users only)
+    1. Implement Booking SQLModel with Pydantic schema:
+       - User relationship (One-to-Many)
        - Consultation type (market analysis, investment advice, property valuation)
        - Preferred date/time
        - Status (pending, confirmed, completed, cancelled)
        - Notes/requirements from user
-    2. Create bookingController.js
-    3. Implement POST /api/bookings endpoint (create booking, PAID_USER only)
-    4. Implement GET /api/bookings endpoint (user's bookings, authenticated)
-    5. Implement GET /api/bookings/:id endpoint (single booking details)
-    6. Implement PUT /api/bookings/:id endpoint (update booking, own bookings only)
-    7. Implement DELETE /api/bookings/:id endpoint (cancel booking, own bookings only)
-    8. Create GET /api/bookings/admin endpoint (all bookings, ADMIN only)
-    9. Implement PUT /api/bookings/:id/status endpoint (update status, ADMIN only)
+    2. Create bookings router
+    3. Implement POST /api/bookings endpoint (create booking, PAID_USER only) with Pydantic request schema and RBAC dependency
+    4. Implement GET /api/bookings endpoint (user's bookings, authenticated) with Pydantic response model
+    5. Implement GET /api/bookings/{id} endpoint (single booking details) with path parameter
+    6. Implement PUT /api/bookings/{id} endpoint (update booking, own bookings only) with Pydantic request schema
+    7. Implement DELETE /api/bookings/{id} endpoint (cancel booking, own bookings only)
+    8. Create GET /api/bookings/admin endpoint (all bookings, ADMIN only) with admin dependency
+    9. Implement PUT /api/bookings/{id}/status endpoint (update status, ADMIN only) with Pydantic request schema
     10. Add booking availability validation (no overlapping admin bookings)
     11. Implement email notifications (booking created, confirmed, cancelled) - stub email service
     12. Test booking flow with different user roles
     13. Document booking endpoints in docs/api/endpoints.md
 
 2.4.5. Day 15: Admin APIs
-    1. Create adminController.js
-    2. Implement GET /api/admin/users endpoint (list users, pagination, filtering by role)
-    3. Implement PUT /api/admin/users/:id/role endpoint (change user role)
-    4. Implement DELETE /api/admin/users/:id endpoint (deactivate user)
-    5. Implement GET /api/admin/data-sources endpoint (list configured scrapers/OCR sources)
-    6. Implement POST /api/admin/data-sources endpoint (add new data source)
-    7. Implement PUT /api/admin/data-sources/:id endpoint (update data source config)
-    8. Implement POST /api/admin/data-sources/:id/trigger endpoint (manual pipeline trigger)
-    9. Implement GET /api/admin/models endpoint (list ML models, versions, metrics)
-    10. Implement POST /api/admin/models/retrain endpoint (trigger model retraining)
-    11. Implement GET /api/admin/stats endpoint (system statistics: users, properties, bookings, data quality)
-    12. Add RBAC checks to all admin endpoints (ADMIN role required)
+    1. Create admin router
+    2. Implement GET /api/admin/users endpoint (list users, pagination, filtering by role) with Pydantic query parameters and response models
+    3. Implement PUT /api/admin/users/{id}/role endpoint (change user role) with Pydantic request schema
+    4. Implement DELETE /api/admin/users/{id} endpoint (deactivate user) with path parameter
+    5. Implement GET /api/admin/data-sources endpoint (list configured scrapers/OCR sources) with Pydantic response model
+    6. Implement POST /api/admin/data-sources endpoint (add new data source) with Pydantic request schema
+    7. Implement PUT /api/admin/data-sources/{id} endpoint (update data source config) with Pydantic request schema
+    8. Implement POST /api/admin/data-sources/{id}/trigger endpoint (manual pipeline trigger) using async subprocess or background task
+    9. Implement GET /api/admin/models endpoint (list ML models, versions, metrics) with Pydantic response model
+    10. Implement POST /api/admin/models/retrain endpoint (trigger model retraining) using FastAPI BackgroundTasks
+    11. Implement GET /api/admin/stats endpoint (system statistics: users, properties, bookings, data quality) with Pydantic response model
+    12. Add RBAC dependency checks to all admin endpoints (ADMIN role required) using FastAPI Depends
     13. Test admin endpoints with admin test user
     14. Document admin endpoints in docs/api/endpoints.md
     15. Commit Phase 4 completion
 
 3. DATABASE SCHEMA AND DATA VERSIONING
 
-3.1. MongoDB Collections Schema
+3.1. PostgreSQL Tables Schema
 
-3.1.1. User Collection
+3.1.1. User Table
     {
-        _id: ObjectId,
-        email: String (unique, indexed, required),
-        password: String (hashed, required),
-        role: String (enum: ['FREE_USER', 'PAID_USER', 'ADMIN'], default: 'FREE_USER', indexed),
-        firstName: String,
-        lastName: String,
-        phone: String,
-        createdAt: Date (indexed),
-        updatedAt: Date,
-        lastLogin: Date,
-        isActive: Boolean (default: true),
-        resetPasswordToken: String,
-        resetPasswordExpires: Date,
-        subscriptionExpires: Date (for PAID_USER)
+        id: UUID (Primary Key, default: gen_random_uuid()),
+        email: VARCHAR(255) (unique, indexed, required),
+        password: VARCHAR(255) (hashed, required),
+        role: VARCHAR(20) (enum: ['FREE_USER', 'PAID_USER', 'ADMIN'], default: 'FREE_USER', indexed),
+        first_name: VARCHAR(100),
+        last_name: VARCHAR(100),
+        phone: VARCHAR(20),
+        created_at: TIMESTAMP WITH TIME ZONE (default: now(), indexed),
+        updated_at: TIMESTAMP WITH TIME ZONE (default: now()),
+        last_login: TIMESTAMP WITH TIME ZONE,
+        is_active: BOOLEAN (default: true),
+        reset_password_token: VARCHAR(255),
+        reset_password_expires: TIMESTAMP WITH TIME ZONE,
+        subscription_expires: TIMESTAMP WITH TIME ZONE (for PAID_USER)
     }
 
-3.1.2. Property Collection
+3.1.2. Properties Table
     {
-        _id: ObjectId,
-        title: String (required, indexed for text search),
-        description: String,
-        city: String (enum: ['Yaoundé', 'Douala'], required, indexed),
-        neighborhood: String (indexed),
-        location: {
-            type: String (enum: ['Point'], default: 'Point'),
-            coordinates: [Number] (longitude, latitude, indexed geospatial)
-        },
-        propertyType: String (enum: ['apartment', 'house', 'land', 'commercial'], required, indexed),
-        price: Number (required, > 0),
-        currency: String (default: 'XAF'),
-        size: Number (m², required, > 0),
-        pricePerM2: Number (computed, indexed),
-        bedrooms: Number,
-        bathrooms: Number,
-        images: [String] (URLs),
-        dataSource: ObjectId (reference to DataSource, indexed),
-        dataSourceRecordId: String (original ID from source),
-        qualityScore: Number (0-100, validation score),
-        validationStatus: String (enum: ['pending', 'validated', 'rejected'], default: 'pending'),
-        createdAt: Date (indexed),
-        updatedAt: Date,
-        scrapedAt: Date (when data was collected),
-        version: Number (default: 1)
+        id: UUID (Primary Key),
+        title: VARCHAR(255) (required, indexed for GIN text search),
+        description: TEXT,
+        city: VARCHAR(50) (enum: ['Yaoundé', 'Douala'], required, indexed),
+        neighborhood: VARCHAR(100) (indexed),
+        location: Geography(Point, 4326) (indexed geospatial),
+        property_type: VARCHAR(20) (enum: ['apartment', 'house', 'land', 'commercial'], required, indexed),
+        price: NUMERIC(15, 2) (required, > 0),
+        currency: VARCHAR(10) (default: 'XAF'),
+        size: NUMERIC(10, 2) (m², required, > 0),
+        price_per_m2: NUMERIC(15, 2) (computed/stored, indexed),
+        bedrooms: INTEGER,
+        bathrooms: INTEGER,
+        images: JSONB (List of URLs),
+        data_source_id: UUID (Foreign Key to DataSources, indexed),
+        data_source_record_id: VARCHAR(255) (original ID from source),
+        quality_score: NUMERIC(5, 2) (0-100, validation score),
+        validation_status: VARCHAR(20) (enum: ['pending', 'validated', 'rejected'], default: 'pending'),
+        created_at: TIMESTAMP WITH TIME ZONE (indexed),
+        updated_at: TIMESTAMP WITH TIME ZONE,
+        scraped_at: TIMESTAMP WITH TIME ZONE (when data was collected),
+        version: INTEGER (default: 1)
     }
 
-3.1.3. Listing Collection (aggregated/processed data)
+3.1.3. Listings Table (aggregated/processed data snapshots)
     {
-        _id: ObjectId,
-        city: String (required, indexed),
-        neighborhood: String (indexed),
-        propertyType: String (required, indexed),
-        period: String (enum: ['daily', 'weekly', 'monthly'], default: 'monthly'),
-        periodStart: Date (indexed),
-        periodEnd: Date,
-        avgPrice: Number,
-        medianPrice: Number,
-        minPrice: Number,
-        maxPrice: Number,
-        avgPricePerM2: Number,
-        propertyCount: Number,
-        trendDirection: String (enum: ['up', 'down', 'stable']),
-        trendPercentage: Number,
-        createdAt: Date
+        id: UUID (Primary Key),
+        city: VARCHAR(50) (required, indexed),
+        neighborhood: VARCHAR(100) (indexed),
+        property_type: VARCHAR(20) (required, indexed),
+        period: VARCHAR(20) (enum: ['daily', 'weekly', 'monthly'], default: 'monthly'),
+        period_start: DATE (indexed),
+        period_end: DATE,
+        avg_price: NUMERIC(15, 2),
+        median_price: NUMERIC(15, 2),
+        min_price: NUMERIC(15, 2),
+        max_price: NUMERIC(15, 2),
+        avg_price_per_m2: NUMERIC(15, 2),
+        property_count: INTEGER,
+        trend_direction: VARCHAR(10) (enum: ['up', 'down', 'stable']),
+        trend_percentage: NUMERIC(5, 2),
+        created_at: TIMESTAMP WITH TIME ZONE
     }
 
-3.1.4. Booking Collection
+3.1.4. Bookings Table
     {
-        _id: ObjectId,
-        user: ObjectId (reference to User, required, indexed),
-        consultationType: String (enum: ['market_analysis', 'investment_advice', 'property_valuation'], required),
-        preferredDate: Date (required),
-        preferredTime: String,
-        status: String (enum: ['pending', 'confirmed', 'completed', 'cancelled'], default: 'pending', indexed),
-        notes: String,
-        adminNotes: String,
-        createdAt: Date (indexed),
-        updatedAt: Date,
-        confirmedAt: Date,
-        completedAt: Date
+        id: UUID (Primary Key),
+        user_id: UUID (Foreign Key to Users, required, indexed),
+        consultation_type: VARCHAR(50) (enum: ['market_analysis', 'investment_advice', 'property_valuation'], required),
+        preferred_date: DATE (required),
+        preferred_time: VARCHAR(20),
+        status: VARCHAR(20) (enum: ['pending', 'confirmed', 'completed', 'cancelled'], default: 'pending', indexed),
+        notes: TEXT,
+        admin_notes: TEXT,
+        created_at: TIMESTAMP WITH TIME ZONE (indexed),
+        updated_at: TIMESTAMP WITH TIME ZONE,
+        confirmed_at: TIMESTAMP WITH TIME ZONE,
+        completed_at: TIMESTAMP WITH TIME ZONE
     }
 
-3.1.5. DataSource Collection
+3.1.5. DataSources Table
     {
-        _id: ObjectId,
-        name: String (required, unique),
-        type: String (enum: ['scraper', 'ocr', 'manual'], required),
-        sourceUrl: String (for scrapers),
-        sourcePath: String (for OCR, file path),
-        isActive: Boolean (default: true),
-        lastRunAt: Date,
-        lastRunStatus: String (enum: ['success', 'failed', 'partial']),
-        recordsCollected: Number,
-        recordsValidated: Number,
-        recordsRejected: Number,
-        config: Object (source-specific configuration),
-        createdAt: Date,
-        updatedAt: Date
+        id: UUID (Primary Key),
+        name: VARCHAR(100) (required, unique),
+        type: VARCHAR(20) (enum: ['scraper', 'ocr', 'manual'], required),
+        source_url: VARCHAR(255),
+        source_path: VARCHAR(255),
+        is_active: BOOLEAN (default: true),
+        last_run_at: TIMESTAMP WITH TIME ZONE,
+        last_run_status: VARCHAR(20) (enum: ['success', 'failed', 'partial']),
+        records_collected: INTEGER,
+        records_validated: INTEGER,
+        records_rejected: INTEGER,
+        config: JSONB (source-specific configuration),
+        created_at: TIMESTAMP WITH TIME ZONE,
+        updated_at: TIMESTAMP WITH TIME ZONE
     }
 
-3.1.6. MLModel Collection
+3.1.6. MLModels Table
     {
-        _id: ObjectId,
-        name: String (required, e.g., 'price_prediction_v1'),
-        version: String (required, semantic versioning),
-        type: String (enum: ['price_prediction', 'trend_forecast'], required),
-        algorithm: String (e.g., 'random_forest', 'prophet', 'xgboost'),
-        status: String (enum: ['training', 'active', 'archived'], default: 'training', indexed),
-        metrics: {
-            mse: Number,
-            mae: Number,
-            r2: Number,
-            rmse: Number
-        },
-        featureImportance: Object (feature names and importance scores),
-        trainingDataRange: {
-            startDate: Date,
-            endDate: Date,
-            recordCount: Number
-        },
-        trainedAt: Date,
-        deployedAt: Date,
-        modelPath: String (file path to serialized model),
-        config: Object (hyperparameters, feature list)
+        id: UUID (Primary Key),
+        name: VARCHAR(100) (required, e.g., 'price_prediction_v1'),
+        version: VARCHAR(20) (required, semantic versioning),
+        type: VARCHAR(50) (enum: ['price_prediction', 'trend_forecast'], required),
+        algorithm: VARCHAR(50),
+        status: VARCHAR(20) (enum: ['training', 'active', 'archived'], default: 'training', indexed),
+        metrics: JSONB (MSE, MAE, R2, RMSE),
+        feature_importance: JSONB,
+        training_data_range_start: DATE,
+        training_data_range_end: DATE,
+        record_count: INTEGER,
+        trained_at: TIMESTAMP WITH TIME ZONE,
+        deployed_at: TIMESTAMP WITH TIME ZONE,
+        model_path: VARCHAR(255),
+        config: JSONB
     }
 
-3.1.7. PricePrediction Collection (prediction cache/history)
+3.1.7. PricePredictions Table (cache/history)
     {
-        _id: ObjectId,
-        model: ObjectId (reference to MLModel),
-        input: {
-            city: String,
-            propertyType: String,
-            size: Number,
-            neighborhood: String (optional)
-        },
-        prediction: Number (predicted price),
-        confidenceInterval: {
-            lower: Number,
-            upper: Number
-        },
-        createdAt: Date (indexed, TTL: 30 days)
+        id: UUID (Primary Key),
+        model_id: UUID (Foreign Key to MLModels),
+        input_data: JSONB (city, property_type, size, neighborhood),
+        prediction: NUMERIC(15, 2),
+        confidence_interval_lower: NUMERIC(15, 2),
+        confidence_interval_upper: NUMERIC(15, 2),
+        created_at: TIMESTAMP WITH TIME ZONE (indexed)
     }
 
 3.2. Indexes
 
-3.2.1. Property Collection Indexes
-    1. city, propertyType (compound index)
+3.2.1. Property Table Indexes
+    1. city, property_type (composite B-tree index)
     2. price (ascending)
-    3. pricePerM2 (ascending)
-    4. createdAt (descending)
-    5. location (2dsphere, geospatial)
-    6. title (text index for search)
-    7. city, neighborhood (compound index)
-    8. dataSource, validationStatus (compound index)
+    3. price_per_m2 (ascending)
+    4. created_at (descending)
+    5. location (PostGIS GIST index)
+    6. title (GIN index with to_tsvector for search)
+    7. city, neighborhood (composite index)
+    8. data_source_id, validation_status (composite index)
 
-3.2.2. Listing Collection Indexes
-    1. city, propertyType, periodStart (compound index)
-    2. city, neighborhood, periodStart (compound index)
-    3. periodStart (descending)
+3.2.2. Listing Table Indexes
+    1. city, property_type, period_start (composite index)
+    2. city, neighborhood, period_start (composite index)
+    3. period_start (descending)
 
-3.2.3. User Collection Indexes
-    1. email (unique)
-    2. role (for RBAC queries)
-    3. createdAt (for user analytics)
+3.2.3. User Table Indexes
+    1. email (unique B-tree)
+    2. role (for access control)
+    3. created_at (for analytics)
 
-3.2.4. Booking Collection Indexes
-    1. user (for user's bookings)
-    2. status, preferredDate (for admin queries)
-    3. preferredDate (for availability checks)
+3.2.4. Booking Table Indexes
+    1. user_id (B-tree)
+    2. status, preferred_date (composite)
+    3. preferred_date (ascending)
 
 3.3. Data Versioning Strategy
 
 3.3.1. Property Versioning
     1. New properties: version = 1
-    2. Updates from re-scraping: increment version, keep previous version in history collection
-    3. History collection: PropertyHistory (same schema + version field, no indexes on version)
-    4. Current properties: only latest version (version field in Property collection for tracking)
+    2. Updates from re-scraping: increment version, keep previous version in PropertyHistory table
+    3. PropertyHistory table: same schema + original_id (FFK) + version_timestamp
+    4. Current properties: only latest version (version field in Property table for tracking)
     5. Historical analysis: query PropertyHistory for trend analysis
 
 3.3.2. ML Model Versioning
@@ -616,7 +598,7 @@ STRATAXIS — EXECUTION BLUEPRINT
     3. Minor: new features, improved accuracy
     4. Patch: bug fixes, parameter tuning
     5. Only one active model per type (price_prediction, trend_forecast)
-    6. Archive previous models (status = 'archived'), keep for comparison
+    6. Archive previous models (status = 'archived') in MLModels table
 
 3.3.3. Listing Aggregation Versioning
     1. Listings are time-period snapshots (not versioned)
@@ -628,7 +610,7 @@ STRATAXIS — EXECUTION BLUEPRINT
 
 4.1. Scraping Pipeline
     1. Scheduler triggers scraper (cron: daily at 02:00 UTC)
-    2. Scraper factory selects active scrapers from DataSource collection
+    2. Scraper factory selects active scrapers from DataSources table
     3. For each scraper:
        a. Load scraper configuration (base URL, selectors, rate limits)
        b. Fetch listing pages (respect robots.txt, delays between requests)
@@ -641,7 +623,7 @@ STRATAXIS — EXECUTION BLUEPRINT
 
 4.2. OCR Pipeline
     1. Scheduler triggers OCR processor (cron: weekly, Sunday 03:00 UTC)
-    2. Load active OCR sources from DataSource collection
+    2. Load active OCR sources from DataSources table
     3. For each PDF source:
        a. Load PDF file from configured path
        b. Convert PDF pages to images (pdf2image)
@@ -674,8 +656,8 @@ STRATAXIS — EXECUTION BLUEPRINT
     5. Load phase:
        a. Check for duplicates (compare dataSource + dataSourceRecordId)
        b. If duplicate: compare versions, update if newer or higher quality
-       c. If new: insert into Property collection
-       d. Update DataSource collection (records collected, validated, rejected)
+       c. If new: insert into Properties table
+       d. Update DataSources table (records collected, validated, rejected)
        e. Log pipeline execution metrics
     6. Post-load:
        a. Trigger listing aggregation recalculation
@@ -727,7 +709,7 @@ STRATAXIS — EXECUTION BLUEPRINT
 5.1. Feature Engineering
 
 5.1.1. Data Preparation
-    1. Load validated properties from MongoDB (validationStatus = 'validated')
+    1. Load validated properties from PostgreSQL (validation_status = 'validated')
     2. Filter by date range (last 24 months minimum, all historical if available)
     3. Filter by cities: Yaoundé, Douala only
     4. Remove properties with missing critical features (price, size, propertyType, city)
@@ -811,7 +793,7 @@ STRATAXIS — EXECUTION BLUEPRINT
     6. Final training on train + validation combined (after validation confirms good performance)
     7. Save model artifact (joblib or pickle)
     8. Calculate feature importance
-    9. Store model metadata in MLModel collection:
+    9. Store model metadata in MLModels table:
        a. Algorithm name
        b. Hyperparameters
        c. Feature list
@@ -831,7 +813,7 @@ STRATAXIS — EXECUTION BLUEPRINT
     6. Evaluate forecast accuracy (RMSE, MAE, MAPE)
     7. If satisfactory, train final model on all data
     8. Save model artifact
-    9. Store model metadata in MLModel collection
+    9. Store model metadata in MLModel table
 
 5.4. Evaluation
 
@@ -880,7 +862,7 @@ STRATAXIS — EXECUTION BLUEPRINT
     2. Model promotion:
        a. Archive current active model (status = 'archived')
        b. Set new model as active (status = 'active')
-       c. Update MLModel collection
+       c. Update MLModel table
        d. Move model artifact to production path
     3. API integration:
        a. Load model artifact in prediction service
@@ -949,7 +931,8 @@ STRATAXIS — EXECUTION BLUEPRINT
     Status codes: 200 (success)
     Public endpoint (no auth required)
 
-6.2.2. GET /api/properties/:id
+6.2.2. GET /api/properties/{id}
+    Path parameter: id (UUID string)
     Response: { property: {...} }
     Status codes: 200 (success), 404 (not found)
     Public endpoint
@@ -1018,18 +1001,21 @@ STRATAXIS — EXECUTION BLUEPRINT
     Status codes: 200 (success)
     Requires authentication (returns own bookings for regular users)
 
-6.6.3. GET /api/bookings/:id
+6.6.3. GET /api/bookings/{id}
+    Path parameter: id (UUID string)
     Response: { booking: {...} }
     Status codes: 200 (success), 403 (not own booking), 404 (not found)
     Requires authentication
 
-6.6.4. PUT /api/bookings/:id
+6.6.4. PUT /api/bookings/{id}
+    Path parameter: id (UUID string)
     Request body: { preferredDate?, preferredTime?, notes? }
     Response: { booking: {...} }
     Status codes: 200 (success), 403 (not own booking), 404 (not found)
     Requires authentication (own bookings only, or ADMIN)
 
-6.6.5. DELETE /api/bookings/:id
+6.6.5. DELETE /api/bookings/{id}
+    Path parameter: id (UUID string)
     Response: { message: "Booking cancelled" }
     Status codes: 200 (success), 403 (not own booking), 404 (not found)
     Requires authentication (own bookings only)
@@ -1042,13 +1028,15 @@ STRATAXIS — EXECUTION BLUEPRINT
     Status codes: 200 (success), 403 (forbidden)
     Requires authentication (ADMIN)
 
-6.7.2. PUT /api/admin/users/:id/role
+6.7.2. PUT /api/admin/users/{id}/role
+    Path parameter: id (UUID string)
     Request body: { role }
     Response: { user: {...} }
     Status codes: 200 (success), 400 (invalid role), 403 (forbidden), 404 (not found)
     Requires authentication (ADMIN)
 
-6.7.3. DELETE /api/admin/users/:id
+6.7.3. DELETE /api/admin/users/{id}
+    Path parameter: id (UUID string)
     Response: { message: "User deactivated" }
     Status codes: 200 (success), 403 (forbidden), 404 (not found)
     Requires authentication (ADMIN)
@@ -1064,13 +1052,15 @@ STRATAXIS — EXECUTION BLUEPRINT
     Status codes: 201 (created), 400 (validation error), 403 (forbidden)
     Requires authentication (ADMIN)
 
-6.7.6. PUT /api/admin/data-sources/:id
+6.7.6. PUT /api/admin/data-sources/{id}
+    Path parameter: id (UUID string)
     Request body: { name?, type?, sourceUrl?, sourcePath?, config?, isActive? }
     Response: { dataSource: {...} }
     Status codes: 200 (success), 403 (forbidden), 404 (not found)
     Requires authentication (ADMIN)
 
-6.7.7. POST /api/admin/data-sources/:id/trigger
+6.7.7. POST /api/admin/data-sources/{id}/trigger
+    Path parameter: id (UUID string)
     Response: { message: "Pipeline triggered", jobId }
     Status codes: 200 (success), 403 (forbidden), 404 (not found)
     Requires authentication (ADMIN)
@@ -1242,7 +1232,7 @@ STRATAXIS — EXECUTION BLUEPRINT
 
 2.6.2. Day 24: Feature Engineering Implementation
     1. Implement feature_engineering.py:
-       - Data loading from MongoDB or CSV
+       - Data loading from PostgreSQL or CSV
        - Missing value imputation functions
        - Feature extraction functions (numerical, categorical, temporal, derived, geospatial)
        - Feature normalization/scaling
@@ -1265,7 +1255,7 @@ STRATAXIS — EXECUTION BLUEPRINT
     4. Final evaluation on test set
     5. Calculate feature importance
     6. Save best model artifact
-    7. Store model metadata in MongoDB (MLModel collection)
+    7. Store model metadata in PostgreSQL (MLModel table)
     8. Document model selection rationale
 
 2.6.4. Day 26: Trend Forecasting Model Training
@@ -1280,24 +1270,28 @@ STRATAXIS — EXECUTION BLUEPRINT
     6. Compare Prophet vs ARIMA
     7. Select best trend forecasting model
     8. Save model artifact
-    9. Store model metadata in MongoDB
+    9. Store model metadata in PostgreSQL
     10. Document trend forecasting model selection
 
 2.6.5. Day 27: Model Integration with Backend
-    1. Implement predictor.py:
-       - Load price prediction model artifact
-       - Load trend forecasting model artifact
+    1. Implement predictor.py in backend services:
+       - Load price prediction model artifact (using joblib)
+       - Load trend forecasting model artifact (using joblib)
        - Prediction function (input → feature engineering → model.predict → output)
        - Trend forecast function (input → model.forecast → output)
-    2. Create Python API endpoint (Flask/FastAPI) or integrate directly with Node.js:
-       - Option A: Python microservice with REST API (recommended for MVP)
-       - Option B: Use child_process in Node.js to call Python scripts
-    3. Update predictionController.js to call ML service
-    4. Implement prediction caching (store in PricePrediction collection)
-    5. Add error handling for model not ready scenarios
+    2. Integrate ML models directly into FastAPI backend:
+       - Create model loading service that initializes models on application startup
+       - Use FastAPI lifespan events to load models when app starts
+       - Implement async prediction functions for FastAPI router endpoints
+    3. Update predictions router to use ML prediction service directly:
+       - Import predictor service functions
+       - Call prediction functions in router endpoint handlers
+       - Return Pydantic response models with prediction results
+    4. Implement prediction caching (store in PricePrediction SQLModel table)
+    5. Add error handling for model not ready scenarios using FastAPI exception handlers
     6. Test prediction endpoints with sample inputs
     7. Test trend forecast endpoints with sample inputs
-    8. Document ML service integration
+    8. Document ML model integration in backend
 
 2.6.6. Day 28: Model Evaluation and Documentation
     1. Generate model evaluation reports:
@@ -1405,9 +1399,9 @@ STRATAXIS — EXECUTION BLUEPRINT
 
 8.2. API Security
     1. Input validation: validate all request parameters and body fields
-    2. SQL injection prevention: not applicable (MongoDB with parameterized queries)
-    3. NoSQL injection prevention: sanitize user inputs, use Mongoose schema validation
-    4. XSS prevention: sanitize user inputs, use helmet.js middleware
+    2. SQL injection prevention: use SQLModel/SQLAlchemy parameterized queries via asyncpg
+    3. NoSQL injection prevention: Not applicable (SQL based)
+    4. XSS prevention: sanitize user inputs, use FastAPI security middlewares
     5. CSRF protection: use CSRF tokens for state-changing operations (POST, PUT, DELETE)
     6. Rate limiting:
        - Public endpoints: 100 requests/minute per IP
@@ -1421,7 +1415,7 @@ STRATAXIS — EXECUTION BLUEPRINT
     1. Sensitive data encryption:
        - Passwords: hashed (bcrypt)
        - JWT tokens: signed, not encrypted (no sensitive data in payload)
-       - Database connection: use TLS/SSL for MongoDB connection
+       - Database connection: use TLS/SSL for PostgreSQL connection
     2. Environment variables: never commit .env files, use .env.example template
     3. API keys: store in environment variables, never in code
     4. User data: 
@@ -1448,10 +1442,9 @@ STRATAXIS — EXECUTION BLUEPRINT
        - Keep OS and software updated
        - Use firewall (UFW or iptables)
        - Allow only necessary ports (80, 443, 22 for SSH)
-    3. Database security:
-       - Use MongoDB authentication (username/password)
-       - Restrict database access to application server IP only
-       - Use MongoDB Atlas network whitelist (if using Atlas)
+     3. Database security:
+        - Use PostgreSQL password authentication with strong scram-sha-256 hashing
+        - Restrict database access to application server IP only
     4. Environment separation: separate development, staging, production environments
     5. Secrets management: use environment variables, consider secret management service for production
 
@@ -1468,7 +1461,7 @@ STRATAXIS — EXECUTION BLUEPRINT
     1. Choose hosting provider (VPS: DigitalOcean, Linode, AWS EC2, or equivalent)
     2. Select server specifications: minimum 2GB RAM, 1 CPU, 20GB SSD (scalable)
     3. Choose domain name and configure DNS
-    4. Set up MongoDB: MongoDB Atlas (cloud) or self-hosted on VPS
+    4. Set up PostgreSQL: Managed PostgreSQL (DigitalOcean/AWS RDS) or self-hosted on VPS
     5. Prepare environment variables for production (.env files)
     6. Set up GitHub repository (private or public, as required)
 
@@ -1478,7 +1471,7 @@ STRATAXIS — EXECUTION BLUEPRINT
     3. Update system packages: apt update && apt upgrade
     4. Install Node.js (v18 LTS): use NodeSource repository
     5. Install Python 3.9+: apt install python3 python3-pip
-    6. Install MongoDB (if self-hosting): use MongoDB official repository
+    6. Install PostgreSQL (if self-hosting): sudo apt install postgresql postgresql-contrib postgis
     7. Install Nginx: apt install nginx
     8. Install PM2 (Node.js process manager): npm install -g pm2
     9. Configure firewall: ufw allow 22 (SSH), 80 (HTTP), 443 (HTTPS), ufw enable
@@ -1491,47 +1484,39 @@ STRATAXIS — EXECUTION BLUEPRINT
     4. Configure automatic renewal: certbot renew --dry-run (test)
     5. Set up cron job for certificate renewal: 0 0 * * * certbot renew --quiet
 
-9.4. MongoDB Setup
-    9.4.1. MongoDB Atlas (Cloud - Recommended)
-        1. Create MongoDB Atlas account
-        2. Create cluster (free tier: M0, or paid for production)
-        3. Configure network access (whitelist VPS IP)
-        4. Create database user (admin user, strong password)
-        5. Get connection string
-        6. Update backend .env with connection string
-
-    9.4.2. Self-Hosted MongoDB
-        1. Install MongoDB on VPS
-        2. Configure MongoDB authentication (create admin user)
-        3. Configure MongoDB bind address (127.0.0.1 or specific IP)
-        4. Enable MongoDB service: systemctl enable mongod, systemctl start mongod
-        5. Create application database and user
-        6. Update backend .env with connection string
+9.4. PostgreSQL Setup (Managed - Recommended)
+    1. Create Managed Database instance (DigitalOcean/AWS RDS)
+    2. Create cluster (minimum 2GB RAM, SSD)
+    3. Configure network access (whitelist VPS IP)
+    4. Create database user and separate database 'strataxis'
+    5. Enable PostGIS extension: CREATE EXTENSION postgis;
+    6. Get connection string: postgresql://user:password@host:port/strataxis
+    7. Update backend .env with connection string
 
 9.5. Backend Deployment
     1. Clone repository on VPS: git clone <repo-url>
     2. Navigate to backend directory: cd backend
-    3. Install dependencies: npm install --production
+    3. Install dependencies: pip install -r requirements.txt
     4. Create .env file with production environment variables:
-       - NODE_ENV=production
-       - PORT=3000
-       - MONGODB_URI=<connection-string>
+       - ENVIRONMENT=production
+       - PORT=8000
+       - DATABASE_URL=postgresql+asyncpg://user:password@host:port/strataxis
        - JWT_SECRET=<strong-secret>
        - JWT_EXPIRES_IN=15m
        - JWT_REFRESH_EXPIRES_IN=7d
        - FRONTEND_URL=<frontend-url>
-    5. Build application (if TypeScript): npm run build
-    6. Start application with PM2: pm2 start server.js --name strataxis-backend
+    5. Verify Python environment: python3 --version && pip --version
+    6. Start application with PM2: pm2 start "uvicorn src.main:app --host 0.0.0.0 --port 8000" --name strataxis-backend
     7. Configure PM2 to start on boot: pm2 startup, pm2 save
     8. Set up PM2 monitoring: pm2 monit
-    9. Test backend health endpoint: curl http://localhost:3000/api/health
+    9. Test backend health endpoint: curl http://localhost:8000/api/health
 
 9.6. Data Pipeline Deployment
     1. Navigate to data-pipeline directory: cd data-pipeline
     2. Create Python virtual environment: python3 -m venv venv
     3. Activate virtual environment: source venv/bin/activate
     4. Install dependencies: pip install -r requirements.txt
-    5. Create config.yaml with production settings (MongoDB URI, paths)
+    5. Create config.yaml with production settings (DATABASE_URL, paths)
     6. Set up cron jobs for scheduled execution:
        - Scraping: 0 2 * * * (daily at 02:00 UTC)
        - OCR: 0 3 * * 0 (weekly, Sunday at 03:00 UTC)
@@ -1545,7 +1530,7 @@ STRATAXIS — EXECUTION BLUEPRINT
        - Location: /var/www/strataxis-frontend
        - Nginx configuration: proxy API requests to backend, serve static files for frontend routes
     4. Configure Nginx reverse proxy for API:
-       - /api/* → proxy to http://localhost:3000
+       - /api/* → proxy to http://localhost:8000
        - / → serve React build/index.html (SPA routing)
     5. Test frontend: access https://yourdomain.com
 
@@ -1563,10 +1548,10 @@ STRATAXIS — EXECUTION BLUEPRINT
     2. Test frontend pages (Home, Login, Register, Dashboard, Analytics)
     3. Test authentication flow (register, login, protected routes)
     4. Test RBAC (different user roles accessing different endpoints)
-    5. Test data pipeline (trigger manual run, verify data in MongoDB)
+    5. Test data pipeline (trigger manual run, verify data in PostgreSQL)
     6. Test ML predictions (trigger prediction endpoint, verify response)
     7. Verify SSL certificate (HTTPS works, certificate valid)
-    8. Check server logs (PM2 logs, Nginx logs, MongoDB logs)
+    8. Check server logs (PM2 logs, Nginx logs, PostgreSQL logs)
     9. Monitor server resources (CPU, memory, disk usage)
 
 10. MONITORING, LOGGING, AND MAINTENANCE
@@ -1601,7 +1586,7 @@ STRATAXIS — EXECUTION BLUEPRINT
        - Error rate monitoring (count errors per hour/day)
        - Uptime monitoring (external service: UptimeRobot free tier)
     3. Database monitoring:
-       - MongoDB connection pool monitoring
+       - PostgreSQL connection pool monitoring
        - Query performance monitoring (slow queries)
        - Database size monitoring
     4. ML model monitoring:
@@ -1647,7 +1632,7 @@ STRATAXIS — EXECUTION BLUEPRINT
        - Review user feedback and support requests
     3. Monthly:
        - Update system packages (security patches)
-       - Update application dependencies (npm audit, pip check)
+       - Update application dependencies (pip list --outdated, pip install --upgrade)
        - Review and optimize database indexes
        - Retrain ML models (if new data available)
        - Review and update documentation
@@ -1695,7 +1680,7 @@ STRATAXIS — EXECUTION BLUEPRINT
        - Review RBAC implementation (role checks, permission checks)
        - Review scraping ethics compliance
     2. Fix security vulnerabilities found
-    3. Implement security best practices (helmet.js, sanitization)
+    3. Implement security best practices (FastAPI security middleware, sanitization)
     4. Test security (attempt SQL injection, XSS, CSRF attacks)
     5. Update security documentation
 
@@ -1769,7 +1754,7 @@ STRATAXIS — EXECUTION BLUEPRINT
 
 2.8.1. Day 36: Production Environment Setup
     1. Provision VPS server (if not done earlier)
-    2. Set up server infrastructure (Node.js, Python, MongoDB, Nginx)
+    2. Set up server infrastructure (Python, PostgreSQL, PostGIS, Nginx)
     3. Configure domain and DNS
     4. Set up SSL certificates (Let's Encrypt)
     5. Configure environment variables for production
@@ -1958,7 +1943,7 @@ STRATAXIS — EXECUTION BLUEPRINT
        - Error codes and messages
        - Examples (curl commands, JSON examples)
     2. Database Schema Documentation (docs/api/schemas.md):
-       - All MongoDB collections and their schemas
+       - All PostgreSQL tables and their schemas
        - Indexes and their purposes
        - Data relationships
     3. Architecture Documentation (docs/architecture.md):
@@ -2141,12 +2126,13 @@ STRATAXIS — EXECUTION BLUEPRINT
 14.5. Deployment Requirements
     1. Application deployed and accessible via domain
     2. All services running (backend, frontend, database, data pipeline)
-    3. SSL certificate installed and valid
-    4. Monitoring set up (PM2, uptime monitoring)
-    5. Logging configured (application logs, error logs)
-    6. Backups configured (database backups automated)
-    7. Environment variables configured for production
-    8. DNS configured correctly
+    3. PostGIS extension enabled in production database
+    4. SSL certificate installed and valid
+    5. Monitoring set up (PM2, uptime monitoring)
+    6. Logging configured (application logs, error logs)
+    7. Backups configured (PostgreSQL dumps automated)
+    8. Environment variables configured for production
+    9. DNS configured correctly
 
 14.6. Documentation Requirements
     1. README.md complete and accurate
@@ -2212,15 +2198,15 @@ STRATAXIS — EXECUTION BLUEPRINT
 15.1. Environment Variables Specification
 
 15.1.1. Backend Environment Variables (.env)
-    NODE_ENV=production (or development)
-    PORT=3000
-    MONGODB_URI=mongodb://user:password@host:port/database or mongodb+srv://...
+    ENVIRONMENT=production (or development)
+    PORT=8000
+    DATABASE_URL=postgresql+asyncpg://user:password@host:port/database
     JWT_SECRET=<32+ character random string>
     JWT_EXPIRES_IN=15m
     JWT_REFRESH_SECRET=<32+ character random string, different from JWT_SECRET>
     JWT_REFRESH_EXPIRES_IN=7d
-    FRONTEND_URL=https://yourdomain.com (or http://localhost:3001 for development)
-    CORS_ORIGIN=https://yourdomain.com (or http://localhost:3001 for development)
+    FRONTEND_URL=https://yourdomain.com (or http://localhost:3000 for development)
+    CORS_ORIGIN=https://yourdomain.com (or http://localhost:3000 for development)
     RATE_LIMIT_WINDOW_MS=60000
     RATE_LIMIT_MAX_REQUESTS=100
     LOG_LEVEL=info (or debug, warn, error)
@@ -2233,12 +2219,12 @@ STRATAXIS — EXECUTION BLUEPRINT
     BACKUP_SCHEDULE_CRON=0 2 * * * (daily at 02:00 UTC)
 
 15.1.2. Frontend Environment Variables (.env)
-    REACT_APP_API_URL=http://localhost:3000/api (or https://yourdomain.com/api)
+    REACT_APP_API_URL=http://localhost:8000/api (or https://yourdomain.com/api)
     REACT_APP_ENV=production (or development)
     REACT_APP_VERSION=1.0.0
 
 15.1.3. Data Pipeline Environment Variables (config.yaml or .env)
-    MONGODB_URI=mongodb://user:password@host:port/database
+    DATABASE_URL=postgresql://user:password@host:port/database (for data-pipeline use sync driver)
     LOG_LEVEL=INFO
     LOG_FILE_PATH=/var/log/strataxis/pipeline.log
     SCRAPER_DELAY_SECONDS=2
@@ -2319,13 +2305,14 @@ STRATAXIS — EXECUTION BLUEPRINT
     module.exports = {
         apps: [{
             name: 'strataxis-backend',
-            script: 'server.js',
+            script: 'uvicorn',
+            args: 'src.main:app --host 0.0.0.0 --port 8000',
             cwd: '/var/www/strataxis/backend',
             instances: 1,
             exec_mode: 'fork',
             env: {
-                NODE_ENV: 'production',
-                PORT: 3000
+                ENVIRONMENT: 'production',
+                PORT: 8000
             },
             error_file: '/var/log/strataxis/backend-error.log',
             out_file: '/var/log/strataxis/backend-out.log',
@@ -2391,7 +2378,7 @@ STRATAXIS — EXECUTION BLUEPRINT
         
         # API proxy to backend
         location /api {
-            proxy_pass http://localhost:3000;
+            proxy_pass http://localhost:8000;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection 'upgrade';
@@ -2454,8 +2441,8 @@ STRATAXIS — EXECUTION BLUEPRINT
 
 15.7. Backup Script Configuration (infrastructure/scripts/backup.sh)
     1. Database backup script structure:
-       - Connect to MongoDB
-       - Create backup dump (mongodump)
+       - Connect to PostgreSQL
+       - Create backup dump (pg_dump)
        - Compress backup file
        - Upload to cloud storage (AWS S3, Backblaze, or local backup server)
        - Remove backups older than retention policy (7 daily, 4 weekly)
@@ -2465,4 +2452,4 @@ STRATAXIS — EXECUTION BLUEPRINT
        - RETENTION_DAYS=7
        - RETENTION_WEEKS=4
        - CLOUD_STORAGE_BUCKET=<optional>
-       - MONGODB_URI=<connection string>
+       - DATABASE_URL=<connection string>

@@ -21,6 +21,7 @@ async def init_db():
     async with engine.begin() as conn:
         # Enable PostGIS extension for geospatial queries
         await conn.execute("CREATE EXTENSION IF NOT EXISTS postgis;")
+        import src.models  # noqa: F401
         # Create all tables defined in SQLModel metadata
         # In production, migrations should be handled by Alembic
         await conn.run_sync(SQLModel.metadata.create_all)

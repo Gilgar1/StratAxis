@@ -1,11 +1,12 @@
 from .site1_scraper import Site1Scraper
+from .site2_scraper import Site2Scraper
 from .base_scraper import BaseScraper
 from typing import Dict, Type
 
 class ScraperFactory:
     _scrapers: Dict[str, Type[BaseScraper]] = {
         "site1": Site1Scraper,
-        # "site2": Site2Scraper, # To be implemented
+        "site2": Site2Scraper,
     }
 
     @classmethod

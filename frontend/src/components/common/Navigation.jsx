@@ -22,170 +22,44 @@ const Navigation = () => {
     };
 
     return (
-        <>
-            {/* Desktop & Mobile Header */}
-            <header className="fixed top-0 left-0 right-0 z-40 glass-card border-b border-white/10">
-                <div className="container-custom">
-                    <div className="flex items-center justify-between h-20">
-                        {/* Logo */}
-                        <Link to="/" className="flex items-center space-x-3 group">
-                            <img
-                                src={logo}
-                                alt="StratAxis Logo"
-                                className="h-12 w-auto transition-transform duration-300 group-hover:scale-110"
-                            />
-                            <span className="text-2xl font-display font-bold tracking-tight text-white">
-                                Strat<span className="gradient-text">Axis</span>
-                            </span>
-                        </Link>
-
-                        {/* Desktop Navigation */}
-                        <nav className="hidden lg:flex items-center space-x-8">
-                            {navLinks.map((link) => (
-                                (!link.public && !user) ? null : (
-                                    <Link
-                                        key={link.path}
-                                        to={link.path}
-                                        className={`nav-link ${isActive(link.path) ? 'text-white' : ''}`}
-                                    >
-                                        {link.label}
-                                    </Link>
-                                )
-                            ))}
-                        </nav>
-
-                        {/* Desktop Auth Buttons */}
-                        <div className="hidden lg:flex items-center space-x-4">
-                            {user ? (
-                                <>
-                                    <Link to="/profile" className="btn-ghost">
-                                        Profile
-                                    </Link>
-                                    {user.role === 'ADMIN' && (
-                                        <Link to="/admin" className="btn-ghost">
-                                            Admin
-                                        </Link>
-                                    )}
-                                    <button onClick={logout} className="btn-outline-gold">
-                                        Logout
-                                    </button>
-                                </>
-                            ) : (
-                                <>
-                                    <Link to="/login" className="btn-ghost">
-                                        Sign In
-                                    </Link>
-                                    <Link to="/register" className="btn-primary">
-                                        Get Started
-                                    </Link>
-                                </>
-                            )}
-                        </div>
-
-                        {/* Mobile Menu Button */}
-                        <button
-                            onClick={toggleMobileMenu}
-                            className="lg:hidden p-2 text-white hover:text-brand-gold transition-colors"
-                            aria-label="Toggle menu"
-                        >
-                            <svg
-                                className="w-6 h-6"
-                                fill="none"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                {isMobileMenuOpen ? (
-                                    <path d="M6 18L18 6M6 6l12 12" />
-                                ) : (
-                                    <path d="M4 6h16M4 12h16M4 18h16" />
-                                )}
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </header>
-
-            {/* Mobile Menu Sheet */}
-            {isMobileMenuOpen && (
-                <div
-                    className="mobile-sheet"
-                    style={{ transform: isMobileMenuOpen ? 'translateX(0)' : 'translateX(100%)' }}
+        <nav className="bg-primary text-white">
+            <div className="container mx-auto flex justify-between items-center p-4">
+                <Link to="/" className="flex items-center space-x-3 group">
+                    <img
+                        src={logo}
+                        alt="StratAxis Logo"
+                        className="h-12 w-auto transition-transform duration-300 group-hover:scale-110"
+                    />
+                    <span className="text-2xl font-display font-bold tracking-tight text-white">
+                        Strat<span className="gradient-text">Axis</span>
+                    </span>
+                </Link>
+                <button
+                    className="md:hidden text-white focus:outline-none"
+                    onClick={toggleMobileMenu}
                 >
-                    <div className="container-custom py-24">
-                        <nav className="flex flex-col space-y-6 mb-12">
-                            {navLinks.map((link) => (
-                                (!link.public && !user) ? null : (
-                                    <Link
-                                        key={link.path}
-                                        to={link.path}
-                                        onClick={toggleMobileMenu}
-                                        className={`text-2xl font-display font-semibold transition-colors ${isActive(link.path) ? 'text-brand-gold' : 'text-white hover:text-brand-gold'
-                                            }`}
-                                    >
-                                        {link.label}
-                                    </Link>
-                                )
-                            ))}
-                        </nav>
-
-                        <div className="flex flex-col space-y-4 pt-8 border-t border-white/10">
-                            {user ? (
-                                <>
-                                    <Link
-                                        to="/profile"
-                                        onClick={toggleMobileMenu}
-                                        className="btn-ghost text-center"
-                                    >
-                                        Profile
-                                    </Link>
-                                    {user.role === 'ADMIN' && (
-                                        <Link
-                                            to="/admin"
-                                            onClick={toggleMobileMenu}
-                                            className="btn-ghost text-center"
-                                        >
-                                            Admin
-                                        </Link>
-                                    )}
-                                    <button
-                                        onClick={() => {
-                                            logout();
-                                            toggleMobileMenu();
-                                        }}
-                                        className="btn-outline-gold w-full"
-                                    >
-                                        Logout
-                                    </button>
-                                </>
-                            ) : (
-                                <>
-                                    <Link
-                                        to="/login"
-                                        onClick={toggleMobileMenu}
-                                        className="btn-ghost text-center"
-                                    >
-                                        Sign In
-                                    </Link>
-                                    <Link
-                                        to="/register"
-                                        onClick={toggleMobileMenu}
-                                        className="btn-primary w-full text-center"
-                                    >
-                                        Get Started
-                                    </Link>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Spacer to prevent content from hiding under fixed header */}
-            <div className="h-20"></div>
-        </>
+                    {isMobileMenuOpen ? 'Close' : 'Menu'}
+                </button>
+                <ul
+                    className={`md:flex md:space-x-4 absolute md:static bg-primary w-full md:w-auto transition-transform transform ${
+                        isMobileMenuOpen ? 'translate-y-0' : '-translate-y-full'
+                    }`}
+                >
+                    {navLinks.map((link) => (
+                        (!link.public && !user) ? null : (
+                            <li key={link.path}>
+                                <Link
+                                    to={link.path}
+                                    className={`block p-2 hover:underline ${isActive(link.path) ? 'text-white' : ''}`}
+                                >
+                                    {link.label}
+                                </Link>
+                            </li>
+                        )
+                    ))}
+                </ul>
+            </div>
+        </nav>
     );
 };
 

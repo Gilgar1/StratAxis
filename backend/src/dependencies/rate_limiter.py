@@ -15,3 +15,8 @@ def rate_limit(calls: int = 100, period: int = 60):
     def decorator(func):
         return func
     return decorator
+
+# Example usage in FastAPI endpoint
+@limiter.limit("100/minute")
+def example_endpoint():
+    return {"message": "Rate limited endpoint"}

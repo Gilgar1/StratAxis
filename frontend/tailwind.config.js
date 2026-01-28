@@ -2,6 +2,7 @@
 module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
+    "./public/index.html",
   ],
   theme: {
     extend: {
@@ -22,10 +23,14 @@ module.exports = {
             emerald: '#10B981',
           },
         },
+        primary: "#1D4ED8",
+        secondary: "#9333EA",
+        accent: "#F59E0B",
       },
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
         display: ['Outfit', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        serif: ['Merriweather', 'serif'],
       },
       borderWidth: {
         '1': '1px',
@@ -62,6 +67,12 @@ module.exports = {
           '100%': { backgroundPosition: '1000px 0' },
         },
       },
+    },
+    screens: {
+      sm: "640px",
+      md: "768px",
+      lg: "1024px",
+      xl: "1280px",
     },
   },
   plugins: [],

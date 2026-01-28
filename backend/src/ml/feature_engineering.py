@@ -13,6 +13,8 @@ from typing import List, Dict, Tuple, Optional
 from datetime import datetime, timedelta
 from sqlmodel import Session, select
 from geopy.distance import geodesic
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler
 
 from src.models.property import Property, PropertyCity, PropertyType, ValidationStatus
 from src.utils.logger import logger
@@ -476,3 +478,38 @@ class FeatureEngineer:
         logger.info("="*70 + "\n")
         
         return final_df, selected_features
+
+# Load data from PostgreSQL or CSV
+def load_data(source):
+    if source.endswith('.csv'):
+        return pd.read_csv(source)
+    else:
+        raise ValueError("Unsupported data source")
+
+# Missing value imputation
+def impute_missing_values(df):
+    imputer = SimpleImputer(strategy='mean')
+    return pd.DataFrame(imputer.fit_transform(df), columns=df.columns)
+
+# Feature extraction
+def extract_features(df):
+    # Example: Extract numerical, categorical, and derived features
+    df['price_per_m2'] = df['price'] / df['size']
+    return df
+
+# Feature normalization
+def normalize_features(df):
+    scaler = StandardScaler()
+    return pd.DataFrame(scaler.fit_transform(df), columns=df.columns)
+
+# Save processed features
+def save_features(df, path):
+    df.to_csv(path, index=False)
+
+# Example usage
+if __name__ == "__main__":
+    data = load_data("data.csv")
+    data = impute_missing_values(data)
+    data = extract_features(data)
+    data = normalize_features(data)
+    save_features(data, "processed_features.csv")

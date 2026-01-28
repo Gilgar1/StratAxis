@@ -21,7 +21,7 @@ const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword'));
 
 function App() {
     return (
-        <div className="flex flex-col min-h-screen bg-slate-950">
+        <div className="flex flex-col min-h-screen bg-brand-black scrollbar-custom">
             <ErrorBoundary>
                 <Header />
                 <main className="flex-grow">

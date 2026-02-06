@@ -1,0 +1,219 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* StratAxis Global Styles - Minimal, Data-First, Calm */
+
+@layer base {
+  * {
+    @apply border-primary-200 dark:border-primary-800;
+  }
+  
+  body {
+    @apply bg-white dark:bg-primary-950 text-primary-900 dark:text-primary-50;
+    @apply font-sans antialiased;
+    @apply transition-colors duration-200;
+  }
+  
+  /* Typography */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+  
+  h1 {
+    @apply text-4xl md:text-5xl;
+  }
+  
+  h2 {
+    @apply text-3xl md:text-4xl;
+  }
+  
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+  
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-primary-100 dark:bg-primary-900;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary-300 dark:bg-primary-700 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary-400 dark:bg-primary-600;
+  }
+}
+
+@layer components {
+  /* Button Variants */
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+  
+  .btn-primary {
+    @apply bg-primary-900 dark:bg-primary-50 text-white dark:text-primary-950;
+    @apply hover:bg-primary-800 dark:hover:bg-primary-200;
+    @apply focus:ring-primary-500;
+  }
+  
+  .btn-secondary {
+    @apply bg-primary-100 dark:bg-primary-800 text-primary-900 dark:text-primary-50;
+    @apply hover:bg-primary-200 dark:hover:bg-primary-700;
+    @apply focus:ring-primary-400;
+  }
+  
+  .btn-gold {
+    @apply bg-accent-gold text-primary-950;
+    @apply hover:bg-accent-gold-light;
+    @apply focus:ring-accent-gold-dark;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-primary-300 dark:border-primary-700;
+    @apply text-primary-900 dark:text-primary-50;
+    @apply hover:bg-primary-50 dark:hover:bg-primary-900;
+  }
+  
+  /* Card */
+  .card {
+    @apply bg-white dark:bg-primary-900 rounded-xl shadow-soft;
+    @apply border border-primary-200 dark:border-primary-800;
+    @apply transition-all duration-200;
+  }
+  
+  .card-hover {
+    @apply hover:shadow-medium hover:border-primary-300 dark:hover:border-primary-700;
+  }
+  
+  /* Input */
+  .input {
+    @apply w-full px-4 py-2 rounded-lg;
+    @apply bg-white dark:bg-primary-900;
+    @apply border border-primary-300 dark:border-primary-700;
+    @apply text-primary-900 dark:text-primary-50;
+    @apply placeholder:text-primary-400 dark:placeholder:text-primary-600;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply transition-all duration-200;
+  }
+  
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .badge-high {
+    @apply bg-semantic-success/10 text-semantic-success;
+  }
+  
+  .badge-medium {
+    @apply bg-semantic-warning/10 text-semantic-warning;
+  }
+  
+  .badge-low {
+    @apply bg-semantic-error/10 text-semantic-error;
+  }
+  
+  /* Data Table */
+  .data-table {
+    @apply w-full border-collapse;
+  }
+  
+  .data-table th {
+    @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider;
+    @apply bg-primary-50 dark:bg-primary-900;
+    @apply text-primary-700 dark:text-primary-300;
+    @apply border-b border-primary-200 dark:border-primary-800;
+  }
+  
+  .data-table td {
+    @apply px-4 py-3 text-sm;
+    @apply border-b border-primary-100 dark:border-primary-900;
+  }
+  
+  .data-table tbody tr {
+    @apply hover:bg-primary-50 dark:hover:bg-primary-900/50 transition-colors;
+  }
+  
+  /* Stat Card */
+  .stat-card {
+    @apply card p-6;
+  }
+  
+  .stat-label {
+    @apply text-sm font-medium text-primary-600 dark:text-primary-400;
+  }
+  
+  .stat-value {
+    @apply text-3xl font-bold text-primary-900 dark:text-primary-50 mt-2;
+  }
+  
+  .stat-change {
+    @apply text-sm font-medium mt-2;
+  }
+  
+  .stat-change-positive {
+    @apply text-semantic-success;
+  }
+  
+  .stat-change-negative {
+    @apply text-semantic-error;
+  }
+}
+
+@layer utilities {
+  /* Glass morphism effect */
+  .glass {
+    @apply bg-white/80 dark:bg-primary-900/80 backdrop-blur-md;
+  }
+  
+  /* Gradient text */
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary-900 to-accent-gold bg-clip-text text-transparent;
+  }
+  
+  /* Section spacing */
+  .section-padding {
+    @apply py-16 md:py-24 px-4 md:px-8;
+  }
+  
+  /* Container */
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+/* Leaflet Map Overrides */
+.leaflet-container {
+  @apply rounded-xl;
+  font-family: 'Inter', sans-serif;
+}
+
+.leaflet-popup-content-wrapper {
+  @apply rounded-lg shadow-medium;
+}
+
+/* Loading Animation */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Smooth transitions for dark mode */
+* {
+  @apply transition-colors duration-200;
+}

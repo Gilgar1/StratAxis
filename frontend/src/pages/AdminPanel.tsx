@@ -1,6 +1,6 @@
 ﻿import React, { useState } from 'react';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
-import { Users, Server, Activity, Ban, Edit, Trash2, CheckCircle, AlertTriangle, Terminal, Save, Search } from 'lucide-react';
+import { Activity, Users, Search, AlertTriangle, CheckCircle, Server, Edit, Ban, Terminal } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { formatCurrency } from '../utils/formatters';
 
@@ -16,12 +16,7 @@ const AdminPanel: React.FC = () => {
     { id: 4, name: 'Demo User', email: 'demo@strataxis.cm', role: 'FREE_USER', status: 'Active', lastLogin: 'Now' },
   ]);
 
-  const [scraperLogs, setScraperLogs] = useState([
-    { id: 105, timestamp: '2026-02-06 04:30:15', level: 'INFO', message: 'Job started: Daily Land Price Scrape' },
-    { id: 106, timestamp: '2026-02-06 04:32:10', level: 'INFO', message: 'Connected to Source A (immo-cm). Found 45 new listings.' },
-    { id: 107, timestamp: '2026-02-06 04:35:45', level: 'WARN', message: 'Source B response slow (2500ms). Retrying...' },
-    { id: 108, timestamp: '2026-02-06 04:36:00', level: 'INFO', message: 'Source B connected. Found 12 listings.' },
-    { id: 109, timestamp: '2026-02-06 04:40:22', level: 'INFO', message: 'ETL Pipeline finished. 57 records processed. 0 errors.' },
+  const [scraperLogs] = useState([
     { id: 110, timestamp: '2026-02-06 04:40:23', level: 'SUCCESS', message: 'Job completed successfully.' },
   ]);
 
@@ -165,8 +160,8 @@ const AdminPanel: React.FC = () => {
                   <div key={log.id} className="mb-2 last:mb-0">
                     <span className="text-primary-500 mr-2">[{log.timestamp.split(' ')[1]}]</span>
                     <span className={`font-bold mr-2 ${log.level === 'INFO' ? 'text-blue-400' :
-                        log.level === 'WARN' ? 'text-yellow-400' :
-                          log.level === 'SUCCESS' ? 'text-green-400' : 'text-red-400'
+                      log.level === 'WARN' ? 'text-yellow-400' :
+                        log.level === 'SUCCESS' ? 'text-green-400' : 'text-red-400'
                       }`}>
                       {log.level}
                     </span>

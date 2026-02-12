@@ -1,7 +1,7 @@
 import React from 'react';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
-import { Lightbulb, TrendingUp, AlertTriangle, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Lightbulb, ArrowRight } from 'lucide-react';
+// import { Link } from 'react-router-dom';
 
 const Insights: React.FC = () => {
     // Mock insights engine output
@@ -53,14 +53,14 @@ const Insights: React.FC = () => {
                         <div key={insight.id} className="bg-white dark:bg-primary-900 p-6 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
                             {/* Color Strip */}
                             <div className={`absolute left-0 top-0 bottom-0 w-1 ${insight.type === 'opportunity' ? 'bg-semantic-success' :
-                                    insight.type === 'risk' ? 'bg-semantic-error' : 'bg-semantic-info'
+                                insight.type === 'risk' ? 'bg-semantic-error' : 'bg-semantic-info'
                                 }`}></div>
 
                             <div className="ml-4">
                                 <div className="flex justify-between items-start mb-2">
                                     <div className="flex items-center space-x-2">
                                         <span className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded ${insight.type === 'opportunity' ? 'bg-semantic-success/10 text-semantic-success' :
-                                                insight.type === 'risk' ? 'bg-semantic-error/10 text-semantic-error' : 'bg-semantic-info/10 text-semantic-info'
+                                            insight.type === 'risk' ? 'bg-semantic-error/10 text-semantic-error' : 'bg-semantic-info/10 text-semantic-info'
                                             }`}>
                                             {insight.type}
                                         </span>

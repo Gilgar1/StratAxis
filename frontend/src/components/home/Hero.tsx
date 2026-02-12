@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, TrendingUp, Map } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 

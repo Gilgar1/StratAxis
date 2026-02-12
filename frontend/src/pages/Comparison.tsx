@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
-import { GitCompare, Plus, X } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
 
 const Comparison: React.FC = () => {

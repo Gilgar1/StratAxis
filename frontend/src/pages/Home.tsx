@@ -5,7 +5,7 @@ import LiveMetrics from '../components/home/LiveMetrics';
 import UserSegments from '../components/home/UserSegments';
 import MapPreview from '../components/home/MapPreview';
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+// import { CheckCircle2, TrendingUp, BarChart3, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Home: React.FC = () => {

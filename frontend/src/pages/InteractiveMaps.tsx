@@ -2,7 +2,7 @@
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import { CITY_COORDINATES, MAP_CONFIG } from '../utils/constants';
+import { MAP_CONFIG } from '../utils/constants';
 import landDataRaw from '../data/land_prices_intelligence.json';
 import { LandPriceData } from '../types';
 import { formatCurrency } from '../utils/formatters';

@@ -2,13 +2,12 @@
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import PublicLayout from '../layouts/PublicLayout';
-import { useAuth } from '../contexts/AuthContext';
-import { Mail, Lock, CheckCircle2, User, Building, AlertCircle } from 'lucide-react';
+// import { useAuth } from '../contexts/AuthContext';
+import { Mail, Lock, User, Building, AlertCircle } from 'lucide-react';
 import { isValidEmail, isValidPassword } from '../utils/validators';
-import Loading from '../components/common/Loading';
 
 const Register: React.FC = () => {
-  const { register } = useAuth();
+  // const { login } = useAuth();
   const navigate = useNavigate();
 
   const [step, setStep] = useState(1);

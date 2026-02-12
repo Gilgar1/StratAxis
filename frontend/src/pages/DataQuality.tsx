@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
-import { ShieldCheck, Database, AlertCircle, CheckCircle } from 'lucide-react';
+import { CheckCircle, AlertCircle } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
 const DataQuality: React.FC = () => {
@@ -24,7 +24,7 @@ const DataQuality: React.FC = () => {
       <div className="p-8 max-w-7xl mx-auto">
         <div className="flex items-center space-x-3 mb-8">
           <div className="p-2 bg-semantic-success/10 rounded-lg">
-            <ShieldCheck className="w-6 h-6 text-semantic-success" />
+            <CheckCircle className="w-6 h-6 text-semantic-success" />
           </div>
           <div>
             <h1 className="text-3xl font-bold text-primary-900 dark:text-white">Data Quality & Confidence</h1>
@@ -62,8 +62,8 @@ const DataQuality: React.FC = () => {
                     paddingAngle={5}
                     dataKey="value"
                   >
-                    {sourceDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    {sourceDistribution.map((_, index) => (
+                      <Cell key={`cell - ${index} `} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip />
@@ -95,7 +95,7 @@ const DataQuality: React.FC = () => {
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className="w-48 h-2 bg-primary-100 dark:bg-primary-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-semantic-success" style={{ width: `${metric.score}%` }}></div>
+                    <div className="h-full bg-semantic-success" style={{ width: `${metric.score}% ` }}></div>
                   </div>
                   <span className="font-bold text-primary-700 dark:text-primary-300 w-8 text-right">{metric.score}%</span>
                 </div>

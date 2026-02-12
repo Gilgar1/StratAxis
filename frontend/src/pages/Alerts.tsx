@@ -1,6 +1,5 @@
 ﻿import React from 'react';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
-import { Bell, Settings, Mail } from 'lucide-react';
 
 const Alerts: React.FC = () => {
   return (

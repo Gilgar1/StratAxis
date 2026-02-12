@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
-import { Calculator, DollarSign, PenTool as Tool } from 'lucide-react';
+import { Calculator, DollarSign } from 'lucide-react';
 import { formatCurrency, formatPercentage } from '../utils/formatters';
 
 const Scenario: React.FC = () => {
@@ -9,7 +9,7 @@ const Scenario: React.FC = () => {
     const [constructionCost, setConstructionCost] = useState(150000000); // 150M
     const [monthlyRent, setMonthlyRent] = useState(1200000); // 1.2M
     const [occupancyRate, setOccupancyRate] = useState(90); // 90%
-    const [expensesInfo, setExpensesInfo] = useState(15); // 15%
+    const [expensesInfo] = useState(15); // 15%
 
     // Outputs
     const [grossYield, setGrossYield] = useState(0);
@@ -143,7 +143,7 @@ const Scenario: React.FC = () => {
                             </div>
                             <div className="mt-4 w-full bg-white/10 rounded-full h-2">
                                 {/* Visual progress bar for ROI speed */}
-                                <div className="bg-accent-gold h-full rounded-full" style={{ width: `${Math.max(0, Math.min(100, (15 / roiYears) * 100))}%` }}></div>
+                                <div className="bg-accent-gold h-full rounded-full" style={{ width: `${Math.max(0, Math.min(100, (15 / roiYears) * 100))}% ` }}></div>
                             </div>
                             <p className="text-xs text-primary-500 mt-2 text-right">Target &lt; 12 years</p>
                         </div>

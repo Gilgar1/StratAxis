@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
-import { FileText, Download, Printer } from 'lucide-react';
+import { FileText, Download } from 'lucide-react';
 
 const ExportReporting: React.FC = () => {
   const reports = [

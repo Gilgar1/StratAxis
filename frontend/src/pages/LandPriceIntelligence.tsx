@@ -1,9 +1,8 @@
 ﻿import React, { useState } from 'react';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
-import { useLandPrices } from '../hooks/useData';
-import { formatCurrency, formatConfidenceScore, formatCompactNumber } from '../utils/formatters';
+import { formatCurrency } from '../utils/formatters';
 import { Search, Filter, Download, ArrowUpDown } from 'lucide-react';
-import Loading from '../components/common/Loading';
+// import Loading from '../components/common/Loading';
 import clsx from 'clsx';
 
 // We need to create the hook first, but I'll write the component assuming the hook exists or inline the data loading for now.
@@ -117,7 +116,7 @@ const LandPriceIntelligence: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredData.map((row, idx) => (
+                {filteredData.map((row) => (
                   <tr
                     key={`${row.city}-${row.neighborhood}`}
                     className="border-b border-primary-100 dark:border-primary-800 hover:bg-primary-50 dark:hover:bg-primary-800/50 transition-colors"

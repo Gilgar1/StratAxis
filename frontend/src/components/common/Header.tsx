@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Menu, X, Sun, Moon } from 'lucide-react';
 import clsx from 'clsx';
+import Logo from './Logo';
 
 const Header: React.FC = () => {
     const { isAuthenticated, user, logout } = useAuth();
@@ -31,13 +32,8 @@ const Header: React.FC = () => {
             <nav className="container-custom">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
-                    <Link to="/" className="flex items-center space-x-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-primary-900 to-accent-gold rounded-lg flex items-center justify-center">
-                            <span className="text-white font-bold text-lg">S</span>
-                        </div>
-                        <span className="text-xl font-bold text-primary-900 dark:text-white">
-                            StratAxis
-                        </span>
+                    <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
+                        <Logo variant="full" size={140} className="text-primary-900 dark:text-white" />
                     </Link>
 
                     {/* Desktop Navigation */}

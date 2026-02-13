@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, MapPin, Phone } from 'lucide-react';
+import Logo from './Logo';
 
 const Footer: React.FC = () => {
     const currentYear = new Date().getFullYear();
@@ -11,11 +12,8 @@ const Footer: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                     {/* Brand */}
                     <div className="col-span-1">
-                        <div className="flex items-center space-x-2 mb-4">
-                            <div className="w-8 h-8 bg-gradient-to-br from-primary-900 to-accent-gold rounded-lg flex items-center justify-center">
-                                <span className="text-white font-bold text-lg">S</span>
-                            </div>
-                            <span className="text-xl font-bold text-white">StratAxis</span>
+                        <div className="mb-4">
+                            <Logo variant="full" size={140} className="text-white" />
                         </div>
                         <p className="text-sm text-primary-400 leading-relaxed">
                             The trusted intelligence for real estate insights in Cameroon.

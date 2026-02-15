@@ -1,12 +1,12 @@
 ﻿import React, { useState } from 'react';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
-import { Activity, Users, Search, AlertTriangle, CheckCircle, Server, Edit, Ban, Terminal } from 'lucide-react';
+import { Activity, Users, Search, AlertTriangle, CheckCircle, Server, Edit, Ban, Terminal, CreditCard } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { formatCurrency } from '../utils/formatters';
 
 const AdminPanel: React.FC = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'users' | 'system' | 'overrides'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'payments' | 'system' | 'overrides'>('users');
 
   // --- MOCK DATA ---
   const [users, setUsers] = useState([
@@ -26,10 +26,32 @@ const AdminPanel: React.FC = () => {
     { id: 3, neighborhood: 'Logbessou', city: 'Douala', price: 15400, source: 'Manual Override (Jan 15)', flag: 'Manual' },
   ]);
 
+  const [pendingPayments, setPendingPayments] = useState([
+    { id: 1, userId: '2', userEmail: 'newuser@test.com', userName: 'Paul Smith', plan: 'PRO_INVESTOR', period: 'monthly', amount: 15000, paymentIdLastFour: '5324', createdAt: '2026-02-15 04:30:00' },
+    { id: 2, userId: '3', userEmail: 'investor2@example.com', userName: 'Marie Ngono', plan: 'PRO_INVESTOR', period: 'yearly', amount: 150000, paymentIdLastFour: '8921', createdAt: '2026-02-15 03:15:00' },
+  ]);
+
   // --- ACTIONS ---
   const handleBanUser = (id: number) => {
     if (confirm('Are you sure you want to suspend this user?')) {
       setUsers(users.map(u => u.id === id ? { ...u, status: 'Suspended' } : u));
+    }
+  };
+
+  const handleApprovePayment = async (paymentId: number) => {
+    if (confirm('Approve this payment and upgrade user to PAID_USER?')) {
+      // In real app, call API: await approvePayment(paymentId)
+      setPendingPayments(pendingPayments.filter(p => p.id !== paymentId));
+      alert('Payment approved! User has been upgraded to PRO INVESTOR.');
+    }
+  };
+
+  const handleRejectPayment = async (paymentId: number) => {
+    const reason = prompt('Enter rejection reason:');
+    if (reason) {
+      // In real app, call API: await rejectPayment(paymentId, reason)
+      setPendingPayments(pendingPayments.filter(p => p.id !== paymentId));
+      alert('Payment rejected and user notified.');
     }
   };
 
@@ -67,6 +89,18 @@ const AdminPanel: React.FC = () => {
           >
             <Users className="w-4 h-4 mr-2" />
             User Management
+          </button>
+          <button
+            onClick={() => setActiveTab('payments')}
+            className={`pb-4 px-2 font-medium transition-colors border-b-2 flex items-center relative ${activeTab === 'payments' ? 'border-accent-gold text-accent-gold' : 'border-transparent text-primary-500 hover:text-primary-700'}`}
+          >
+            <CreditCard className="w-4 h-4 mr-2" />
+            Payment Verification
+            {pendingPayments.length > 0 && (
+              <span className="ml-2 bg-semantic-error text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                {pendingPayments.length}
+              </span>
+            )}
           </button>
           <button
             onClick={() => setActiveTab('system')}
@@ -138,6 +172,87 @@ const AdminPanel: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* --- PAYMENT VERIFICATION --- */}
+        {activeTab === 'payments' && (
+          <div className="space-y-6">
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-200 dark:border-blue-800 flex items-start">
+              <CreditCard className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-3 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">Payment Verification Queue</h3>
+                <p className="text-sm text-blue-700 dark:text-blue-200">
+                  Review and approve pending mobile money payments. Users will be automatically upgraded to PRO INVESTOR upon approval.
+                </p>
+              </div>
+            </div>
+
+            {pendingPayments.length === 0 ? (
+              <div className="bg-white dark:bg-primary-900 rounded-xl border border-primary-200 dark:border-primary-800 p-12 text-center">
+                <CheckCircle className="w-16 h-16 text-semantic-success mx-auto mb-4 opacity-50" />
+                <h3 className="text-xl font-bold text-primary-900 dark:text-white mb-2">All Caught Up!</h3>
+                <p className="text-primary-500">No pending payment verifications at the moment.</p>
+              </div>
+            ) : (
+              <div className="bg-white dark:bg-primary-900 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm overflow-hidden">
+                <table className="w-full text-left">
+                  <thead className="bg-primary-50 dark:bg-primary-800">
+                    <tr>
+                      <th className="p-4 font-semibold text-primary-900 dark:text-white">User</th>
+                      <th className="p-4 font-semibold text-primary-900 dark:text-white">Plan</th>
+                      <th className="p-4 font-semibold text-primary-900 dark:text-white">Amount</th>
+                      <th className="p-4 font-semibold text-primary-900 dark:text-white">Payment ID</th>
+                      <th className="p-4 font-semibold text-primary-900 dark:text-white">Submitted</th>
+                      <th className="p-4 font-semibold text-primary-900 dark:text-white text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-primary-100 dark:divide-primary-800">
+                    {pendingPayments.map(payment => (
+                      <tr key={payment.id} className="hover:bg-primary-50 dark:hover:bg-primary-800/50 transition-colors bg-white dark:bg-primary-900">
+                        <td className="p-4">
+                          <div className="font-bold text-primary-900 dark:text-white">{payment.userName}</div>
+                          <div className="text-sm text-primary-500">{payment.userEmail}</div>
+                        </td>
+                        <td className="p-4">
+                          <div className="font-semibold text-primary-900 dark:text-white">Pro Investor</div>
+                          <div className="text-sm text-primary-500">{payment.period === 'monthly' ? 'Monthly' : 'Yearly'}</div>
+                        </td>
+                        <td className="p-4">
+                          <span className="font-bold text-accent-gold">{formatCurrency(payment.amount)}</span>
+                        </td>
+                        <td className="p-4">
+                          <span className="font-mono text-sm bg-primary-100 dark:bg-primary-800 px-3 py-1 rounded text-primary-900 dark:text-white">
+                            ****{payment.paymentIdLastFour}
+                          </span>
+                        </td>
+                        <td className="p-4 text-sm text-primary-500">
+                          {new Date(payment.createdAt).toLocaleString()}
+                        </td>
+                        <td className="p-4 text-right">
+                          <div className="flex justify-end space-x-2">
+                            <button
+                              onClick={() => handleApprovePayment(payment.id)}
+                              className="px-4 py-2 bg-semantic-success text-white rounded-lg hover:bg-semantic-success/90 transition-colors font-semibold text-sm flex items-center"
+                            >
+                              <CheckCircle className="w-4 h-4 mr-1" />
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => handleRejectPayment(payment.id)}
+                              className="px-4 py-2 bg-semantic-error text-white rounded-lg hover:bg-semantic-error/90 transition-colors font-semibold text-sm"
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
 
         {/* --- SYSTEM STATUS --- */}
         {activeTab === 'system' && (

@@ -20,6 +20,9 @@ import {
     Percent,
     DollarSign,
     ClipboardList,
+    Clock,
+    Package,
+    Building2,
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -51,7 +54,14 @@ const Navigation: React.FC = () => {
         { name: 'Getting Funded', href: '/getting-funded', icon: DollarSign },
         { name: 'Project Process', href: '/project-process', icon: ClipboardList },
 
-        // Paid User Features
+        // Paid User Intelligence Features
+        { name: 'Neighborhood Rental Yield', href: '/neighborhood-rental-yield', icon: Percent, requiredRole: 'PAID_USER' },
+        { name: 'Vacancy Rate', href: '/vacancy-rate', icon: Home, requiredRole: 'PAID_USER' },
+        { name: 'Inventory (Months of Supply)', href: '/inventory', icon: Package, requiredRole: 'PAID_USER' },
+        { name: 'Days on Market', href: '/days-on-market', icon: Clock, requiredRole: 'PAID_USER' },
+        { name: 'Construction & Permit Volume', href: '/construction-permit-volume', icon: Building2, requiredRole: 'PAID_USER' },
+
+        // Other Paid User Features
         { name: 'Smart Insights', href: '/insights', icon: Lightbulb, requiredRole: 'PAID_USER' },
         { name: 'Data Quality', href: '/data-quality', icon: Shield },
         { name: 'Watchlists', href: '/watchlists', icon: Star, requiredRole: 'PAID_USER' },

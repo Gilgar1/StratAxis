@@ -35,6 +35,13 @@ import BasicRentalYield from './pages/BasicRentalYield';
 import GettingFunded from './pages/GettingFunded';
 import ProjectProcess from './pages/ProjectProcess';
 
+// Paid User Intelligence Pages
+import NeighborhoodRentalYield from './pages/NeighborhoodRentalYield';
+import VacancyRate from './pages/VacancyRate';
+import Inventory from './pages/Inventory';
+import DaysOnMarket from './pages/DaysOnMarket';
+import ConstructionPermitVolume from './pages/ConstructionPermitVolume';
+
 // Admin
 import AdminPanel from './pages/AdminPanel';
 
@@ -216,6 +223,48 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <ProjectProcess />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    {/* Paid User Intelligence Routes */}
+                    <Route
+                        path="/neighborhood-rental-yield"
+                        element={
+                            <ProtectedRoute requiredRole="PAID_USER">
+                                <NeighborhoodRentalYield />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/vacancy-rate"
+                        element={
+                            <ProtectedRoute requiredRole="PAID_USER">
+                                <VacancyRate />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/inventory"
+                        element={
+                            <ProtectedRoute requiredRole="PAID_USER">
+                                <Inventory />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/days-on-market"
+                        element={
+                            <ProtectedRoute requiredRole="PAID_USER">
+                                <DaysOnMarket />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/construction-permit-volume"
+                        element={
+                            <ProtectedRoute requiredRole="PAID_USER">
+                                <ConstructionPermitVolume />
                             </ProtectedRoute>
                         }
                     />

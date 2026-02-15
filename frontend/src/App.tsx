@@ -25,6 +25,16 @@ import Scenario from './pages/Scenario';
 import Alerts from './pages/Alerts';
 import ExportReporting from './pages/ExportReporting';
 
+// Free User Intelligence Pages
+import MedianPropertyPrice from './pages/MedianPropertyPrice';
+import AveragePropertyPrice from './pages/AveragePropertyPrice';
+import PricePerSquareMeter from './pages/PricePerSquareMeter';
+import AnnualAppreciation from './pages/AnnualAppreciation';
+import AverageRent from './pages/AverageRent';
+import BasicRentalYield from './pages/BasicRentalYield';
+import GettingFunded from './pages/GettingFunded';
+import ProjectProcess from './pages/ProjectProcess';
+
 // Admin
 import AdminPanel from './pages/AdminPanel';
 
@@ -140,6 +150,72 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <ExportReporting />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    {/* Free User Intelligence Routes */}
+                    <Route
+                        path="/median-property-price"
+                        element={
+                            <ProtectedRoute>
+                                <MedianPropertyPrice />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/average-property-price"
+                        element={
+                            <ProtectedRoute>
+                                <AveragePropertyPrice />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/price-per-sqm"
+                        element={
+                            <ProtectedRoute>
+                                <PricePerSquareMeter />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/annual-appreciation"
+                        element={
+                            <ProtectedRoute>
+                                <AnnualAppreciation />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/average-rent"
+                        element={
+                            <ProtectedRoute>
+                                <AverageRent />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/basic-rental-yield"
+                        element={
+                            <ProtectedRoute>
+                                <BasicRentalYield />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/getting-funded"
+                        element={
+                            <ProtectedRoute>
+                                <GettingFunded />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/project-process"
+                        element={
+                            <ProtectedRoute>
+                                <ProjectProcess />
                             </ProtectedRoute>
                         }
                     />

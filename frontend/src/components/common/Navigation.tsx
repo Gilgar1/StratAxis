@@ -15,6 +15,11 @@ import {
     Bell,
     Download,
     Settings,
+    BarChart3,
+    Maximize2,
+    Percent,
+    DollarSign,
+    ClipboardList,
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -35,6 +40,18 @@ const Navigation: React.FC = () => {
         { name: 'Land Intelligence', href: '/land-intelligence', icon: Home },
         { name: 'Rent Intelligence', href: '/rent-intelligence', icon: TrendingUp },
         { name: 'Time Series', href: '/time-series', icon: LineChart },
+
+        // Free User Intelligence Items
+        { name: 'Median Property Price', href: '/median-property-price', icon: TrendingUp },
+        { name: 'Average Property Price', href: '/average-property-price', icon: BarChart3 },
+        { name: 'Price per Square Meter', href: '/price-per-sqm', icon: Maximize2 },
+        { name: 'Annual Appreciation', href: '/annual-appreciation', icon: LineChart },
+        { name: 'Average Rent', href: '/average-rent', icon: Home },
+        { name: 'Basic Rental Yield', href: '/basic-rental-yield', icon: Percent },
+        { name: 'Getting Funded', href: '/getting-funded', icon: DollarSign },
+        { name: 'Project Process', href: '/project-process', icon: ClipboardList },
+
+        // Paid User Features
         { name: 'Smart Insights', href: '/insights', icon: Lightbulb, requiredRole: 'PAID_USER' },
         { name: 'Data Quality', href: '/data-quality', icon: Shield },
         { name: 'Watchlists', href: '/watchlists', icon: Star, requiredRole: 'PAID_USER' },

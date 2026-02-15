@@ -74,6 +74,19 @@ const Header: React.FC = () => {
                                 >
                                     Dashboard
                                 </Link>
+                                {user?.role === 'ADMIN' && (
+                                    <Link
+                                        to="/admin"
+                                        className={clsx(
+                                            'text-sm font-medium transition-colors',
+                                            isActive('/admin')
+                                                ? 'text-accent-gold'
+                                                : 'text-primary-700 dark:text-primary-300 hover:text-accent-gold'
+                                        )}
+                                    >
+                                        Admin Panel
+                                    </Link>
+                                )}
                                 <div className="flex items-center space-x-4">
                                     <span className="text-sm text-primary-600 dark:text-primary-400">
                                         {user?.email}

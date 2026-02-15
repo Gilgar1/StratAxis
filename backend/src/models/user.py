@@ -14,7 +14,7 @@ class User(SQLModel, table=True):
 
     id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
     email: str = Field(sa_column=Column(String(255), unique=True, index=True, nullable=False))
-    password: str = Field(sa_column=Column(String(255), nullable=False))
+    password: Optional[str] = Field(default=None, sa_column=Column(String(255), nullable=True))
     role: UserRole = Field(default=UserRole.FREE_USER, index=True)
     first_name: Optional[str] = Field(default=None, sa_column=Column(String(100)))
     last_name: Optional[str] = Field(default=None, sa_column=Column(String(100)))

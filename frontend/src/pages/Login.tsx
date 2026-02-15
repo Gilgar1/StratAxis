@@ -38,16 +38,49 @@ const Login: React.FC = () => {
       navigate('/dashboard');
     } catch (err: any) {
       if (err.message) {
-        // If mock login works, great, if not we show error
-        // For demo purposes, if login fails we'll simulate a mock login to allow testing
-        // In production this Catch block would only show error
-        if (formData.email === "demo@strataxis.cm" && formData.password === "demo123") {
+        // Mock Demo Users - Fallback when backend is unavailable
+        const mockUsers = [
+          {
+            email: "free@strataxis.com",
+            password: "Free@123",
+            role: "FREE_USER",
+            name: "Free User"
+          },
+          {
+            email: "paid@strataxis.com",
+            password: "Paid@123",
+            role: "PAID_USER",
+            name: "Paid User"
+          },
+          {
+            email: "admin@strataxis.com",
+            password: "Admin@123",
+            role: "ADMIN",
+            name: "Admin User"
+          }
+        ];
+
+        const mockUser = mockUsers.find(
+          u => u.email === formData.email && u.password === formData.password
+        );
+
+        if (mockUser) {
           // Mock manual login if API fails locally without backend
-          localStorage.setItem('strataxis_token', 'mock_token');
-          localStorage.setItem('strataxis_user', JSON.stringify({ id: '1', email: 'demo@strataxis.cm', role: 'PAID_USER' }));
+          localStorage.setItem('strataxis_token', 'mock_token_' + mockUser.role);
+          localStorage.setItem('strataxis_user', JSON.stringify({
+            id: String(Math.floor(Math.random() * 1000)),
+            email: mockUser.email,
+            role: mockUser.role,
+            first_name: mockUser.name.split(' ')[0],
+            last_name: mockUser.name.split(' ')[1] || '',
+            created_at: new Date().toISOString()
+          }));
+
+          // Redirect to dashboard - Dashboard will handle role-based display
           window.location.href = '/dashboard';
           return;
         }
+
         setError(err.message || "Invalid credentials");
       }
     } finally {
@@ -133,8 +166,25 @@ const Login: React.FC = () => {
                 </Link>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-primary-100 dark:border-primary-800 text-xs text-center text-primary-400">
-                <p>Demo Login: demo@strataxis.cm / demo123</p>
+              <div className="mt-8 pt-6 border-t border-primary-100 dark:border-primary-800 text-xs text-primary-400 space-y-2">
+                <p className="font-bold text-center mb-3 text-primary-600 dark:text-primary-300">Demo Test Accounts</p>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold">Free User:</span>
+                    <span className="font-mono text-primary-600 dark:text-primary-200">free@strataxis.com</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold">Paid User:</span>
+                    <span className="font-mono text-primary-600 dark:text-primary-200">paid@strataxis.com</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold">Admin:</span>
+                    <span className="font-mono text-primary-600 dark:text-primary-200">admin@strataxis.com</span>
+                  </div>
+                  <div className="mt-3 pt-2 border-t border-primary-100 dark:border-primary-700 text-center">
+                    <span className="text-primary-500">Passwords: Free@123, Paid@123, Admin@123</span>
+                  </div>
+                </div>
               </div>
             </div>
           </motion.div>

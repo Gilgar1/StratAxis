@@ -11,10 +11,14 @@ class Settings(BaseSettings):
     
     # Security Settings
     JWT_SECRET: str
-    JWT_REFRESH_SECRET: str
+    JWT_REFRESH_SECRET: str = "your_refresh_secret"  # Added default or adjust as needed
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    
+    # Supabase Settings
+    SUPABASE_URL: str
+    SUPABASE_KEY: str
     
     # CORS
     CORS_ORIGINS: list[str] = ["http://localhost:3000"]

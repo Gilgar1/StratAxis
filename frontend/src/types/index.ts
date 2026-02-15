@@ -45,7 +45,7 @@ export interface RentalIntelligence {
 export interface User {
     id: string;
     email: string;
-    role: 'FREE_USER' | 'PAID_USER' | 'ADMIN';
+    role: 'FREE_USER' | 'PAID_USER' | 'INSTITUTIONAL' | 'ADMIN';
     first_name?: string;
     last_name?: string;
     created_at: string;

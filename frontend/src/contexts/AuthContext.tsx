@@ -39,12 +39,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                     setToken(storedToken);
                     setUser(JSON.parse(storedUser));
 
-                    // Verify token is still valid
-                    try {
-                        await authService.verifyToken(storedToken);
-                    } catch (error) {
-                        // Token invalid, clear auth
-                        logout();
+                    // Verify token is still valid (skip for mock tokens)
+                    if (!storedToken.startsWith('mock_token_')) {
+                        try {
+                            await authService.verifyToken(storedToken);
+                        } catch (error) {
+                            // Token invalid, clear auth
+                            logout();
+                        }
                     }
                 }
             } catch (error) {

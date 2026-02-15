@@ -55,9 +55,10 @@ const Navigation: React.FC = () => {
         if (!item.requiredRole) return true;
         if (!user) return false;
 
-        const roleHierarchy = {
+        const roleHierarchy: Record<string, number> = {
             FREE_USER: 1,
             PAID_USER: 2,
+            INSTITUTIONAL: 2,
             ADMIN: 3,
         };
 

@@ -1,13 +1,13 @@
-from datetime import timedelta
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, select
 from src.config.database import get_session
-from src.config.env import settings
 from src.models.user import User, UserRole
 from src.schemas.user import UserCreate, UserRead, Token
-from src.utils.security import create_access_token, create_refresh_token, get_password_hash, verify_password
+from src.utils.supabase import supabase
 from src.dependencies.auth import get_current_user
+from src.utils.logger import logger
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -16,86 +16,155 @@ async def register(
     user_in: UserCreate,
     db: Session = Depends(get_session)
 ):
-    # Check if user exists
-    user = db.exec(select(User).where(User.email == user_in.email)).first()
-    if user:
-        raise HTTPException(
-            status_code=409,
-            detail="The user with this email already exists in the system.",
+    try:
+        # Register user in Supabase
+        auth_response = await supabase.sign_up({
+            "email": user_in.email,
+            "password": user_in.password,
+            "options": {
+                "data": {
+                    "first_name": user_in.first_name,
+                    "last_name": user_in.last_name,
+                    "phone": user_in.phone
+                }
+            }
+        })
+        
+        if not auth_response.user:
+            raise HTTPException(
+                status_code=400, 
+                detail="Registration failed with Supabase"
+            )
+            
+        sb_user = auth_response.user
+        
+        # Check if user already exists in local DB (race condition or partial failure retry)
+        existing_user = db.get(User, sb_user.id)
+        if existing_user:
+            return existing_user
+
+        # Create new user locally
+        db_obj = User(
+            id=sb_user.id,
+            email=user_in.email,
+            password="supabase_managed", # Password is managed by Supabase
+            first_name=user_in.first_name,
+            last_name=user_in.last_name,
+            phone=user_in.phone,
+            role=UserRole.FREE_USER, # Default role
+            is_active=True, 
+            created_at=datetime.utcnow()
         )
-    
-    # Create new user
-    db_obj = User(
-        email=user_in.email,
-        password=get_password_hash(user_in.password),
-        first_name=user_in.first_name,
-        last_name=user_in.last_name,
-        phone=user_in.phone,
-        role=UserRole.FREE_USER,
-    )
-    db.add(db_obj)
-    db.commit()
-    db.refresh(db_obj)
-    return db_obj
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
+        
+    except Exception as e:
+        logger.error(f"Registration error: {e}")
+        error_msg = str(e)
+        if "User already registered" in error_msg or "already registered" in error_msg:
+             raise HTTPException(
+                status_code=409,
+                detail="The user with this email already exists."
+            )
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=error_msg.replace("Signup failed: ", "")
+        )
 
 @router.post("/login", response_model=Token)
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_session)
 ):
-    user = db.exec(select(User).where(User.email == form_data.username)).first()
-    if not user or not verify_password(form_data.password, user.password):
+    try:
+        # Login with Supabase
+        auth_response = await supabase.sign_in_with_password({
+            "email": form_data.username,
+            "password": form_data.password
+        })
+        
+        if not auth_response.session:
+             raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect email or password",
+            )
+            
+        # Check and sync user locally
+        user_id = auth_response.user.id
+        user = db.get(User, user_id)
+        
+        if not user:
+            # Sync user if missing (should not happen if registered via /register, but good for safety)
+            user = User(
+                id=user_id,
+                email=auth_response.user.email,
+                role=UserRole.FREE_USER,
+                is_active=True,
+                password="supabase_managed"
+            )
+            # Try to populate metadata
+            meta = auth_response.user.user_metadata
+            if meta:
+                user.first_name = meta.get('first_name')
+                user.last_name = meta.get('last_name')
+                
+            db.add(user)
+            db.commit()
+        
+        return {
+            "access_token": auth_response.session.access_token,
+            "refresh_token": auth_response.session.refresh_token,
+            "token_type": "bearer",
+        }
+        
+    except Exception as e:
+        logger.error(f"Login error: {e}")
+        error_msg = str(e)
+        status_code = status.HTTP_401_UNAUTHORIZED
+        
+        if "Email not confirmed" in error_msg:
+             status_code = status.HTTP_403_FORBIDDEN
+             
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            status_code=status_code,
+            detail=error_msg.replace("Login failed: ", ""),
         )
-    if not user.is_active:
-        raise HTTPException(status_code=400, detail="Inactive user")
-    
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    return {
-        "access_token": create_access_token(
-            user.id, expires_delta=access_token_expires
-        ),
-        "refresh_token": create_refresh_token(user.id),
-        "token_type": "bearer",
-    }
 
 @router.post("/refresh", response_model=Token)
 async def refresh_token(
     refresh_token: str,
-    db: Session = Depends(get_session)
 ):
-    # In a real app, verify the refresh token against the database/whitelist
-    # For MVP, we decode and verify expiration
-    from src.utils.security import decode_token
-    payload = decode_token(refresh_token, settings.JWT_REFRESH_SECRET)
-    if not payload:
-        raise HTTPException(status_code=401, detail="Invalid refresh token")
-    
-    user_id = payload.get("sub")
-    user = db.get(User, user_id)
-    if not user or not user.is_active:
-        raise HTTPException(status_code=401, detail="Invalid user")
+    try:
+        # Refresh session with Supabase
+        auth_response = await supabase.refresh_session(refresh_token)
         
-    return {
-        "access_token": create_access_token(user.id),
-        "refresh_token": create_refresh_token(user.id),
-        "token_type": "bearer",
-    }
+        if not auth_response.session:
+            raise HTTPException(status_code=401, detail="Invalid refresh token")
+            
+        return {
+            "access_token": auth_response.session.access_token,
+            "refresh_token": auth_response.session.refresh_token,
+            "token_type": "bearer",
+        }
+    except Exception as e:
+        logger.error(f"Refresh error: {e}")
+        raise HTTPException(status_code=401, detail=str(e))
 
 @router.post("/logout")
 async def logout(current_user: User = Depends(get_current_user)):
-    # In practice, with stateless JWT, logout is often handled client-side by deleting the token.
-    # Optionally, blacklist the token in Redis.
+    try:
+        await supabase.sign_out()
+    except:
+        pass # Ignore error if already signed out
     return {"message": "Logged out"}
 
 @router.post("/forgot-password")
 async def forgot_password(email: str):
-    # Mocking email sending
-    return {"message": "Password reset email sent"}
-
-@router.post("/reset-password")
-async def reset_password(token: str, new_password: str):
-    # Mocking password reset
-    return {"message": "Password reset successful"}
+    try:
+        await supabase.reset_password_email(email)
+        return {"message": "Password reset email sent"}
+    except Exception as e:
+        logger.error(f"Forgot password error: {e}")
+        raise HTTPException(status_code=400, detail=str(e))

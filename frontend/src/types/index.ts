@@ -49,6 +49,7 @@ export interface User {
     first_name?: string;
     last_name?: string;
     created_at: string;
+    payment_status?: 'ACTIVE' | 'PENDING' | 'EXPIRED' | 'NONE';
 }
 
 // Auth Types

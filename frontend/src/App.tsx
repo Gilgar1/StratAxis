@@ -42,6 +42,9 @@ import Inventory from './pages/Inventory';
 import DaysOnMarket from './pages/DaysOnMarket';
 import ConstructionPermitVolume from './pages/ConstructionPermitVolume';
 
+// Payment
+import Payment from './pages/Payment';
+
 // Admin
 import AdminPanel from './pages/AdminPanel';
 
@@ -69,6 +72,14 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <Dashboard />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/payment"
+                        element={
+                            <ProtectedRoute>
+                                <Payment />
                             </ProtectedRoute>
                         }
                     />

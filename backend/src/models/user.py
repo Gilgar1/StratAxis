@@ -7,7 +7,14 @@ from enum import Enum
 class UserRole(str, Enum):
     FREE_USER = "FREE_USER"
     PAID_USER = "PAID_USER"
+    INSTITUTIONAL = "INSTITUTIONAL"
     ADMIN = "ADMIN"
+
+class PaymentStatus(str, Enum):
+    NONE = "NONE"
+    PENDING = "PENDING"
+    ACTIVE = "ACTIVE"
+    EXPIRED = "EXPIRED"
 
 class User(SQLModel, table=True):
     __tablename__ = "users"
@@ -26,3 +33,5 @@ class User(SQLModel, table=True):
     reset_password_token: Optional[str] = Field(default=None, sa_column=Column(String(255)))
     reset_password_expires: Optional[datetime] = Field(default=None, sa_column=Column(DateTime(timezone=True)))
     subscription_expires: Optional[datetime] = Field(default=None, sa_column=Column(DateTime(timezone=True)))
+    payment_status: PaymentStatus = Field(default=PaymentStatus.NONE, index=True)
+

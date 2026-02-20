@@ -1,0 +1,78 @@
+{
+  "total_records": 803,
+  "by_institution": {
+    "Ministry of Housing and Urban Development": 802,
+    "National Institute of Statistics": 1
+  },
+  "by_category": {
+    "land": 132,
+    "infrastructure": 97,
+    "development": 143,
+    "housing": 232,
+    "investment": 5,
+    "auction": 3,
+    "regulation": 36,
+    "construction": 21,
+    "market": 12,
+    "zoning": 2,
+    "statistics": 2,
+    "title": 62,
+    "price": 10,
+    "population": 1,
+    "general": 42,
+    "allocation": 2,
+    "indicator": 1
+  },
+  "by_document_type": {
+    "html": 502,
+    "announcement": 9,
+    "pdf": 181,
+    "html_with_tables": 91,
+    "press_release": 16,
+    "report": 4
+  },
+  "by_region": {
+    "Est": 282,
+    "Yaounde": 3,
+    "Centre": 136,
+    "Douala": 14,
+    "Nord": 1,
+    "Adamaoua": 37,
+    "Sud": 1,
+    "Yaoundé": 1,
+    "Extrême-Nord": 1,
+    "East": 12,
+    "North": 2,
+    "Littoral": 1
+  },
+  "date_range": {
+    "earliest": "2022-07-04",
+    "latest": "2026-02-13"
+  },
+  "pdf_count": 181,
+  "records_with_tables": 91,
+  "records_with_dates": 153,
+  "average_relevance_score": 3.54,
+  "top_keywords": {
+    "développement": 403,
+    "construction": 248,
+    "projet": 233,
+    "aménagement": 179,
+    "plan": 155,
+    "logement": 136,
+    "loi": 134,
+    "eau": 126,
+    "marché": 111,
+    "financement": 108,
+    "décret": 104,
+    "permis": 103,
+    "terrain": 74,
+    "investissement": 69,
+    "urbanisation": 68,
+    "arrêté": 67,
+    "terre": 65,
+    "route": 65,
+    "titre": 61,
+    "population": 60
+  }
+}

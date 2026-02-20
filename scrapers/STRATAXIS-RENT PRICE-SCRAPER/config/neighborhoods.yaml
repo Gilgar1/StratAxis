@@ -1,0 +1,104 @@
+douala:
+  akwa:
+    - "akwa"
+    - "akwa nord"
+    - "akwa sud"
+  bonanjo:
+    - "bonanjo"
+    - "bonaberi"
+  bonapriso:
+    - "bonapriso"
+  deido:
+    - "deido"
+    - "deïdo"
+  bali:
+    - "bali"
+  makepe:
+    - "makepe"
+    - "makèpè"
+    - "new makepe"
+  logbaba:
+    - "logbaba"
+    - "logbessou"
+  bonamoussadi:
+    - "bonamoussadi"
+    - "bonamousadi"
+  pk10:
+    - "pk10"
+    - "pk 10"
+    - "pk-10"
+  pk12:
+    - "pk12"
+    - "pk 12"
+    - "pk-12"
+  pk14:
+    - "pk14"
+    - "pk 14"
+    - "pk-14"
+  ndogpassi:
+    - "ndogpassi"
+    - "ndogpasdi"
+  new_bell:
+    - "new bell"
+    - "newbell"
+    - "new-bell"
+  kotto:
+    - "kotto"
+  cite_sic:
+    - "cité sic"
+    - "cite sic"
+    - "sic"
+  yassa:
+    - "yassa"
+  bassa:
+    - "bassa"
+
+yaounde:
+  bastos:
+    - "bastos"
+  odza:
+    - "odza"
+  mvan:
+    - "mvan"
+    - "m'van"
+  essos:
+    - "essos"
+  elig_essono:
+    - "elig-essono"
+    - "elig essono"
+    - "élig-essono"
+  ekounou:
+    - "ekounou"
+    - "éwounou"
+  mimboman:
+    - "mimboman"
+  ngoa_ekelle:
+    - "ngoa-ekelle"
+    - "ngoa ekelle"
+  cite_verte:
+    - "cité verte"
+    - "cite verte"
+  emana:
+    - "emana"
+    - "émana"
+  mokolo:
+    - "mokolo"
+  nkol_eton:
+    - "nkol-eton"
+    - "nkol eton"
+  tsinga:
+    - "tsinga"
+  nkomo:
+    - "nkomo"
+  nlongkak:
+    - "nlongkak"
+    - "nlongak"
+  mendeleo:
+    - "mendelo"
+    - "mendeleo"
+  biyem_assi:
+    - "biyem-assi"
+    - "biyem assi"
+  santa_barbara:
+    - "santa barbara"
+    - "santa-barbara"

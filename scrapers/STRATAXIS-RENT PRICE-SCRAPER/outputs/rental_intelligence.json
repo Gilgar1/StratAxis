@@ -1,0 +1,250 @@
+{
+  "douala": {
+    "": {
+      "studio": {
+        "2026": {
+          "median_monthly_rent_xaf": 67500.0,
+          "p25_monthly_rent_xaf": 56250.0,
+          "p75_monthly_rent_xaf": 86250.0,
+          "median_rent_per_sqm": null,
+          "listing_count": 10,
+          "rent_volatility_score": 0.47023382101808125,
+          "data_confidence": "medium"
+        }
+      },
+      "unknown": {
+        "2026": {
+          "median_monthly_rent_xaf": 130000.0,
+          "p25_monthly_rent_xaf": 80000.0,
+          "p75_monthly_rent_xaf": 300000.0,
+          "median_rent_per_sqm": 3066.666666666667,
+          "listing_count": 25,
+          "rent_volatility_score": 0.8421432387363103,
+          "data_confidence": "low"
+        }
+      },
+      "villa_house": {
+        "2026": {
+          "median_monthly_rent_xaf": 800000.0,
+          "p25_monthly_rent_xaf": 675000.0,
+          "p75_monthly_rent_xaf": 1675000.0,
+          "median_rent_per_sqm": 13333.333333333334,
+          "listing_count": 4,
+          "rent_volatility_score": 1.0568311720693002,
+          "data_confidence": "low"
+        }
+      }
+    },
+    "ange raphaël": {
+      "studio": {
+        "2026": {
+          "median_monthly_rent_xaf": 30.0,
+          "p25_monthly_rent_xaf": 30.0,
+          "p75_monthly_rent_xaf": 30.0,
+          "median_rent_per_sqm": 1.0,
+          "listing_count": 1,
+          "rent_volatility_score": 0.0,
+          "data_confidence": "low"
+        }
+      }
+    },
+    "logbaba": {
+      "unknown": {
+        "2026": {
+          "median_monthly_rent_xaf": 100000.0,
+          "p25_monthly_rent_xaf": 100000.0,
+          "p75_monthly_rent_xaf": 100000.0,
+          "median_rent_per_sqm": null,
+          "listing_count": 1,
+          "rent_volatility_score": 0.0,
+          "data_confidence": "low"
+        }
+      }
+    },
+    "louer": {
+      "studio": {
+        "2026": {
+          "median_monthly_rent_xaf": 700.0,
+          "p25_monthly_rent_xaf": 575.0,
+          "p75_monthly_rent_xaf": 825.0,
+          "median_rent_per_sqm": null,
+          "listing_count": 2,
+          "rent_volatility_score": 0.5050762722761054,
+          "data_confidence": "low"
+        }
+      },
+      "two_bedroom": {
+        "2026": {
+          "median_monthly_rent_xaf": 1.0,
+          "p25_monthly_rent_xaf": 1.0,
+          "p75_monthly_rent_xaf": 1.0,
+          "median_rent_per_sqm": null,
+          "listing_count": 1,
+          "rent_volatility_score": 0.0,
+          "data_confidence": "low"
+        }
+      },
+      "villa_house": {
+        "2026": {
+          "median_monthly_rent_xaf": 300.6,
+          "p25_monthly_rent_xaf": 150.89999999999998,
+          "p75_monthly_rent_xaf": 450.3,
+          "median_rent_per_sqm": null,
+          "listing_count": 2,
+          "rent_volatility_score": 1.408567999249849,
+          "data_confidence": "low"
+        }
+      }
+    },
+    "louer à bastos": {
+      "two_bedroom": {
+        "2026": {
+          "median_monthly_rent_xaf": 550.0,
+          "p25_monthly_rent_xaf": 550.0,
+          "p75_monthly_rent_xaf": 550.0,
+          "median_rent_per_sqm": null,
+          "listing_count": 1,
+          "rent_volatility_score": 0.0,
+          "data_confidence": "low"
+        }
+      }
+    },
+    "louer à nsimeyong nsimeyong": {
+      "studio": {
+        "2026": {
+          "median_monthly_rent_xaf": 250.0,
+          "p25_monthly_rent_xaf": 250.0,
+          "p75_monthly_rent_xaf": 250.0,
+          "median_rent_per_sqm": null,
+          "listing_count": 1,
+          "rent_volatility_score": 0.0,
+          "data_confidence": "low"
+        }
+      }
+    }
+  },
+  "yaounde": {
+    "": {
+      "studio": {
+        "2026": {
+          "median_monthly_rent_xaf": 67500.0,
+          "p25_monthly_rent_xaf": 56250.0,
+          "p75_monthly_rent_xaf": 86250.0,
+          "median_rent_per_sqm": null,
+          "listing_count": 10,
+          "rent_volatility_score": 0.47023382101808125,
+          "data_confidence": "medium"
+        }
+      },
+      "unknown": {
+        "2026": {
+          "median_monthly_rent_xaf": 130000.0,
+          "p25_monthly_rent_xaf": 80000.0,
+          "p75_monthly_rent_xaf": 300000.0,
+          "median_rent_per_sqm": 3066.666666666667,
+          "listing_count": 25,
+          "rent_volatility_score": 0.8421432387363103,
+          "data_confidence": "low"
+        }
+      },
+      "villa_house": {
+        "2026": {
+          "median_monthly_rent_xaf": 800000.0,
+          "p25_monthly_rent_xaf": 675000.0,
+          "p75_monthly_rent_xaf": 1675000.0,
+          "median_rent_per_sqm": 13333.333333333334,
+          "listing_count": 4,
+          "rent_volatility_score": 1.0568311720693002,
+          "data_confidence": "low"
+        }
+      }
+    },
+    "- logbessou location": {
+      "unknown": {
+        "2026": {
+          "median_monthly_rent_xaf": 100000.0,
+          "p25_monthly_rent_xaf": 100000.0,
+          "p75_monthly_rent_xaf": 100000.0,
+          "median_rent_per_sqm": null,
+          "listing_count": 1,
+          "rent_volatility_score": 0.0,
+          "data_confidence": "low"
+        }
+      }
+    },
+    "ange raphaël": {
+      "studio": {
+        "2026": {
+          "median_monthly_rent_xaf": 30.0,
+          "p25_monthly_rent_xaf": 30.0,
+          "p75_monthly_rent_xaf": 30.0,
+          "median_rent_per_sqm": 1.0,
+          "listing_count": 1,
+          "rent_volatility_score": 0.0,
+          "data_confidence": "low"
+        }
+      }
+    },
+    "bastos": {
+      "two_bedroom": {
+        "2026": {
+          "median_monthly_rent_xaf": 550.0,
+          "p25_monthly_rent_xaf": 550.0,
+          "p75_monthly_rent_xaf": 550.0,
+          "median_rent_per_sqm": null,
+          "listing_count": 1,
+          "rent_volatility_score": 0.0,
+          "data_confidence": "low"
+        }
+      }
+    },
+    "louer": {
+      "studio": {
+        "2026": {
+          "median_monthly_rent_xaf": 700.0,
+          "p25_monthly_rent_xaf": 575.0,
+          "p75_monthly_rent_xaf": 825.0,
+          "median_rent_per_sqm": null,
+          "listing_count": 2,
+          "rent_volatility_score": 0.5050762722761054,
+          "data_confidence": "low"
+        }
+      },
+      "two_bedroom": {
+        "2026": {
+          "median_monthly_rent_xaf": 1.0,
+          "p25_monthly_rent_xaf": 1.0,
+          "p75_monthly_rent_xaf": 1.0,
+          "median_rent_per_sqm": null,
+          "listing_count": 1,
+          "rent_volatility_score": 0.0,
+          "data_confidence": "low"
+        }
+      },
+      "villa_house": {
+        "2026": {
+          "median_monthly_rent_xaf": 300.6,
+          "p25_monthly_rent_xaf": 150.89999999999998,
+          "p75_monthly_rent_xaf": 450.3,
+          "median_rent_per_sqm": null,
+          "listing_count": 2,
+          "rent_volatility_score": 1.408567999249849,
+          "data_confidence": "low"
+        }
+      }
+    },
+    "louer à nsimeyong nsimeyong": {
+      "studio": {
+        "2026": {
+          "median_monthly_rent_xaf": 250.0,
+          "p25_monthly_rent_xaf": 250.0,
+          "p75_monthly_rent_xaf": 250.0,
+          "median_rent_per_sqm": null,
+          "listing_count": 1,
+          "rent_volatility_score": 0.0,
+          "data_confidence": "low"
+        }
+      }
+    }
+  }
+}

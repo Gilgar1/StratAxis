@@ -1,0 +1,21 @@
+﻿city,neighborhood,housing_type,year,median_monthly_rent_xaf,p25_monthly_rent_xaf,p75_monthly_rent_xaf,median_rent_per_sqm,listing_count,rent_volatility_score,data_confidence
+douala,,studio,2026,67500.0,56250.0,86250.0,,10,0.47023382101808125,medium
+douala,,unknown,2026,130000.0,80000.0,300000.0,3066.666666666667,25,0.8421432387363103,low
+douala,,villa_house,2026,800000.0,675000.0,1675000.0,13333.333333333334,4,1.0568311720693002,low
+douala,ange raphaël,studio,2026,30.0,30.0,30.0,1.0,1,0.0,low
+douala,logbaba,unknown,2026,100000.0,100000.0,100000.0,,1,0.0,low
+douala,louer,studio,2026,700.0,575.0,825.0,,2,0.5050762722761054,low
+douala,louer,two_bedroom,2026,1.0,1.0,1.0,,1,0.0,low
+douala,louer,villa_house,2026,300.6,150.89999999999998,450.3,,2,1.408567999249849,low
+douala,louer à bastos,two_bedroom,2026,550.0,550.0,550.0,,1,0.0,low
+douala,louer à nsimeyong nsimeyong,studio,2026,250.0,250.0,250.0,,1,0.0,low
+yaounde,,studio,2026,67500.0,56250.0,86250.0,,10,0.47023382101808125,medium
+yaounde,,unknown,2026,130000.0,80000.0,300000.0,3066.666666666667,25,0.8421432387363103,low
+yaounde,,villa_house,2026,800000.0,675000.0,1675000.0,13333.333333333334,4,1.0568311720693002,low
+yaounde,- logbessou location,unknown,2026,100000.0,100000.0,100000.0,,1,0.0,low
+yaounde,ange raphaël,studio,2026,30.0,30.0,30.0,1.0,1,0.0,low
+yaounde,bastos,two_bedroom,2026,550.0,550.0,550.0,,1,0.0,low
+yaounde,louer,studio,2026,700.0,575.0,825.0,,2,0.5050762722761054,low
+yaounde,louer,two_bedroom,2026,1.0,1.0,1.0,,1,0.0,low
+yaounde,louer,villa_house,2026,300.6,150.89999999999998,450.3,,2,1.408567999249849,low
+yaounde,louer à nsimeyong nsimeyong,studio,2026,250.0,250.0,250.0,,1,0.0,low

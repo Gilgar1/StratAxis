@@ -1,0 +1,62 @@
+studio:
+  keywords:
+    - "studio"
+    - "chambre moderne"
+    - "chambre meublée"
+    - "single room"
+    - "chambre salon"
+    - "t1"
+  bedrooms: 0
+
+one_bedroom:
+  keywords:
+    - "1 chambre"
+    - "1 bedroom"
+    - "appartement 1 chambre"
+    - "f2"
+    - "t2"
+  bedrooms: 1
+
+two_bedroom:
+  keywords:
+    - "2 chambres"
+    - "2 bedroom"
+    - "appartement 2 chambres"
+    - "f3"
+    - "t3"
+    - "deux chambres"
+  bedrooms: 2
+
+three_plus_bedroom:
+  keywords:
+    - "3 chambres"
+    - "3 bedroom"
+    - "4 chambres"
+    - "4 bedroom"
+    - "5 chambres"
+    - "f4"
+    - "f5"
+    - "t4"
+    - "t5"
+    - "trois chambres"
+    - "quatre chambres"
+  bedrooms: 3
+
+villa_house:
+  keywords:
+    - "villa"
+    - "maison"
+    - "house"
+    - "duplex"
+    - "triplex"
+    - "bungalow"
+    - "pavillon"
+  bedrooms: null
+
+shared_housing:
+  keywords:
+    - "colocation"
+    - "shared"
+    - "partagé"
+    - "roommate"
+  bedrooms: null

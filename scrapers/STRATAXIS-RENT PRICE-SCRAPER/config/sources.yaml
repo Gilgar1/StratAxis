@@ -1,0 +1,118 @@
+portals:
+  - name: "Mapiole"
+    url: "https://www.mapiole.com/"
+    type: "portal"
+    search_params:
+      douala: "/location/douala"
+      yaounde: "/location/yaounde"
+    filters: "rental"
+    
+  - name: "Koutchoumi"
+    url: "https://koutchoumi.com/"
+    type: "portal"
+    search_params:
+      douala: "/immobilier/location/douala"
+      yaounde: "/immobilier/location/yaounde"
+    
+  - name: "Keur Immo"
+    url: "https://keur-immo.com/en/cameroon/"
+    type: "portal"
+    
+  - name: "Geloka"
+    url: "https://www.geloka.com/en"
+    type: "portal"
+    
+  - name: "ADPM Real Estate"
+    url: "https://adpmrealestate.com/"
+    type: "agency"
+    
+  - name: "Coin Afrique"
+    url: "https://cm.coinafrique.com/categorie/immobilier"
+    type: "classifieds"
+    
+  - name: "HomeCM"
+    url: "https://www.homecm.online/"
+    type: "portal"
+    
+  - name: "Cameroun Maison"
+    url: "https://camerounmaison.com/"
+    type: "portal"
+    
+  - name: "Weetyu"
+    url: "https://weetyu.com/"
+    type: "portal"
+    
+  - name: "Cameroon Property"
+    url: "https://www.cameroonproperty.com/"
+    type: "portal"
+    
+  - name: "Realting"
+    url: "https://realting.com/cameroon/property"
+    type: "portal"
+    
+  - name: "4321 Property"
+    url: "https://www.4321property.com/cameroon/"
+    type: "portal"
+
+classifieds:
+  - name: "Jumia Deals"
+    url: "https://deals.jumia.cm/immobilier"
+    type: "classifieds"
+    
+  - name: "Expat"
+    url: "https://www.expat.com/en/housing/africa/cameroon/"
+    type: "classifieds"
+    
+  - name: "Afribaba"
+    url: "https://www.afribaba.cm/c-immobilier"
+    type: "classifieds"
+
+agencies:
+  - name: "SECPE Investments"
+    url: "https://www.secpeinvestments.com/listings/"
+    type: "agency"
+    
+  - name: "Groupe Tesla"
+    url: "https://www.groupetesla.com/"
+    type: "agency"
+    
+  - name: "Diamond Realty"
+    url: "https://www.diamondrealty.estate/"
+    type: "agency"
+    
+  - name: "C2C Mentors"
+    url: "https://c2cmentors.com/search-cameroon-properties/"
+    type: "agency"
+    
+  - name: "Immobilier A2M"
+    url: "https://immobiliera2m.com/"
+    type: "agency"
+    
+  - name: "Abbas Immob"
+    url: "https://www.abbasimmob.cm/"
+    type: "agency"
+    
+  - name: "Logements Du Cam"
+    url: "https://www.logementsducam.com/"
+    type: "agency"
+    
+  - name: "Groupe Sohaing"
+    url: "https://groupesohaing.com/our-business/real-estate/"
+    type: "agency"
+    
+  - name: "SCI L'immobilier"
+    url: "https://www.sci-limmobilier.com/"
+    type: "agency"
+    
+  - name: "Cameroon Realtors"
+    url: "https://cameroonrealtors.com/"
+    type: "agency"
+
+directories:
+  - name: "Walazouo"
+    url: "https://cm.walazouo.com/en/agencies"
+    type: "directory"
+    
+  - name: "Go Africa Online"
+    url: "https://www.goafricaonline.com/cm/annuaire/agences-immobilieres"
+    type: "directory"

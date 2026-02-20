@@ -114,3 +114,33 @@ node_modules/
 # IDEs
 .vscode/
 .idea/
+
+# ─── StratAxis specific ───────────────────────────────
+
+# Raw scraped data (large CSVs, keep cleaned ones only)
+data/raw/*.csv
+data/raw/*.json
+data/raw/institutional_pdfs/
+!data/raw/README.md
+
+# ML model artifacts (large binary files)
+backend/models/*.pkl
+backend/models/*.joblib
+!backend/models/README.md
+
+# Scrapers standalone data output folders
+scrapers/STRATAXIS-LAND-PRICE-SCRAPER/data/
+scrapers/STRATAXIS-LAND-PRICE-SCRAPER/output/
+scrapers/STRATAXIS-LAND-PRICE-SCRAPER/logs/
+scrapers/STRATAXIS-RENT\ PRICE-SCRAPER/data/
+scrapers/STRATAXIS-RENT\ PRICE-SCRAPER/logs/
+scrapers/RELEVANT\ RE\ DATA\ BY\ INS\ AND\ MIN\ STRATAXIS/strataxis_data/models/
+
+# Frontend build output
+frontend/dist/
+frontend/node_modules/
+
+# Python temp
+temp/
+*.tmp
+pipeline.log

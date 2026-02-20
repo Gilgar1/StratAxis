@@ -1,6 +1,6 @@
 # StratAxis
 
-StratAxis is a real estate analytics and price prediction platform focused on the Cameroonian market (initially Yaoundé and Douala). It combines automated data scraping, document OCR processing, and machine learning to provide actionable insights for property buyers, sellers, and investors.
+StratAxis is the real estate Analytics and Consulting platform focused on the Cameroonian market (initially Yaoundé and Douala). It combines automated data scraping, document OCR processing, and machine learning to provide actionable insights for property buyers, sellers, and investors.
 
 ## Features
 

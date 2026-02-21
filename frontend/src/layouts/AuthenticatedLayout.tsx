@@ -8,11 +8,11 @@ interface AuthenticatedLayoutProps {
 
 const AuthenticatedLayout: React.FC<AuthenticatedLayoutProps> = ({ children }) => {
     return (
-        <div className="min-h-screen flex flex-col">
+        <div className="h-screen overflow-hidden flex flex-col">
             <Header />
-            <div className="flex-1 flex">
+            <div className="flex-1 flex overflow-hidden">
                 <Navigation />
-                <main className="flex-1 overflow-auto bg-cream-50 dark:bg-primary-950">
+                <main className="flex-1 overflow-y-auto bg-cream-50 dark:bg-primary-950">
                     {children}
                 </main>
             </div>

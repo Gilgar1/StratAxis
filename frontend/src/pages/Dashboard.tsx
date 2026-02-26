@@ -346,7 +346,7 @@ const Dashboard: React.FC = () => {
                                     </Link>
                                 </div>
                                 <div className="hidden md:block text-right">
-                                    <div className="text-4xl font-bold mb-1">$49</div>
+                                    <div className="text-4xl font-bold mb-1">15,000 FCFA</div>
                                     <div className="text-sm text-primary-200">per month</div>
                                 </div>
                             </div>

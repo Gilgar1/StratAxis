@@ -1,67 +1,101 @@
 import React from 'react';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
-import { Package, TrendingDown, TrendingUp, MapPin } from 'lucide-react';
+import { Package, TrendingDown, TrendingUp, MapPin, Download, FileText } from 'lucide-react';
+import { exportToCSV, downloadAsPDF } from '../utils/exportUtils';
+import WatchlistButton from '../components/common/WatchlistButton';
+
+const inventoryData = [
+    {
+        city: 'Douala',
+        monthsOfSupply: 4.2,
+        trend: -0.3,
+        totalListings: 1247,
+        newListings30Days: 184,
+        marketStatus: 'Balanced',
+        neighborhoods: [
+            { name: 'Akwa', months: 2.8, status: "Seller's Market", price: 118500 },
+            { name: 'Bonanjo', months: 3.1, status: "Seller's Market", price: 108200 },
+            { name: 'Bonapriso', months: 3.5, status: 'Balanced', price: 97632 },
+            { name: 'Logbaba', months: 5.2, status: 'Balanced', price: 41000 },
+            { name: 'Makepe', months: 5.8, status: 'Balanced', price: 52932 },
+            { name: 'Kotto', months: 6.1, status: "Buyer's Market", price: 35000 },
+        ],
+    },
+    {
+        city: 'Yaoundé',
+        monthsOfSupply: 4.7,
+        trend: -0.2,
+        totalListings: 1163,
+        newListings30Days: 172,
+        marketStatus: 'Balanced',
+        neighborhoods: [
+            { name: 'Bastos', months: 2.5, status: "Seller's Market", price: 124229 },
+            { name: 'Nlongkak', months: 4.2, status: 'Balanced', price: 68000 },
+            { name: 'Essos', months: 5.1, status: 'Balanced', price: 55000 },
+            { name: 'Mvan', months: 5.6, status: 'Balanced', price: 42000 },
+            { name: 'Odza', months: 6.3, status: "Buyer's Market", price: 38000 },
+            { name: 'Mokolo', months: 6.8, status: "Buyer's Market", price: 31000 },
+        ],
+    },
+];
 
 const Inventory: React.FC = () => {
-    const inventoryData = [
-        {
-            city: 'Douala',
-            monthsOfSupply: 4.2,
-            trend: -0.3,
-            totalListings: 1247,
-            newListings30Days: 184,
-            marketStatus: 'Balanced',
-            neighborhoods: [
-                { name: 'Akwa', months: 2.8, status: 'Seller\'s Market' },
-                { name: 'Bonanjo', months: 3.1, status: 'Seller\'s Market' },
-                { name: 'Bonapriso', months: 3.5, status: 'Balanced' },
-                { name: 'Logbaba', months: 5.2, status: 'Balanced' },
-                { name: 'Makepe', months: 5.8, status: 'Balanced' },
-                { name: 'Kotto', months: 6.1, status: 'Buyer\'s Market' },
-            ]
-        },
-        {
-            city: 'Yaoundé',
-            monthsOfSupply: 4.7,
-            trend: -0.2,
-            totalListings: 1163,
-            newListings30Days: 172,
-            marketStatus: 'Balanced',
-            neighborhoods: [
-                { name: 'Bastos', months: 2.5, status: 'Seller\'s Market' },
-                { name: 'Nlongkak', months: 4.2, status: 'Balanced' },
-                { name: 'Essos', months: 5.1, status: 'Balanced' },
-                { name: 'Mvan', months: 5.6, status: 'Balanced' },
-                { name: 'Odza', months: 6.3, status: 'Buyer\'s Market' },
-                { name: 'Mokolo', months: 6.8, status: 'Buyer\'s Market' },
-            ]
-        }
-    ];
-
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'Seller\'s Market':
+            case "Seller's Market":
                 return 'bg-red-500/20 text-red-600 dark:text-red-400';
             case 'Balanced':
                 return 'bg-semantic-success/20 text-semantic-success';
-            case 'Buyer\'s Market':
+            case "Buyer's Market":
                 return 'bg-blue-500/20 text-blue-600 dark:text-blue-400';
             default:
                 return 'bg-primary-500/20 text-primary-600';
         }
     };
 
+    const handleExportCSV = () => {
+        const rows: Record<string, unknown>[] = [];
+        inventoryData.forEach(city => {
+            city.neighborhoods.forEach(n => {
+                rows.push({
+                    City: city.city,
+                    Neighborhood: n.name,
+                    'Months of Supply': n.months,
+                    'Market Status': n.status,
+                    'Approx. Median Price/m² (XAF)': n.price,
+                    'City Total Listings': city.totalListings,
+                    'New Listings (30d)': city.newListings30Days,
+                });
+            });
+        });
+        exportToCSV(rows, `StratAxis_Inventory_${new Date().toISOString().slice(0, 10)}`);
+    };
+
+    const handleDownloadPDF = () => {
+        downloadAsPDF('StratAxis – Inventory & Market Supply Report');
+    };
+
     return (
         <AuthenticatedLayout>
             <div className="p-8 max-w-7xl mx-auto">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-primary-900 dark:text-white mb-2 flex items-center">
-                        <Package className="w-8 h-8 mr-3 text-accent-gold" />
-                        Inventory (Months of Supply)
-                    </h1>
-                    <p className="text-primary-600 dark:text-primary-300">
-                        Property inventory and market supply analysis
-                    </p>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                    <div>
+                        <h1 className="text-3xl font-bold text-primary-900 dark:text-white mb-2 flex items-center">
+                            <Package className="w-8 h-8 mr-3 text-accent-gold" />
+                            Inventory (Months of Supply)
+                        </h1>
+                        <p className="text-primary-600 dark:text-primary-300">
+                            Property inventory and market supply analysis
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <button onClick={handleDownloadPDF} className="btn btn-outline flex items-center">
+                            <FileText className="w-4 h-4 mr-2" /> Download PDF
+                        </button>
+                        <button onClick={handleExportCSV} className="btn btn-outline flex items-center">
+                            <Download className="w-4 h-4 mr-2" /> Export CSV
+                        </button>
+                    </div>
                 </div>
 
                 {inventoryData.map((city) => (
@@ -122,9 +156,19 @@ const Inventory: React.FC = () => {
                             {city.neighborhoods.map((neighborhood) => (
                                 <div
                                     key={neighborhood.name}
-                                    className="bg-white dark:bg-primary-900 p-4 rounded-lg border border-primary-200 dark:border-primary-800"
+                                    className="bg-white dark:bg-primary-900 p-4 rounded-lg border border-primary-200 dark:border-primary-800 hover:border-accent-gold/50 transition-colors"
                                 >
-                                    <h4 className="font-semibold text-primary-900 dark:text-white mb-3">{neighborhood.name}</h4>
+                                    <div className="flex justify-between items-start mb-3">
+                                        <h4 className="font-semibold text-primary-900 dark:text-white">{neighborhood.name}</h4>
+                                        <WatchlistButton
+                                            compact
+                                            neighborhood={neighborhood.name}
+                                            city={city.city}
+                                            type="Land"
+                                            currentPrice={neighborhood.price}
+                                            change="+0%"
+                                        />
+                                    </div>
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between">
                                             <p className="text-sm text-primary-500 dark:text-primary-400">Supply</p>
@@ -132,11 +176,9 @@ const Inventory: React.FC = () => {
                                                 {neighborhood.months} mo
                                             </p>
                                         </div>
-                                        <div>
-                                            <span className={`inline-block px-2 py-1 rounded text-xs font-semibold w-full text-center ${getStatusColor(neighborhood.status)}`}>
-                                                {neighborhood.status}
-                                            </span>
-                                        </div>
+                                        <span className={`inline-block px-2 py-1 rounded text-xs font-semibold w-full text-center ${getStatusColor(neighborhood.status)}`}>
+                                            {neighborhood.status}
+                                        </span>
                                     </div>
                                 </div>
                             ))}
@@ -150,19 +192,19 @@ const Inventory: React.FC = () => {
                         <div>
                             <strong className="text-red-600 dark:text-red-400">0-4 Months:</strong>
                             <p className="text-primary-600 dark:text-primary-300 mt-1">
-                                Seller's Market - Low inventory, strong demand, rising prices
+                                Seller's Market — Low inventory, strong demand, rising prices
                             </p>
                         </div>
                         <div>
                             <strong className="text-semantic-success">4-6 Months:</strong>
                             <p className="text-primary-600 dark:text-primary-300 mt-1">
-                                Balanced Market - Supply and demand in equilibrium
+                                Balanced Market — Supply and demand in equilibrium
                             </p>
                         </div>
                         <div>
                             <strong className="text-blue-600 dark:text-blue-400">6+ Months:</strong>
                             <p className="text-primary-600 dark:text-primary-300 mt-1">
-                                Buyer's Market - High inventory, negotiating power for buyers
+                                Buyer's Market — High inventory, negotiating power for buyers
                             </p>
                         </div>
                     </div>

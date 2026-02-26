@@ -1,13 +1,10 @@
 ﻿import React, { useState } from 'react';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
 import { formatCurrency } from '../utils/formatters';
-import { Search, Filter, Download, ArrowUpDown } from 'lucide-react';
-// import Loading from '../components/common/Loading';
+import { Search, Filter, Download, FileText, ArrowUpDown } from 'lucide-react';
 import clsx from 'clsx';
-
-// We need to create the hook first, but I'll write the component assuming the hook exists or inline the data loading for now.
-// Actually, creating a hook based on the JSON file is better architecture.
-// For this step, I'll import the JSON directly since it's in src/data
+import { exportToCSV, downloadAsPDF } from '../utils/exportUtils';
+import WatchlistButton from '../components/common/WatchlistButton';
 
 import landDataRaw from '../data/land_prices_intelligence.json';
 import { LandPriceData, LandPriceNeighborhood } from '../types';
@@ -28,22 +25,39 @@ const LandPriceIntelligence: React.FC = () => {
     }
   };
 
-  const filteredData = data.neighborhoods.filter((item) => {
-    const matchesSearch = item.neighborhood.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCity = cityFilter === 'All' || item.city === cityFilter;
-    return matchesSearch && matchesCity;
-  }).sort((a, b) => {
-    const aValue = a[sortField];
-    const bValue = b[sortField];
+  const filteredData = data.neighborhoods
+    .filter((item) => {
+      const matchesSearch = item.neighborhood.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCity = cityFilter === 'All' || item.city === cityFilter;
+      return matchesSearch && matchesCity;
+    })
+    .sort((a, b) => {
+      const aValue = a[sortField];
+      const bValue = b[sortField];
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+      }
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
 
-    if (typeof aValue === 'string' && typeof bValue === 'string') {
-      return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
-    }
-    // numeric sort
-    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-    return 0;
-  });
+  const handleExportCSV = () => {
+    const rows = filteredData.map(row => ({
+      City: row.city,
+      Neighborhood: row.neighborhood,
+      'Median Price/m² (XAF)': row.median_land_price_per_sqm_xaf,
+      'P25 Price/m² (XAF)': row.p25_land_price_per_sqm_xaf,
+      'P75 Price/m² (XAF)': row.p75_land_price_per_sqm_xaf,
+      'Listing Count': row.listing_count,
+      'Data Confidence': row.data_confidence_flag,
+    }));
+    exportToCSV(rows, `StratAxis_Land_Prices_${cityFilter}_${new Date().toISOString().slice(0, 10)}`);
+  };
+
+  const handleDownloadPDF = () => {
+    downloadAsPDF('StratAxis – Land Price Intelligence Report');
+  };
 
   return (
     <AuthenticatedLayout>
@@ -55,9 +69,14 @@ const LandPriceIntelligence: React.FC = () => {
               Detailed price analysis per square meter across {data.metadata.total_neighborhoods} neighborhoods.
             </p>
           </div>
-          <button className="btn btn-outline flex items-center">
-            <Download className="w-4 h-4 mr-2" /> Export CSV
-          </button>
+          <div className="flex items-center gap-3">
+            <button onClick={handleDownloadPDF} className="btn btn-outline flex items-center">
+              <FileText className="w-4 h-4 mr-2" /> Download PDF
+            </button>
+            <button onClick={handleExportCSV} className="btn btn-outline flex items-center">
+              <Download className="w-4 h-4 mr-2" /> Export CSV
+            </button>
+          </div>
         </div>
 
         {/* Filters */}
@@ -113,6 +132,7 @@ const LandPriceIntelligence: React.FC = () => {
                   <th className="p-4 font-semibold text-primary-900 dark:text-white text-center cursor-pointer hover:bg-primary-100 dark:hover:bg-primary-700 transition" onClick={() => handleSort('data_confidence_flag')}>
                     <div className="flex items-center justify-center">Confidence <ArrowUpDown className="w-3 h-3 ml-2 opacity-50" /></div>
                   </th>
+                  <th className="p-4 font-semibold text-primary-900 dark:text-white text-center">Watch</th>
                 </tr>
               </thead>
               <tbody>
@@ -149,12 +169,22 @@ const LandPriceIntelligence: React.FC = () => {
                         {row.data_confidence_flag}
                       </span>
                     </td>
+                    <td className="p-4 text-center">
+                      <WatchlistButton
+                        compact
+                        neighborhood={row.neighborhood}
+                        city={row.city}
+                        type="Land"
+                        currentPrice={row.median_land_price_per_sqm_xaf}
+                        change="+0%"
+                      />
+                    </td>
                   </tr>
                 ))}
 
                 {filteredData.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="p-8 text-center text-primary-500">
+                    <td colSpan={8} className="p-8 text-center text-primary-500">
                       No neighborhoods found matching your criteria.
                     </td>
                   </tr>

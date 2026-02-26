@@ -1,55 +1,84 @@
 import React from 'react';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
 import { Home, TrendingDown, MapPin, AlertCircle } from 'lucide-react';
+import ExportBar from '../components/common/ExportBar';
+import WatchlistButton from '../components/common/WatchlistButton';
+
+const cityData = [
+    {
+        city: 'Douala',
+        currentRate: 5.8,
+        trend: -0.3,
+        avgDaysVacant: 28,
+        neighborhoods: [
+            { name: 'Akwa', rate: 3.2, demand: 'High' },
+            { name: 'Bonanjo', rate: 4.1, demand: 'High' },
+            { name: 'Bonapriso', rate: 3.8, demand: 'High' },
+            { name: 'Logbaba', rate: 6.5, demand: 'Medium' },
+            { name: 'Makepe', rate: 7.2, demand: 'Medium' },
+            { name: 'Kotto', rate: 8.1, demand: 'Medium' },
+        ],
+    },
+    {
+        city: 'Yaoundé',
+        currentRate: 6.2,
+        trend: -0.5,
+        avgDaysVacant: 32,
+        neighborhoods: [
+            { name: 'Bastos', rate: 2.9, demand: 'High' },
+            { name: 'Nlongkak', rate: 5.3, demand: 'Medium' },
+            { name: 'Essos', rate: 6.8, demand: 'Medium' },
+            { name: 'Mvan', rate: 7.5, demand: 'Medium' },
+            { name: 'Odza', rate: 7.9, demand: 'Medium' },
+            { name: 'Mokolo', rate: 9.2, demand: 'Low' },
+        ],
+    },
+];
 
 const VacancyRate: React.FC = () => {
-    const cityData = [
-        {
-            city: 'Douala',
-            currentRate: 5.8,
-            trend: -0.3,
-            avgDaysVacant: 28,
-            neighborhoods: [
-                { name: 'Akwa', rate: 3.2, demand: 'High' },
-                { name: 'Bonanjo', rate: 4.1, demand: 'High' },
-                { name: 'Bonapriso', rate: 3.8, demand: 'High' },
-                { name: 'Logbaba', rate: 6.5, demand: 'Medium' },
-                { name: 'Makepe', rate: 7.2, demand: 'Medium' },
-                { name: 'Kotto', rate: 8.1, demand: 'Medium' },
-            ]
-        },
-        {
-            city: 'Yaoundé',
-            currentRate: 6.2,
-            trend: -0.5,
-            avgDaysVacant: 32,
-            neighborhoods: [
-                { name: 'Bastos', rate: 2.9, demand: 'High' },
-                { name: 'Nlongkak', rate: 5.3, demand: 'Medium' },
-                { name: 'Essos', rate: 6.8, demand: 'Medium' },
-                { name: 'Mvan', rate: 7.5, demand: 'Medium' },
-                { name: 'Odza', rate: 7.9, demand: 'Medium' },
-                { name: 'Mokolo', rate: 9.2, demand: 'Low' },
-            ]
-        }
-    ];
+    const demandColor = (d: string) =>
+        d === 'High'
+            ? 'bg-semantic-success/20 text-semantic-success'
+            : d === 'Medium'
+                ? 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-400'
+                : 'bg-red-500/20 text-red-600 dark:text-red-400';
+
+    const csvRows: Record<string, unknown>[] = [];
+    cityData.forEach(city => {
+        city.neighborhoods.forEach(n => {
+            csvRows.push({
+                City: city.city,
+                Neighborhood: n.name,
+                'Vacancy Rate (%)': n.rate,
+                'Rental Demand': n.demand,
+                'City Vacancy Rate (%)': city.currentRate,
+                'City Avg Days Vacant': city.avgDaysVacant,
+            });
+        });
+    });
 
     return (
         <AuthenticatedLayout>
             <div className="p-8 max-w-7xl mx-auto">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-primary-900 dark:text-white mb-2 flex items-center">
-                        <Home className="w-8 h-8 mr-3 text-accent-gold" />
-                        Vacancy Rate
-                    </h1>
-                    <p className="text-primary-600 dark:text-primary-300">
-                        Current vacancy rates and rental market health indicators
-                    </p>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                    <div>
+                        <h1 className="text-3xl font-bold text-primary-900 dark:text-white mb-2 flex items-center">
+                            <Home className="w-8 h-8 mr-3 text-accent-gold" />
+                            Vacancy Rate
+                        </h1>
+                        <p className="text-primary-600 dark:text-primary-300">
+                            Current vacancy rates and rental market health indicators
+                        </p>
+                    </div>
+                    <ExportBar
+                        csvRows={csvRows}
+                        csvFilename={`StratAxis_Vacancy_Rate_${new Date().toISOString().slice(0, 10)}`}
+                        pdfTitle="StratAxis – Vacancy Rate Report"
+                    />
                 </div>
 
                 {cityData.map((city) => (
                     <div key={city.city} className="mb-8">
-                        {/* City Overview */}
                         <div className="bg-white dark:bg-primary-900 p-6 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm mb-6">
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center">
@@ -65,7 +94,6 @@ const VacancyRate: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
-
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="bg-primary-50 dark:bg-primary-800 p-4 rounded-lg">
                                     <p className="text-sm text-primary-500 dark:text-primary-400 mb-1">Average Days Vacant</p>
@@ -78,29 +106,33 @@ const VacancyRate: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Neighborhood Breakdown */}
                         <h3 className="text-lg font-bold text-primary-900 dark:text-white mb-4">Neighborhood Breakdown</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                            {city.neighborhoods.map((neighborhood) => (
+                            {city.neighborhoods.map((n) => (
                                 <div
-                                    key={neighborhood.name}
-                                    className="bg-white dark:bg-primary-900 p-4 rounded-lg border border-primary-200 dark:border-primary-800"
+                                    key={n.name}
+                                    className="bg-white dark:bg-primary-900 p-4 rounded-lg border border-primary-200 dark:border-primary-800 hover:border-accent-gold/50 transition-colors"
                                 >
-                                    <h4 className="font-semibold text-primary-900 dark:text-white mb-2">{neighborhood.name}</h4>
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h4 className="font-semibold text-primary-900 dark:text-white">{n.name}</h4>
+                                        <WatchlistButton
+                                            compact
+                                            neighborhood={n.name}
+                                            city={city.city}
+                                            type="Vacancy"
+                                            currentPrice={0}
+                                            change={`${n.rate}%`}
+                                        />
+                                    </div>
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <p className="text-sm text-primary-500 dark:text-primary-400">Vacancy</p>
-                                            <p className="text-xl font-bold text-primary-900 dark:text-white">{neighborhood.rate}%</p>
+                                            <p className="text-xl font-bold text-primary-900 dark:text-white">{n.rate}%</p>
                                         </div>
                                         <div className="text-right">
                                             <p className="text-sm text-primary-500 dark:text-primary-400">Demand</p>
-                                            <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${neighborhood.demand === 'High'
-                                                    ? 'bg-semantic-success/20 text-semantic-success'
-                                                    : neighborhood.demand === 'Medium'
-                                                        ? 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-400'
-                                                        : 'bg-red-500/20 text-red-600 dark:text-red-400'
-                                                }`}>
-                                                {neighborhood.demand}
+                                            <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${demandColor(n.demand)}`}>
+                                                {n.demand}
                                             </span>
                                         </div>
                                     </div>
@@ -116,8 +148,8 @@ const VacancyRate: React.FC = () => {
                         <div>
                             <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">What's a Healthy Vacancy Rate?</h3>
                             <p className="text-sm text-blue-700 dark:text-blue-200">
-                                A vacancy rate between 5-8% is generally considered healthy, indicating balanced supply and demand.
-                                Rates below 5% suggest a landlord's market with strong demand, while rates above 8% may indicate oversupply.
+                                A vacancy rate between 5–8% is generally considered healthy. Rates below 5% signal a landlord's market;
+                                above 8% may indicate oversupply.
                             </p>
                         </div>
                     </div>

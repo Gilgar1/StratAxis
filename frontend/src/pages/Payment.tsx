@@ -12,7 +12,6 @@ const Payment: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
 
-    const plan = searchParams.get('plan');
     const period = searchParams.get('period');
 
     const amount = period === 'yearly' ? '150,000' : '15,000';

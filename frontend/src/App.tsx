@@ -21,7 +21,7 @@ import Insights from './pages/Insights';
 import DataQuality from './pages/DataQuality';
 import Watchlists from './pages/Watchlists';
 import Comparison from './pages/Comparison';
-import Scenario from './pages/Scenario';
+import YieldEstimator from './pages/YieldEstimator';
 import Alerts from './pages/Alerts';
 import ExportReporting from './pages/ExportReporting';
 
@@ -148,10 +148,10 @@ function App() {
                         }
                     />
                     <Route
-                        path="/scenario"
+                        path="/yield-estimator"
                         element={
                             <ProtectedRoute>
-                                <Scenario />
+                                <YieldEstimator />
                             </ProtectedRoute>
                         }
                     />

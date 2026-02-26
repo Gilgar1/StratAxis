@@ -5,7 +5,12 @@ import { Menu, X, Sun, Moon } from 'lucide-react';
 import clsx from 'clsx';
 import Logo from './Logo';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+    toggleSidebar?: () => void;
+    isSidebarOpen?: boolean;
+}
+
+const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen = false }) => {
     const { isAuthenticated, user, logout } = useAuth();
     const location = useLocation();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -117,10 +122,17 @@ const Header: React.FC = () => {
 
                     {/* Mobile Menu Button */}
                     <button
-                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        onClick={() => {
+                            if (toggleSidebar) {
+                                toggleSidebar();
+                            } else {
+                                setMobileMenuOpen(!mobileMenuOpen);
+                            }
+                        }}
                         className="md:hidden p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-800"
+                        aria-label="Toggle menu"
                     >
-                        {mobileMenuOpen ? (
+                        {(toggleSidebar ? isSidebarOpen : mobileMenuOpen) ? (
                             <X className="w-6 h-6" />
                         ) : (
                             <Menu className="w-6 h-6" />
@@ -129,7 +141,7 @@ const Header: React.FC = () => {
                 </div>
 
                 {/* Mobile Menu */}
-                {mobileMenuOpen && (
+                {mobileMenuOpen && !toggleSidebar && (
                     <div className="md:hidden py-4 border-t border-primary-200 dark:border-primary-800">
                         <div className="flex flex-col space-y-4">
                             {!isAuthenticated ? (

@@ -1,6 +1,8 @@
 import React from 'react';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
 import { Clock, TrendingDown, MapPin, Calendar } from 'lucide-react';
+import ExportBar from '../components/common/ExportBar';
+import WatchlistButton from '../components/common/WatchlistButton';
 
 const DaysOnMarket: React.FC = () => {
     const marketData = [
@@ -49,17 +51,39 @@ const DaysOnMarket: React.FC = () => {
         }
     };
 
+    const csvRows: Record<string, unknown>[] = [];
+    marketData.forEach(city => {
+        city.neighborhoods.forEach(n => {
+            csvRows.push({
+                City: city.city,
+                Neighborhood: n.name,
+                'Avg Days on Market': n.avgDays,
+                'Median Days on Market': n.medianDays,
+                'Market Speed': n.speed,
+                'City Avg Days': city.avgDays,
+                'Fastest Sales (city)': city.fastestSales,
+            });
+        });
+    });
+
     return (
         <AuthenticatedLayout>
             <div className="p-8 max-w-7xl mx-auto">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-primary-900 dark:text-white mb-2 flex items-center">
-                        <Clock className="w-8 h-8 mr-3 text-accent-gold" />
-                        Days on Market
-                    </h1>
-                    <p className="text-primary-600 dark:text-primary-300">
-                        Average time properties spend on the market before selling
-                    </p>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                    <div>
+                        <h1 className="text-3xl font-bold text-primary-900 dark:text-white mb-2 flex items-center">
+                            <Clock className="w-8 h-8 mr-3 text-accent-gold" />
+                            Days on Market
+                        </h1>
+                        <p className="text-primary-600 dark:text-primary-300">
+                            Average time properties spend on the market before selling
+                        </p>
+                    </div>
+                    <ExportBar
+                        csvRows={csvRows}
+                        csvFilename={`StratAxis_Days_On_Market_${new Date().toISOString().slice(0, 10)}`}
+                        pdfTitle="StratAxis – Days on Market Report"
+                    />
                 </div>
 
                 {marketData.map((city) => (
@@ -108,9 +132,19 @@ const DaysOnMarket: React.FC = () => {
                             {city.neighborhoods.map((neighborhood) => (
                                 <div
                                     key={neighborhood.name}
-                                    className="bg-white dark:bg-primary-900 p-4 rounded-lg border border-primary-200 dark:border-primary-800"
+                                    className="bg-white dark:bg-primary-900 p-4 rounded-lg border border-primary-200 dark:border-primary-800 hover:border-accent-gold/50 transition-colors"
                                 >
-                                    <h4 className="font-semibold text-primary-900 dark:text-white mb-3">{neighborhood.name}</h4>
+                                    <div className="flex justify-between items-start mb-3">
+                                        <h4 className="font-semibold text-primary-900 dark:text-white">{neighborhood.name}</h4>
+                                        <WatchlistButton
+                                            compact
+                                            neighborhood={neighborhood.name}
+                                            city={city.city}
+                                            type="Days on Market"
+                                            currentPrice={0}
+                                            change="—"
+                                        />
+                                    </div>
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between">
                                             <p className="text-sm text-primary-500 dark:text-primary-400">Average</p>

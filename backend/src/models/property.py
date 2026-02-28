@@ -3,7 +3,13 @@ from typing import Optional, List, Dict, Any
 from uuid import UUID, uuid4
 from sqlmodel import SQLModel, Field, Column, String, DateTime, Numeric, Integer, JSON, Relationship
 from enum import Enum
-from geoalchemy2 import Geography
+try:
+    from geoalchemy2 import Geography
+except ImportError:
+    # Python 3.14 fallback where Shapely fails to compile
+    def Geography(*args, **kwargs):
+        from sqlalchemy import String
+        return String
 
 class PropertyCity(str, Enum):
     YAOUNDE = "Yaoundé"

@@ -1,101 +1,134 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
 import { Percent, MapPin, Info } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import ExportBar from '../components/common/ExportBar';
-import WatchlistButton from '../components/common/WatchlistButton';
+import { RENT_BY_TYPE, CITIES, PROPERTY_TYPE_COLORS, fmt, City } from '../data/marketData';
 
-const YIELD_DATA = [
-    { city: 'Douala', grossYield: 7.2, propertyValue: 47500000, annualRent: 3420000 },
-    { city: 'Yaoundé', grossYield: 6.8, propertyValue: 54800000, annualRent: 3724000 },
-];
+const clsx = (...c: (string | boolean | undefined)[]) => c.filter(Boolean).join(' ');
 
 const BasicRentalYield: React.FC = () => {
-    const csvRows = YIELD_DATA.map(r => ({
+    const [selectedCity, setSelectedCity] = useState<City>('Douala');
+
+    const cityData = RENT_BY_TYPE.filter(r => r.city === selectedCity);
+
+    const csvRows = cityData.map(r => ({
         City: r.city,
+        'Property Type': r.propertyType,
         'Gross Yield (%)': r.grossYield,
-        'Avg Property Value (XAF)': r.propertyValue,
-        'Avg Annual Rent (XAF)': r.annualRent,
+        'Avg Monthly Rent (XAF)': r.avgMonthlyRent,
+        'Avg Property Value (XAF)': r.avgPropertyValue,
     }));
+
+    const chartData = cityData.map(r => ({
+        type: r.propertyType,
+        yield: r.grossYield,
+        fill: PROPERTY_TYPE_COLORS[r.propertyType],
+    }));
+
+    // City aggregate
+    const cityAvgYield = (cityData.reduce((s, r) => s + r.grossYield, 0) / cityData.length).toFixed(1);
 
     return (
         <AuthenticatedLayout>
-            <div className="p-8 max-w-7xl mx-auto">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div className="p-8 max-w-7xl mx-auto space-y-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-primary-900 dark:text-white mb-2 flex items-center">
-                            <Percent className="w-8 h-8 mr-3 text-accent-gold" />
+                        <h1 className="text-3xl font-bold text-primary-900 dark:text-white flex items-center mb-1">
+                            <Percent className="w-7 h-7 mr-3 text-accent-gold" />
                             Basic Rental Yield
                         </h1>
-                        <p className="text-primary-600 dark:text-primary-300">City average rental yield calculations</p>
+                        <p className="text-sm text-primary-500">Gross rental yields segmented by property type.</p>
                     </div>
-                    <ExportBar
-                        csvRows={csvRows}
-                        csvFilename={`StratAxis_Rental_Yield_${new Date().toISOString().slice(0, 10)}`}
-                        pdfTitle="StratAxis – Basic Rental Yield Report"
-                    />
+                    <ExportBar csvRows={csvRows} csvFilename="StratAxis_Rental_Yield" pdfTitle="StratAxis – Basic Rental Yield Report" />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    {YIELD_DATA.map(row => (
-                        <div key={row.city} className="bg-white dark:bg-primary-900 p-6 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center">
-                                    <MapPin className="w-6 h-6 text-accent-gold mr-2" />
-                                    <h2 className="text-xl font-bold text-primary-900 dark:text-white">{row.city}</h2>
-                                </div>
-                                <WatchlistButton
-                                    compact
-                                    neighborhood={row.city}
-                                    city={row.city}
-                                    type="Rental Yield"
-                                    currentPrice={0}
-                                    change={`${row.grossYield}%`}
-                                />
+                {/* City Toggle */}
+                <div className="flex gap-2">
+                    {CITIES.map(c => (
+                        <button key={c} onClick={() => setSelectedCity(c)}
+                            className={clsx(
+                                "px-4 py-1.5 rounded-lg text-sm font-semibold border transition-all",
+                                selectedCity === c
+                                    ? "bg-accent-gold/10 text-accent-gold border-accent-gold/30"
+                                    : "bg-white dark:bg-primary-900 text-primary-500 border-primary-200 dark:border-primary-800"
+                            )}>
+                            <MapPin className="w-3 h-3 inline mr-1" />{c}
+                        </button>
+                    ))}
+                </div>
+
+                {/* City Avg Hero */}
+                <div className="bg-white dark:bg-primary-900 p-6 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm flex items-center gap-6">
+                    <div>
+                        <p className="text-xs text-primary-400 uppercase tracking-wider font-bold">City Average Gross Yield</p>
+                        <p className="text-5xl font-bold text-emerald-500">{cityAvgYield}%</p>
+                        <p className="text-xs text-primary-400 mt-1">{selectedCity} — across all property types</p>
+                    </div>
+                </div>
+
+                {/* Yield Chart */}
+                <div className="bg-white dark:bg-primary-900 p-6 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm">
+                    <h3 className="font-bold text-primary-900 dark:text-white mb-4">Gross Yield by Property Type — {selectedCity}</h3>
+                    <ResponsiveContainer width="100%" height={280}>
+                        <BarChart data={chartData}>
+                            <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
+                            <XAxis dataKey="type" tick={{ fontSize: 10 }} angle={-15} textAnchor="end" height={60} />
+                            <YAxis unit="%" tick={{ fontSize: 12 }} domain={[0, 12]} />
+                            <Tooltip formatter={(v: number) => `${v}%`} />
+                            <Bar dataKey="yield" radius={[4, 4, 0, 0]} barSize={36}>
+                                {chartData.map((entry, i) => (
+                                    <Cell key={i} fill={entry.fill} />
+                                ))}
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+
+                {/* Detail Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {cityData.map(row => (
+                        <div key={row.propertyType}
+                            className="bg-white dark:bg-primary-900 p-5 rounded-xl border-l-4 shadow-sm"
+                            style={{ borderLeftColor: PROPERTY_TYPE_COLORS[row.propertyType] }}>
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-xs font-bold px-2 py-0.5 rounded-full"
+                                    style={{ backgroundColor: PROPERTY_TYPE_COLORS[row.propertyType] + '20', color: PROPERTY_TYPE_COLORS[row.propertyType] }}>
+                                    {row.propertyType}
+                                </span>
+                                <span className="text-xl font-bold text-emerald-500">{row.grossYield}%</span>
                             </div>
-                            <div className="space-y-4">
-                                <div>
-                                    <p className="text-sm text-primary-500 dark:text-primary-400">Average Gross Yield</p>
-                                    <p className="text-4xl font-bold text-semantic-success">{row.grossYield}%</p>
+                            <div className="space-y-2 mt-3">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-primary-500">Avg Rent</span>
+                                    <span className="font-semibold text-primary-900 dark:text-white">{fmt(row.avgMonthlyRent)} /mo</span>
                                 </div>
-                                <div className="pt-3 border-t border-primary-100 dark:border-primary-700">
-                                    <p className="text-xs text-primary-500 dark:text-primary-400 mb-2">Calculation Basis</p>
-                                    <div className="space-y-1 text-sm">
-                                        <div className="flex justify-between">
-                                            <span className="text-primary-600 dark:text-primary-300">Avg. Property Value:</span>
-                                            <span className="font-semibold text-primary-900 dark:text-white">{(row.propertyValue / 1e6).toFixed(1)}M FCFA</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-primary-600 dark:text-primary-300">Avg. Annual Rent:</span>
-                                            <span className="font-semibold text-primary-900 dark:text-white">{(row.annualRent / 1e6).toFixed(2)}M FCFA</span>
-                                        </div>
-                                    </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-primary-500">Avg Property Value</span>
+                                    <span className="font-semibold text-primary-900 dark:text-white">{(row.avgPropertyValue / 1e6).toFixed(1)}M XAF</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-primary-500">Annual Rent</span>
+                                    <span className="font-semibold text-primary-900 dark:text-white">{fmt(row.avgMonthlyRent * 12)} XAF</span>
                                 </div>
                             </div>
+                            <p className="text-[10px] text-primary-400 mt-3 text-right">{row.sampleSize} listings</p>
                         </div>
                     ))}
                 </div>
 
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-xl border border-blue-200 dark:border-blue-800 mb-6">
-                    <div className="flex items-start">
-                        <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-3 mt-0.5 flex-shrink-0" />
+                {/* Formula */}
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-5 rounded-xl border border-blue-200 dark:border-blue-800">
+                    <div className="flex items-start gap-3">
+                        <Info className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
                         <div>
-                            <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">How Basic Yield is Calculated</h3>
+                            <h3 className="font-bold text-blue-900 dark:text-blue-100 mb-1">How Yield is Calculated</h3>
                             <p className="text-sm text-blue-700 dark:text-blue-200">
-                                Basic Rental Yield = (Annual Rental Income / Property Value) × 100
-                            </p>
-                            <p className="text-xs text-blue-600 dark:text-blue-300 mt-2">
-                                Note: This is a gross yield calculation and does not account for expenses, taxes, or vacancy rates.
+                                Gross Yield = (Monthly Rent × 12 ÷ Property Value) × 100. This is a pre-expense metric.
+                                Use the <strong>Yield Estimator</strong> for net yield with operating costs, vacancy, and financing.
                             </p>
                         </div>
                     </div>
-                </div>
-
-                <div className="bg-primary-50 dark:bg-primary-800 p-6 rounded-xl border border-primary-200 dark:border-primary-700">
-                    <h3 className="font-semibold text-primary-900 dark:text-white mb-2">Unlock Advanced Yield Analysis</h3>
-                    <p className="text-sm text-primary-600 dark:text-primary-300">
-                        Upgrade to Premium to access net yield calculations, neighborhood-specific yields,
-                        property type comparisons, and ROI projections with our advanced scenario modeling tools.
-                    </p>
                 </div>
             </div>
         </AuthenticatedLayout>

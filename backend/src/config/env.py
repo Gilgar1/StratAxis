@@ -18,11 +18,16 @@ class Settings(BaseSettings):
     
     # Supabase Settings
     SUPABASE_URL: str
-    SUPABASE_KEY: str
+    SUPABASE_ANON_KEY: str
+    SUPABASE_SERVICE_ROLE_KEY: str
+    
+    # Other App Settings
+    SECRET_KEY: str = "local_secret"
+    DEBUG: str = "true"
     
     # CORS
     CORS_ORIGINS: list[str] = ["http://localhost:3000"]
     
-    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
+    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True, extra="ignore")
 
 settings = Settings()

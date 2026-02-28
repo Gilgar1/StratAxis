@@ -27,7 +27,6 @@ import {
     ChevronRight,
     Landmark,
     Activity,
-    Wallet,
     Folder,
     PieChart,
     BarChart2,
@@ -107,9 +106,7 @@ const Navigation: React.FC<NavigationProps> = ({ isOpen, closeSidebar }) => {
             name: 'Financing',
             icon: Landmark,
             items: [
-                { name: 'Government Interest Rate', href: '/gov-interest-rate', icon: Landmark },
-                { name: 'Inflation Rate', href: '/inflation-rate', icon: Activity },
-                { name: 'Real Estate Loans', href: '/real-estate-loans', icon: Wallet },
+                { name: 'Economics', href: '/economics', icon: Activity },
                 { name: 'Getting Funded', href: '/getting-funded', icon: DollarSign },
             ]
         },

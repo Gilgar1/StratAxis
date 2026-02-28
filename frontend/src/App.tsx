@@ -33,6 +33,7 @@ import AnnualAppreciation from './pages/AnnualAppreciation';
 import AverageRent from './pages/AverageRent';
 import BasicRentalYield from './pages/BasicRentalYield';
 import GettingFunded from './pages/GettingFunded';
+import Economics from './pages/Economics';
 import ProjectProcess from './pages/ProjectProcess';
 
 // Paid User Intelligence Pages
@@ -218,6 +219,14 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <BasicRentalYield />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/economics"
+                        element={
+                            <ProtectedRoute>
+                                <Economics />
                             </ProtectedRoute>
                         }
                     />

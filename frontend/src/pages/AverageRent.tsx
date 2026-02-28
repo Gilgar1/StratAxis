@@ -1,109 +1,122 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
-import { Home, MapPin } from 'lucide-react';
+import { Home, ChevronDown } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import ExportBar from '../components/common/ExportBar';
-import WatchlistButton from '../components/common/WatchlistButton';
+import { RENT_BY_TYPE, PROPERTY_TYPES, CITIES, PROPERTY_TYPE_COLORS, fmt, PropertyType, City } from '../data/marketData';
 
-const RENT_DATA = [
-    {
-        city: 'Douala',
-        avgMonthly: 285000,
-        studio: 150000,
-        twoBedroom: 285000,
-        threePlus: 450000,
-    },
-    {
-        city: 'Yaoundé',
-        avgMonthly: 310000,
-        studio: 165000,
-        twoBedroom: 310000,
-        threePlus: 485000,
-    },
-];
+const clsx = (...c: (string | boolean | undefined)[]) => c.filter(Boolean).join(' ');
 
 const AverageRent: React.FC = () => {
-    const csvRows = RENT_DATA.map(r => ({
+    const [selectedCity, setSelectedCity] = useState<City>('Douala');
+    const [selectedType, setSelectedType] = useState<PropertyType | 'All'>('All');
+
+    const filtered = RENT_BY_TYPE.filter(r =>
+        r.city === selectedCity &&
+        (selectedType === 'All' || r.propertyType === selectedType)
+    );
+
+    const csvRows = filtered.map(r => ({
         City: r.city,
-        'Avg Monthly Rent (XAF)': r.avgMonthly,
-        'Studio (XAF)': r.studio,
-        '2 Bedroom (XAF)': r.twoBedroom,
-        '3+ Bedroom (XAF)': r.threePlus,
+        'Property Type': r.propertyType,
+        'Avg Monthly Rent (XAF)': r.avgMonthlyRent,
+        'YoY Change (%)': r.yoyChange,
+        'Sample Size': r.sampleSize,
+    }));
+
+    const chartData = RENT_BY_TYPE.filter(r => r.city === selectedCity).map(r => ({
+        type: r.propertyType,
+        rent: r.avgMonthlyRent,
+        fill: PROPERTY_TYPE_COLORS[r.propertyType],
     }));
 
     return (
         <AuthenticatedLayout>
-            <div className="p-8 max-w-7xl mx-auto">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div className="p-8 max-w-7xl mx-auto space-y-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-primary-900 dark:text-white mb-2 flex items-center">
-                            <Home className="w-8 h-8 mr-3 text-accent-gold" />
+                        <h1 className="text-3xl font-bold text-primary-900 dark:text-white flex items-center mb-1">
+                            <Home className="w-7 h-7 mr-3 text-accent-gold" />
                             Average Rent
                         </h1>
-                        <p className="text-primary-600 dark:text-primary-300">City-level average rental prices</p>
+                        <p className="text-sm text-primary-500">Monthly rental rates segmented by property type.</p>
                     </div>
-                    <ExportBar
-                        csvRows={csvRows}
-                        csvFilename={`StratAxis_Average_Rent_${new Date().toISOString().slice(0, 10)}`}
-                        pdfTitle="StratAxis – Average Rent Report"
-                    />
+                    <ExportBar csvRows={csvRows} csvFilename="StratAxis_Average_Rent" pdfTitle="StratAxis – Average Rent Report" />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    {RENT_DATA.map(row => (
-                        <div key={row.city} className="bg-white dark:bg-primary-900 p-6 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center">
-                                    <MapPin className="w-6 h-6 text-accent-gold mr-2" />
-                                    <h2 className="text-xl font-bold text-primary-900 dark:text-white">{row.city}</h2>
-                                </div>
-                                <WatchlistButton
-                                    compact
-                                    neighborhood={row.city}
-                                    city={row.city}
-                                    type="Avg Rent"
-                                    currentPrice={row.avgMonthly}
-                                    change="+0%"
-                                />
+                {/* Filters */}
+                <div className="flex flex-wrap gap-3">
+                    <div className="flex gap-1.5">
+                        {CITIES.map(c => (
+                            <button key={c} onClick={() => setSelectedCity(c)}
+                                className={clsx(
+                                    "px-4 py-1.5 rounded-lg text-sm font-semibold border transition-all",
+                                    selectedCity === c
+                                        ? "bg-accent-gold/10 text-accent-gold border-accent-gold/30"
+                                        : "bg-white dark:bg-primary-900 text-primary-500 border-primary-200 dark:border-primary-800"
+                                )}>
+                                {c}
+                            </button>
+                        ))}
+                    </div>
+                    <div className="relative">
+                        <select value={selectedType} onChange={e => setSelectedType(e.target.value as any)}
+                            className="input pr-8 text-sm appearance-none cursor-pointer">
+                            <option value="All">All Property Types</option>
+                            {PROPERTY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                        </select>
+                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-400 pointer-events-none" />
+                    </div>
+                </div>
+
+                {/* Chart */}
+                <div className="bg-white dark:bg-primary-900 p-6 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm">
+                    <h3 className="font-bold text-primary-900 dark:text-white mb-4">
+                        {selectedCity} — Monthly Rent by Property Type (XAF)
+                    </h3>
+                    <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={chartData} layout="vertical" margin={{ left: 20 }}>
+                            <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
+                            <XAxis type="number" tickFormatter={v => `${(v / 1000).toFixed(0)}K`} tick={{ fontSize: 11 }} />
+                            <YAxis type="category" dataKey="type" tick={{ fontSize: 11 }} width={110} />
+                            <Tooltip formatter={(v: number) => `${fmt(v)} XAF/mo`} />
+                            <Bar dataKey="rent" radius={[0, 4, 4, 0]} barSize={24}>
+                                {chartData.map((entry, i) => (
+                                    <Cell key={i} fill={entry.fill} />
+                                ))}
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+
+                {/* Property Type Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filtered.map(row => (
+                        <div key={`${row.city}-${row.propertyType}`}
+                            className="bg-white dark:bg-primary-900 p-5 rounded-xl border-l-4 shadow-sm"
+                            style={{ borderLeftColor: PROPERTY_TYPE_COLORS[row.propertyType] }}>
+                            <div className="flex justify-between items-center mb-3">
+                                <span className="text-xs font-bold px-2 py-0.5 rounded-full"
+                                    style={{ backgroundColor: PROPERTY_TYPE_COLORS[row.propertyType] + '20', color: PROPERTY_TYPE_COLORS[row.propertyType] }}>
+                                    {row.propertyType}
+                                </span>
+                                <span className="text-xs text-emerald-500 font-bold">+{row.yoyChange}% YoY</span>
                             </div>
-                            <div className="space-y-4">
-                                <div>
-                                    <p className="text-sm text-primary-500 dark:text-primary-400">Average Monthly Rent</p>
-                                    <p className="text-3xl font-bold text-primary-900 dark:text-white">
-                                        {row.avgMonthly.toLocaleString()} FCFA
-                                    </p>
+                            <p className="text-2xl font-bold text-primary-900 dark:text-white">{fmt(row.avgMonthlyRent)}</p>
+                            <p className="text-xs text-primary-400 mb-3">XAF / month</p>
+                            <div className="grid grid-cols-2 gap-2">
+                                <div className="bg-primary-50 dark:bg-primary-800 p-2 rounded">
+                                    <p className="text-[10px] text-primary-400 uppercase">Low</p>
+                                    <p className="text-sm font-bold text-primary-700 dark:text-primary-200">{fmt(row.lowRange)}</p>
                                 </div>
-                                <div className="grid grid-cols-3 gap-2">
-                                    <div className="bg-primary-50 dark:bg-primary-800 p-3 rounded-lg">
-                                        <p className="text-xs text-primary-500 dark:text-primary-400">Studio</p>
-                                        <p className="text-sm font-bold text-primary-700 dark:text-primary-200">
-                                            {(row.studio / 1000).toFixed(0)}K
-                                        </p>
-                                    </div>
-                                    <div className="bg-primary-50 dark:bg-primary-800 p-3 rounded-lg">
-                                        <p className="text-xs text-primary-500 dark:text-primary-400">2 Bedroom</p>
-                                        <p className="text-sm font-bold text-primary-700 dark:text-primary-200">
-                                            {(row.twoBedroom / 1000).toFixed(0)}K
-                                        </p>
-                                    </div>
-                                    <div className="bg-primary-50 dark:bg-primary-800 p-3 rounded-lg">
-                                        <p className="text-xs text-primary-500 dark:text-primary-400">3BR+</p>
-                                        <p className="text-sm font-bold text-primary-700 dark:text-primary-200">
-                                            {(row.threePlus / 1000).toFixed(0)}K
-                                        </p>
-                                    </div>
+                                <div className="bg-primary-50 dark:bg-primary-800 p-2 rounded">
+                                    <p className="text-[10px] text-primary-400 uppercase">High</p>
+                                    <p className="text-sm font-bold text-primary-700 dark:text-primary-200">{fmt(row.highRange)}</p>
                                 </div>
                             </div>
+                            <p className="text-[10px] text-primary-400 mt-2 text-right">{row.sampleSize} listings</p>
                         </div>
                     ))}
-                </div>
-
-                <div className="bg-primary-50 dark:bg-primary-800 p-6 rounded-xl border border-primary-200 dark:border-primary-700">
-                    <h3 className="font-semibold text-primary-900 dark:text-white mb-2">About Average Rent</h3>
-                    <p className="text-sm text-primary-600 dark:text-primary-300">
-                        These averages represent city-wide rental rates across all property types.
-                        For detailed neighborhood-specific rental data, property type breakdowns, and historical trends,
-                        explore the full Rental Intelligence page.
-                    </p>
                 </div>
             </div>
         </AuthenticatedLayout>

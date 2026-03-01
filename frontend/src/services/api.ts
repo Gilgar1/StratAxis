@@ -1,7 +1,9 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosError } from 'axios';
 
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+// VITE_API_URL is set in frontend/.env → http://localhost:8081/api
+// FastAPI runs on 8081; Supabase Kong owns 8000.
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081/api';
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({

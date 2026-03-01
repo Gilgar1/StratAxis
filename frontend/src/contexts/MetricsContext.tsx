@@ -1,6 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-// Define the keys that match the DB
+// ── Single source of truth for the API base URL ──────────────────────────────
+// Always reads from the Vite env var — never hardcodes a port.
+// Set VITE_API_URL in frontend/.env (currently http://localhost:8081/api)
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8081/api';
+
+// ── Metric key types ──────────────────────────────────────────────────────────
 export type MetricKeys =
     | 'avg_land_price_douala'
     | 'avg_land_price_douala_change'
@@ -12,7 +17,7 @@ export type MetricKeys =
     | 'active_listings_change'
     | 'chart_data_json';
 
-// Default values to show before data loads or if nothing is set in the DB
+// ── Fallback values shown before the DB responds ─────────────────────────────
 export const defaultMetrics: Record<MetricKeys, string> = {
     avg_land_price_douala: '97,500',
     avg_land_price_douala_change: '+12.3%',
@@ -30,9 +35,10 @@ export const defaultMetrics: Record<MetricKeys, string> = {
         { p: 'May', douala: 95000, yaounde: 102000, listings: 180 },
         { p: 'Jun', douala: 97500, yaounde: 104000, listings: 210 },
         { p: 'Jul', douala: 97632, yaounde: 108000, listings: 250 },
-    ])
+    ]),
 };
 
+// ── Context type ──────────────────────────────────────────────────────────────
 interface MetricsContextType {
     metrics: Record<string, string>;
     isLoading: boolean;
@@ -43,25 +49,33 @@ interface MetricsContextType {
 
 const MetricsContext = createContext<MetricsContextType | undefined>(undefined);
 
+// ── Helper — authenticated fetch headers ──────────────────────────────────────
+const authHeaders = (): Record<string, string> => {
+    const token = localStorage.getItem('strataxis_token');
+    return {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+};
+
+// ── Provider ──────────────────────────────────────────────────────────────────
 export const MetricsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [metrics, setMetrics] = useState<Record<string, string>>(defaultMetrics);
     const [isLoading, setIsLoading] = useState(true);
 
     const fetchMetrics = async () => {
         try {
-            const token = localStorage.getItem('strataxis_token');
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/metrics/dict`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
+            const response = await fetch(`${API_BASE}/metrics/dict`, {
+                headers: authHeaders(),
             });
             if (response.ok) {
                 const data = await response.json();
                 setMetrics(prev => ({ ...prev, ...data }));
             }
+            // If response is not ok (e.g. 401 before login), silently keep defaults
         } catch (error) {
-            console.error('Failed to fetch metrics:', error);
+            // Backend not reachable — keep showing defaults, don't crash
+            console.warn('[MetricsContext] Backend unreachable, using default metrics.');
         } finally {
             setIsLoading(false);
         }
@@ -69,66 +83,68 @@ export const MetricsProvider: React.FC<{ children: ReactNode }> = ({ children })
 
     useEffect(() => {
         fetchMetrics();
-        // Refresh market metrics periodically every 15 seconds
-        const interval = setInterval(fetchMetrics, 15000);
+        // Poll every 15 seconds so all open dashboards stay in sync
+        const interval = setInterval(fetchMetrics, 15_000);
         return () => clearInterval(interval);
     }, []);
 
     const updateMetric = async (key: string, value: string) => {
         try {
-            const token = localStorage.getItem('strataxis_token');
-            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/metrics/${key}`, {
+            const res = await fetch(`${API_BASE}/metrics/${key}`, {
                 method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ value })
+                headers: authHeaders(),
+                body: JSON.stringify({ value }),
             });
-            if (!res.ok && res.status === 404) {
-                // If not found, create it
-                await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/metrics/`, {
+            if (res.status === 404) {
+                // Metric doesn't exist yet — create it
+                await fetch(`${API_BASE}/metrics/`, {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ key, value })
+                    headers: authHeaders(),
+                    body: JSON.stringify({ key, value }),
                 });
             }
+            // Optimistic update — reflect change immediately in UI
             setMetrics(prev => ({ ...prev, [key]: value }));
         } catch (err) {
-            console.error('Error updating metric', err);
+            console.error('[MetricsContext] Error updating metric:', err);
         }
     };
 
     const bulkUpdateMetrics = async (newMetrics: Record<string, string>) => {
         try {
-            const token = localStorage.getItem('strataxis_token');
-            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/metrics/bulk/update`, {
+            const res = await fetch(`${API_BASE}/metrics/bulk/update`, {
                 method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ metrics: newMetrics })
+                headers: authHeaders(),
+                body: JSON.stringify({ metrics: newMetrics }),
             });
             if (res.ok) {
                 const updated = await res.json();
                 setMetrics(prev => ({ ...prev, ...updated }));
+            } else {
+                const err = await res.json().catch(() => ({}));
+                console.error('[MetricsContext] Bulk update failed:', err);
             }
         } catch (err) {
-            console.error('Error bulk updating metrics', err);
+            console.error('[MetricsContext] Error bulk updating metrics:', err);
         }
     };
 
     return (
-        <MetricsContext.Provider value={{ metrics: { ...defaultMetrics, ...metrics }, isLoading, updateMetric, bulkUpdateMetrics, refreshMetrics: fetchMetrics }}>
+        <MetricsContext.Provider
+            value={{
+                metrics: { ...defaultMetrics, ...metrics },
+                isLoading,
+                updateMetric,
+                bulkUpdateMetrics,
+                refreshMetrics: fetchMetrics,
+            }}
+        >
             {children}
         </MetricsContext.Provider>
     );
 };
 
+// ── Hook ──────────────────────────────────────────────────────────────────────
 export const useMetrics = () => {
     const context = useContext(MetricsContext);
     if (context === undefined) {

@@ -62,3 +62,17 @@ async def get_current_active_user(
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
+
+async def get_optional_user(
+    db: Session = Depends(get_session),
+    token: str = Depends(OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False))
+) -> User | None:
+    if not token:
+        return None
+    try:
+        user_response = await supabase.get_user(token)
+        if not user_response.user:
+            return None
+        return db.get(User, user_response.user.id)
+    except Exception:
+        return None

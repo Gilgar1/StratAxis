@@ -1,62 +1,147 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
-import { Activity, Users, Search, AlertTriangle, CheckCircle, Server, Edit, Ban, Terminal, CreditCard } from 'lucide-react';
+import { Activity, Users, Search, AlertTriangle, CheckCircle, Server, Edit, Ban, Terminal, CreditCard, FileText, Plus, Trash2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { formatCurrency } from '../utils/formatters';
+import { api } from '../services/api';
 
 const AdminPanel: React.FC = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'users' | 'payments' | 'system' | 'overrides'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'payments' | 'system' | 'overrides' | 'blogs'>('users');
 
-  // --- MOCK DATA ---
-  const [users, setUsers] = useState([
-    { id: 1, name: 'John Doe', email: 'john@example.com', role: 'FREE_USER', status: 'Active', lastLogin: '2 mins ago' },
-    { id: 2, name: 'Sarah Smith', email: 'sarah@invest.com', role: 'PAID_USER', status: 'Active', lastLogin: '1 hour ago' },
-    { id: 3, name: 'Dev Corp', email: 'admin@devcorp.cm', role: 'PAID_USER', status: 'Expiring', lastLogin: '3 days ago' },
-    { id: 4, name: 'Demo User', email: 'demo@strataxis.cm', role: 'FREE_USER', status: 'Active', lastLogin: 'Now' },
-  ]);
+  // --- STATES ---
+  const [users, setUsers] = useState<any[]>([]);
+  const [pendingPayments, setPendingPayments] = useState<any[]>([]);
+  const [blogs, setBlogs] = useState<any[]>([]);
 
-  const [scraperLogs] = useState([
-    { id: 110, timestamp: '2026-02-06 04:40:23', level: 'SUCCESS', message: 'Job completed successfully.' },
-  ]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [loadingPayments, setLoadingPayments] = useState(false);
+  const [loadingBlogs, setLoadingBlogs] = useState(false);
 
-  const [dataOverrides, setDataOverrides] = useState([
-    { id: 1, neighborhood: 'Bonapriso', city: 'Douala', price: 97632, source: 'Automated', flag: 'High Variance' },
-    { id: 2, neighborhood: 'Bastos', city: 'Yaoundé', price: 124229, source: 'Automated', flag: 'None' },
-    { id: 3, neighborhood: 'Logbessou', city: 'Douala', price: 15400, source: 'Manual Override (Jan 15)', flag: 'Manual' },
-  ]);
+  // Blog form
+  const [showBlogForm, setShowBlogForm] = useState(false);
+  const [blogForm, setBlogForm] = useState({ title: '', slug: '', content: '', cover_image: '', is_published: false });
 
-  const [pendingPayments, setPendingPayments] = useState([
-    { id: 1, userId: '2', userEmail: 'newuser@test.com', userName: 'Paul Smith', plan: 'PRO_INVESTOR', period: 'monthly', amount: 15000, paymentIdLastFour: '5324', createdAt: '2026-02-15 04:30:00' },
-    { id: 2, userId: '3', userEmail: 'investor2@example.com', userName: 'Marie Ngono', plan: 'PRO_INVESTOR', period: 'yearly', amount: 150000, paymentIdLastFour: '8921', createdAt: '2026-02-15 03:15:00' },
-  ]);
+  // Constants mock data for system & overrides
+  const [scraperLogs] = useState([{ id: 110, timestamp: '2026-02-06 04:40:23', level: 'SUCCESS', message: 'Job completed successfully.' }]);
+  const [dataOverrides] = useState([{ id: 1, neighborhood: 'Bonapriso', city: 'Douala', price: 97632, source: 'Automated', flag: 'High Variance' }]);
+
+  useEffect(() => {
+    if (user?.role === 'ADMIN') {
+      if (activeTab === 'users') fetchUsers();
+      if (activeTab === 'payments') fetchPayments();
+      if (activeTab === 'blogs') fetchBlogs();
+    }
+  }, [activeTab, user?.role]);
+
+  // --- FETCHERS ---
+  const fetchUsers = async () => {
+    setLoadingUsers(true);
+    try {
+      const data: any = await api.get('/admin/users');
+      setUsers(data.items || []);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  const fetchPayments = async () => {
+    setLoadingPayments(true);
+    try {
+      const data: any = await api.get('/payments/pending');
+      setPendingPayments(data.payments || []);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingPayments(false);
+    }
+  };
+
+  const fetchBlogs = async () => {
+    setLoadingBlogs(true);
+    try {
+      const data: any = await api.get('/blogs');
+      setBlogs(data || []);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingBlogs(false);
+    }
+  };
 
   // --- ACTIONS ---
-  const handleBanUser = (id: number) => {
-    if (confirm('Are you sure you want to suspend this user?')) {
-      setUsers(users.map(u => u.id === id ? { ...u, status: 'Suspended' } : u));
+  const handleBanUser = async (id: string, currentlyActive: boolean) => {
+    if (confirm(`Are you sure you want to ${currentlyActive ? 'suspend' : 'reactivate'} this user?`)) {
+      try {
+        // If suspending, we hit DELETE /admin/users/{id}
+        if (currentlyActive) {
+          await api.delete(`/admin/users/${id}`);
+        }
+        fetchUsers();
+      } catch (error) {
+        alert('Error updating user status.');
+      }
     }
   };
 
-  const handleApprovePayment = async (paymentId: number) => {
+  const handleApprovePayment = async (paymentId: string) => {
     if (confirm('Approve this payment and upgrade user to PAID_USER?')) {
-      // In real app, call API: await approvePayment(paymentId)
-      setPendingPayments(pendingPayments.filter(p => p.id !== paymentId));
-      alert('Payment approved! User has been upgraded to PRO INVESTOR.');
+      try {
+        await api.post('/payments/approve', { payment_id: paymentId });
+        setPendingPayments(pendingPayments.filter(p => p.id !== paymentId));
+        alert('Payment approved!');
+      } catch (err: any) {
+        alert('Error approving payment: ' + (err.response?.data?.detail || err.message));
+      }
     }
   };
 
-  const handleRejectPayment = async (paymentId: number) => {
+  const handleRejectPayment = async (paymentId: string) => {
     const reason = prompt('Enter rejection reason:');
     if (reason) {
-      // In real app, call API: await rejectPayment(paymentId, reason)
-      setPendingPayments(pendingPayments.filter(p => p.id !== paymentId));
-      alert('Payment rejected and user notified.');
+      try {
+        await api.post('/payments/reject', { payment_id: paymentId, reason });
+        setPendingPayments(pendingPayments.filter(p => p.id !== paymentId));
+        alert('Payment rejected.');
+      } catch (err: any) {
+        alert('Error rejecting payment: ' + (err.response?.data?.detail || err.message));
+      }
     }
   };
 
-  const handleUpdatePrice = (id: number, newPrice: number) => {
-    setDataOverrides(dataOverrides.map(d => d.id === id ? { ...d, price: newPrice, source: 'Manual Override (Now)', flag: 'Manual' } : d));
+  const handleBlogSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await api.post('/blogs', blogForm);
+      alert('Blog created successfully');
+      setShowBlogForm(false);
+      setBlogForm({ title: '', slug: '', content: '', cover_image: '', is_published: false });
+      fetchBlogs();
+    } catch (err: any) {
+      alert('Error creating blog: ' + (err.response?.data?.detail || err.message));
+    }
+  };
+
+  const handleToggleBlogPublish = async (blogId: string, is_published: boolean) => {
+    try {
+      await api.put(`/blogs/${blogId}`, { is_published: !is_published });
+      fetchBlogs();
+    } catch (error) {
+      alert('Failed to update blog publish status');
+    }
+  };
+
+  const handleDeleteBlog = async (blogId: string) => {
+    if (confirm('Are you sure you want to delete this blog post?')) {
+      try {
+        await api.delete(`/blogs/${blogId}`);
+        fetchBlogs();
+      } catch (error) {
+        alert('Failed to delete blog');
+      }
+    }
   };
 
 
@@ -82,88 +167,54 @@ const AdminPanel: React.FC = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex space-x-6 border-b border-primary-200 dark:border-primary-800 mb-8">
-          <button
-            onClick={() => setActiveTab('users')}
-            className={`pb-4 px-2 font-medium transition-colors border-b-2 flex items-center ${activeTab === 'users' ? 'border-accent-gold text-accent-gold' : 'border-transparent text-primary-500 hover:text-primary-700'}`}
-          >
-            <Users className="w-4 h-4 mr-2" />
-            User Management
+        <div className="flex space-x-6 border-b border-primary-200 dark:border-primary-800 mb-8 overflow-x-auto whitespace-nowrap">
+          <button onClick={() => setActiveTab('users')} className={`pb-4 px-2 font-medium transition-colors border-b-2 flex items-center ${activeTab === 'users' ? 'border-accent-gold text-accent-gold' : 'border-transparent text-primary-500'}`}>
+            <Users className="w-4 h-4 mr-2" /> User Management
           </button>
-          <button
-            onClick={() => setActiveTab('payments')}
-            className={`pb-4 px-2 font-medium transition-colors border-b-2 flex items-center relative ${activeTab === 'payments' ? 'border-accent-gold text-accent-gold' : 'border-transparent text-primary-500 hover:text-primary-700'}`}
-          >
-            <CreditCard className="w-4 h-4 mr-2" />
-            Payment Verification
+          <button onClick={() => setActiveTab('payments')} className={`pb-4 px-2 font-medium transition-colors border-b-2 flex items-center relative ${activeTab === 'payments' ? 'border-accent-gold text-accent-gold' : 'border-transparent text-primary-500'}`}>
+            <CreditCard className="w-4 h-4 mr-2" /> Payment Verification
             {pendingPayments.length > 0 && (
-              <span className="ml-2 bg-semantic-error text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                {pendingPayments.length}
-              </span>
+              <span className="ml-2 bg-semantic-error text-white text-xs font-bold px-2 py-0.5 rounded-full">{pendingPayments.length}</span>
             )}
           </button>
-          <button
-            onClick={() => setActiveTab('system')}
-            className={`pb-4 px-2 font-medium transition-colors border-b-2 flex items-center ${activeTab === 'system' ? 'border-accent-gold text-accent-gold' : 'border-transparent text-primary-500 hover:text-primary-700'}`}
-          >
-            <Server className="w-4 h-4 mr-2" />
-            System & Scraper
+          <button onClick={() => setActiveTab('blogs')} className={`pb-4 px-2 font-medium transition-colors border-b-2 flex items-center ${activeTab === 'blogs' ? 'border-accent-gold text-accent-gold' : 'border-transparent text-primary-500'}`}>
+            <FileText className="w-4 h-4 mr-2" /> Blog Management
           </button>
-          <button
-            onClick={() => setActiveTab('overrides')}
-            className={`pb-4 px-2 font-medium transition-colors border-b-2 flex items-center ${activeTab === 'overrides' ? 'border-accent-gold text-accent-gold' : 'border-transparent text-primary-500 hover:text-primary-700'}`}
-          >
-            <Edit className="w-4 h-4 mr-2" />
-            Data Overrides
+          <button onClick={() => setActiveTab('system')} className={`pb-4 px-2 font-medium transition-colors border-b-2 flex items-center ${activeTab === 'system' ? 'border-accent-gold text-accent-gold' : 'border-transparent text-primary-500'}`}>
+            <Server className="w-4 h-4 mr-2" /> System & Scraper
           </button>
         </div>
 
         {/* --- USER MANAGEMENT --- */}
         {activeTab === 'users' && (
           <div className="space-y-6">
-            <div className="flex justify-between items-center bg-white dark:bg-primary-900 p-4 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-400" />
-                <input type="text" placeholder="Search users by email..." className="input pl-10 w-64" />
-              </div>
-              <button className="btn btn-primary">Add New User</button>
-            </div>
-
-            <div className="bg-white dark:bg-primary-900 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-primary-900 rounded-xl shadow-sm overflow-hidden border border-primary-200 dark:border-primary-800">
               <table className="w-full text-left">
                 <thead className="bg-primary-50 dark:bg-primary-800">
                   <tr>
                     <th className="p-4 font-semibold text-primary-900 dark:text-white">User</th>
                     <th className="p-4 font-semibold text-primary-900 dark:text-white">Role</th>
                     <th className="p-4 font-semibold text-primary-900 dark:text-white">Status</th>
-                    <th className="p-4 font-semibold text-primary-900 dark:text-white">Last Activity</th>
-                    <th className="p-4 font-semibold text-primary-900 dark:text-white text-right">Actions</th>
+                    <th className="p-4 text-right font-semibold text-primary-900 dark:text-white">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-primary-100 dark:divide-primary-800">
-                  {users.map(u => (
-                    <tr key={u.id} className="hover:bg-primary-50 dark:hover:bg-primary-800/50 transition-colors bg-white dark:bg-primary-900">
+                  {loadingUsers ? <tr><td colSpan={4} className="p-4 text-center">Loading...</td></tr> : users.map(u => (
+                    <tr key={u.id}>
                       <td className="p-4">
-                        <div className="font-bold text-primary-900 dark:text-white">{u.name}</div>
+                        <div className="font-bold">{u.first_name || 'User'} {u.last_name || ''}</div>
                         <div className="text-sm text-primary-500">{u.email}</div>
                       </td>
+                      <td className="p-4 text-xs font-bold">{u.role}</td>
                       <td className="p-4">
-                        <span className={`text-xs font-bold px-2 py-1 rounded ${u.role === 'PAID_USER' ? 'bg-accent-gold/10 text-accent-gold' : 'bg-primary-100 dark:bg-primary-700 text-primary-600 dark:text-primary-300'}`}>
-                          {u.role}
+                        <span className={`flex items-center text-sm ${u.is_active ? 'text-semantic-success' : 'text-semantic-error'}`}>
+                          {u.is_active ? 'Active' : 'Suspended'}
                         </span>
                       </td>
-                      <td className="p-4">
-                        <span className={`flex items-center text-sm ${u.status === 'Active' ? 'text-semantic-success' : u.status === 'Suspended' ? 'text-semantic-error' : 'text-semantic-warning'}`}>
-                          {u.status === 'Active' && <CheckCircle className="w-3 h-3 mr-1" />}
-                          {u.status}
-                        </span>
-                      </td>
-                      <td className="p-4 text-sm text-primary-500">{u.lastLogin}</td>
                       <td className="p-4 text-right">
-                        <div className="flex justify-end space-x-2">
-                          <button className="p-1 text-primary-400 hover:text-accent-gold transition-colors"><Edit className="w-4 h-4" /></button>
-                          <button onClick={() => handleBanUser(u.id)} className="p-1 text-primary-400 hover:text-semantic-error transition-colors"><Ban className="w-4 h-4" /></button>
-                        </div>
+                        <button onClick={() => handleBanUser(u.id, u.is_active)} className="p-1 text-primary-400 hover:text-semantic-error">
+                          <Ban className="w-4 h-4" />
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -176,73 +227,30 @@ const AdminPanel: React.FC = () => {
         {/* --- PAYMENT VERIFICATION --- */}
         {activeTab === 'payments' && (
           <div className="space-y-6">
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-200 dark:border-blue-800 flex items-start">
-              <CreditCard className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-3 mt-0.5 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">Payment Verification Queue</h3>
-                <p className="text-sm text-blue-700 dark:text-blue-200">
-                  Review and approve pending mobile money payments. Users will be automatically upgraded to PRO INVESTOR upon approval.
-                </p>
-              </div>
-            </div>
-
-            {pendingPayments.length === 0 ? (
-              <div className="bg-white dark:bg-primary-900 rounded-xl border border-primary-200 dark:border-primary-800 p-12 text-center">
-                <CheckCircle className="w-16 h-16 text-semantic-success mx-auto mb-4 opacity-50" />
-                <h3 className="text-xl font-bold text-primary-900 dark:text-white mb-2">All Caught Up!</h3>
-                <p className="text-primary-500">No pending payment verifications at the moment.</p>
-              </div>
+            {loadingPayments ? <div>Loading...</div> : pendingPayments.length === 0 ? (
+              <div className="bg-white text-center p-12 rounded-xl dark:bg-primary-900">All Caught Up!</div>
             ) : (
-              <div className="bg-white dark:bg-primary-900 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm overflow-hidden">
+              <div className="bg-white dark:bg-primary-900 rounded-xl shadow-sm overflow-hidden border border-primary-200 dark:border-primary-800">
                 <table className="w-full text-left">
                   <thead className="bg-primary-50 dark:bg-primary-800">
                     <tr>
-                      <th className="p-4 font-semibold text-primary-900 dark:text-white">User</th>
-                      <th className="p-4 font-semibold text-primary-900 dark:text-white">Plan</th>
-                      <th className="p-4 font-semibold text-primary-900 dark:text-white">Amount</th>
-                      <th className="p-4 font-semibold text-primary-900 dark:text-white">Payment ID</th>
-                      <th className="p-4 font-semibold text-primary-900 dark:text-white">Submitted</th>
-                      <th className="p-4 font-semibold text-primary-900 dark:text-white text-right">Actions</th>
+                      <th className="p-4 font-semibold">User ID</th>
+                      <th className="p-4 font-semibold">Plan</th>
+                      <th className="p-4 font-semibold">Amount</th>
+                      <th className="p-4 font-semibold">Payment ID</th>
+                      <th className="p-4 text-right font-semibold">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-primary-100 dark:divide-primary-800">
-                    {pendingPayments.map(payment => (
-                      <tr key={payment.id} className="hover:bg-primary-50 dark:hover:bg-primary-800/50 transition-colors bg-white dark:bg-primary-900">
-                        <td className="p-4">
-                          <div className="font-bold text-primary-900 dark:text-white">{payment.userName}</div>
-                          <div className="text-sm text-primary-500">{payment.userEmail}</div>
-                        </td>
-                        <td className="p-4">
-                          <div className="font-semibold text-primary-900 dark:text-white">Pro Investor</div>
-                          <div className="text-sm text-primary-500">{payment.period === 'monthly' ? 'Monthly' : 'Yearly'}</div>
-                        </td>
-                        <td className="p-4">
-                          <span className="font-bold text-accent-gold">{formatCurrency(payment.amount)}</span>
-                        </td>
-                        <td className="p-4">
-                          <span className="font-mono text-sm bg-primary-100 dark:bg-primary-800 px-3 py-1 rounded text-primary-900 dark:text-white">
-                            ****{payment.paymentIdLastFour}
-                          </span>
-                        </td>
-                        <td className="p-4 text-sm text-primary-500">
-                          {new Date(payment.createdAt).toLocaleString()}
-                        </td>
-                        <td className="p-4 text-right">
-                          <div className="flex justify-end space-x-2">
-                            <button
-                              onClick={() => handleApprovePayment(payment.id)}
-                              className="px-4 py-2 bg-semantic-success text-white rounded-lg hover:bg-semantic-success/90 transition-colors font-semibold text-sm flex items-center"
-                            >
-                              <CheckCircle className="w-4 h-4 mr-1" />
-                              Approve
-                            </button>
-                            <button
-                              onClick={() => handleRejectPayment(payment.id)}
-                              className="px-4 py-2 bg-semantic-error text-white rounded-lg hover:bg-semantic-error/90 transition-colors font-semibold text-sm"
-                            >
-                              Reject
-                            </button>
-                          </div>
+                    {pendingPayments.map(p => (
+                      <tr key={p.id}>
+                        <td className="p-4 text-sm font-mono truncate max-w-[150px]">{p.user_id}</td>
+                        <td className="p-4 text-sm">{p.plan} ({p.billing_period})</td>
+                        <td className="p-4 font-bold text-accent-gold">{formatCurrency(p.amount)}</td>
+                        <td className="p-4 font-mono">****{p.payment_id_last_four}</td>
+                        <td className="p-4 text-right space-x-2">
+                          <button onClick={() => handleApprovePayment(p.id)} className="px-3 py-1 bg-semantic-success text-white rounded">Approve</button>
+                          <button onClick={() => handleRejectPayment(p.id)} className="px-3 py-1 bg-semantic-error text-white rounded">Reject</button>
                         </td>
                       </tr>
                     ))}
@@ -253,144 +261,64 @@ const AdminPanel: React.FC = () => {
           </div>
         )}
 
-
-        {/* --- SYSTEM STATUS --- */}
-        {activeTab === 'system' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Scraper Control & Logs */}
-            <div className="bg-white dark:bg-primary-900 p-6 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm flex flex-col h-[500px]">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold flex items-center text-primary-900 dark:text-white">
-                  <Terminal className="w-5 h-5 mr-2 text-primary-500" />
-                  Scraper Logs (Daily Job)
-                </h3>
-                <div className="flex space-x-2">
-                  <span className="text-xs px-2 py-1 bg-semantic-success/10 text-semantic-success rounded font-bold">RUNNING</span>
-                  <button className="text-xs text-primary-500 hover:text-primary-900 underline">View Full History</button>
-                </div>
-              </div>
-
-              <div className="bg-primary-950 rounded-lg p-4 flex-1 overflow-y-auto font-mono text-sm border border-primary-800 shadow-inner">
-                {scraperLogs.map((log) => (
-                  <div key={log.id} className="mb-2 last:mb-0">
-                    <span className="text-primary-500 mr-2">[{log.timestamp.split(' ')[1]}]</span>
-                    <span className={`font-bold mr-2 ${log.level === 'INFO' ? 'text-blue-400' :
-                      log.level === 'WARN' ? 'text-yellow-400' :
-                        log.level === 'SUCCESS' ? 'text-green-400' : 'text-red-400'
-                      }`}>
-                      {log.level}
-                    </span>
-                    <span className="text-primary-300">{log.message}</span>
-                  </div>
-                ))}
-                <div className="animate-pulse text-accent-gold mt-2">_</div>
-              </div>
-
-              <div className="mt-4 flex space-x-4">
-                <button className="btn btn-primary flex-1">Trigger Manual Scrape</button>
-                <button className="btn btn-outline flex-1 text-semantic-error border-semantic-error hover:bg-semantic-error hover:text-white">Stop Job</button>
-              </div>
-            </div>
-
-            {/* Health Metrics */}
-            <div className="space-y-6">
-              <div className="bg-white dark:bg-primary-900 p-6 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm">
-                <h3 className="font-bold mb-4 flex items-center text-primary-900 dark:text-white">
-                  <Activity className="w-5 h-5 mr-2 text-semantic-success" />
-                  Infrastructure Health
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-primary-600 dark:text-primary-400">Database Connection</span>
-                    <span className="flex items-center text-semantic-success text-sm font-bold"><CheckCircle className="w-3 h-3 mr-1" /> Stable</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-primary-600 dark:text-primary-400">Redis Cache Hit Rate</span>
-                    <span className="text-primary-900 dark:text-white text-sm font-mono">94.2%</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-primary-600 dark:text-primary-400">API Latency (p95)</span>
-                    <span className="text-primary-900 dark:text-white text-sm font-mono">120ms</span>
-                  </div>
-                  <div className="w-full bg-primary-100 dark:bg-primary-800 h-2 rounded-full mt-2 overflow-hidden">
-                    <div className="bg-semantic-success h-full w-[90%]"></div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-primary-900 p-6 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm">
-                <h3 className="font-bold mb-4 flex items-center text-primary-900 dark:text-white">
-                  <AlertTriangle className="w-5 h-5 mr-2 text-semantic-warning" />
-                  Recent Alerts
-                </h3>
-                <div className="space-y-3">
-                  <div className="p-3 bg-semantic-warning/5 border border-semantic-warning/20 rounded-lg flex items-start">
-                    <AlertTriangle className="w-4 h-4 text-semantic-warning mt-0.5 mr-2 flex-shrink-0" />
-                    <div>
-                      <h4 className="text-sm font-bold text-primary-900 dark:text-white">High Scraping Failure Rate</h4>
-                      <p className="text-xs text-primary-500">Source 'immo-yde' reported 15 connection timeouts in last 24h.</p>
-                    </div>
-                  </div>
-                  <div className="p-3 bg-semantic-info/5 border border-semantic-info/20 rounded-lg flex items-start">
-                    <Server className="w-4 h-4 text-semantic-info mt-0.5 mr-2 flex-shrink-0" />
-                    <div>
-                      <h4 className="text-sm font-bold text-primary-900 dark:text-white">Database Backup Created</h4>
-                      <p className="text-xs text-primary-500">Manual snapshot 'bk_20260206' created successfully.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* --- DATA OVERRIDES --- */}
-        {activeTab === 'overrides' && (
+        {/* --- BLOG MANAGEMENT --- */}
+        {activeTab === 'blogs' && (
           <div className="space-y-6">
-            <div className="bg-semantic-warning/10 p-4 rounded-xl border border-semantic-warning/20 text-semantic-warning flex items-start">
-              <AlertTriangle className="w-5 h-5 mr-3 flex-shrink-0" />
-              <p className="text-sm">
-                <strong>Warning:</strong> Manual overrides bypass the automated scraping and cleaning pipeline. Changes made here persist until the next full re-indexing of the specific neighborhood, which may be up to 30 days.
-              </p>
+            <div className="flex justify-between items-center bg-white dark:bg-primary-900 p-4 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm">
+              <h2 className="text-xl font-bold">Strategy Posts</h2>
+              <button onClick={() => setShowBlogForm(!showBlogForm)} className="btn btn-primary flex items-center">
+                <Plus className="w-4 h-4 mr-2" /> Write Post
+              </button>
             </div>
 
-            <div className="bg-white dark:bg-primary-900 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm overflow-hidden">
+            {showBlogForm && (
+              <form onSubmit={handleBlogSubmit} className="bg-white dark:bg-primary-900 p-6 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm space-y-4">
+                <div>
+                  <label className="block text-sm font-bold mb-1">Title</label>
+                  <input required type="text" className="input w-full" value={blogForm.title} onChange={e => setBlogForm({ ...blogForm, title: e.target.value })} />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold mb-1">Slug (URL)</label>
+                  <input required type="text" className="input w-full" value={blogForm.slug} onChange={e => setBlogForm({ ...blogForm, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })} placeholder="awesome-post-title" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold mb-1">Cover Image URL</label>
+                  <input type="url" className="input w-full" value={blogForm.cover_image} onChange={e => setBlogForm({ ...blogForm, cover_image: e.target.value })} />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold mb-1">Content (Markdown supported)</label>
+                  <textarea required className="input w-full h-40" value={blogForm.content} onChange={e => setBlogForm({ ...blogForm, content: e.target.value })}></textarea>
+                </div>
+                <div className="flex items-center mt-2">
+                  <input type="checkbox" id="publish" className="mr-2" checked={blogForm.is_published} onChange={e => setBlogForm({ ...blogForm, is_published: e.target.checked })} />
+                  <label htmlFor="publish">Publish immediately</label>
+                </div>
+                <button type="submit" className="btn btn-primary w-full">Save Post</button>
+              </form>
+            )}
+
+            <div className="bg-white dark:bg-primary-900 rounded-xl shadow-sm overflow-hidden border border-primary-200 dark:border-primary-800">
               <table className="w-full text-left">
                 <thead className="bg-primary-50 dark:bg-primary-800">
                   <tr>
-                    <th className="p-4 font-semibold text-primary-900 dark:text-white">Neighborhood</th>
-                    <th className="p-4 font-semibold text-primary-900 dark:text-white">Current Price/m²</th>
-                    <th className="p-4 font-semibold text-primary-900 dark:text-white">Source</th>
-                    <th className="p-4 font-semibold text-primary-900 dark:text-white">Status</th>
-                    <th className="p-4 font-semibold text-primary-900 dark:text-white text-right">Actions</th>
+                    <th className="p-4 font-semibold">Title</th>
+                    <th className="p-4 font-semibold">Status</th>
+                    <th className="p-4 font-semibold">Created</th>
+                    <th className="p-4 text-right font-semibold">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-primary-100 dark:divide-primary-800">
-                  {dataOverrides.map(item => (
-                    <tr key={item.id} className="bg-white dark:bg-primary-900 hover:bg-primary-50 dark:hover:bg-primary-800/50">
+                  {loadingBlogs ? <tr><td colSpan={4} className="p-4 text-center">Loading...</td></tr> : blogs.map(b => (
+                    <tr key={b.id}>
+                      <td className="p-4 font-bold">{b.title} <br /><span className="text-xs text-primary-500">{b.slug}</span></td>
                       <td className="p-4">
-                        <div className="font-bold text-primary-900 dark:text-white">{item.neighborhood}</div>
-                        <div className="text-sm text-primary-500">{item.city}</div>
-                      </td>
-                      <td className="p-4 font-mono font-bold text-accent-gold-dark dark:text-accent-gold">
-                        {formatCurrency(item.price)}
-                      </td>
-                      <td className="p-4 text-sm text-primary-600 dark:text-primary-400">{item.source}</td>
-                      <td className="p-4">
-                        <span className={`text-xs font-bold px-2 py-1 rounded ${item.flag === 'Manual' ? 'bg-primary-200 dark:bg-primary-700 text-primary-800 dark:text-primary-200' : 'bg-semantic-warning/10 text-semantic-warning'}`}>
-                          {item.flag}
-                        </span>
-                      </td>
-                      <td className="p-4 text-right">
-                        <button
-                          onClick={() => {
-                            const val = prompt('Enter new price (XAF):', item.price.toString());
-                            if (val) handleUpdatePrice(item.id, parseInt(val));
-                          }}
-                          className="btn btn-sm btn-outline flex items-center ml-auto"
-                        >
-                          <Edit className="w-3 h-3 mr-1" /> Override
+                        <button onClick={() => handleToggleBlogPublish(b.id, b.is_published)} className={`px-2 py-1 text-xs rounded font-bold ${b.is_published ? 'bg-semantic-success/20 text-semantic-success' : 'bg-primary-200 dark:bg-primary-700'}`}>
+                          {b.is_published ? 'Published' : 'Draft'}
                         </button>
+                      </td>
+                      <td className="p-4 text-sm">{new Date(b.created_at).toLocaleDateString()}</td>
+                      <td className="p-4 text-right space-x-2">
+                        <button onClick={() => handleDeleteBlog(b.id)} className="p-1 text-primary-400 hover:text-semantic-error"><Trash2 className="w-4 h-4" /></button>
                       </td>
                     </tr>
                   ))}
@@ -400,6 +328,12 @@ const AdminPanel: React.FC = () => {
           </div>
         )}
 
+        {activeTab === 'system' && (
+          <div className="p-8 text-center bg-white dark:bg-primary-900 rounded-xl">
+            <Terminal className="w-8 h-8 mx-auto mb-2 text-primary-400" />
+            <p>Basic System Stats & Scraping active in background.</p>
+          </div>
+        )}
       </div>
     </AuthenticatedLayout>
   );

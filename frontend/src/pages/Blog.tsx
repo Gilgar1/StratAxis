@@ -1,89 +1,39 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import PublicLayout from '../layouts/PublicLayout';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Calendar, User, ArrowRight, Search, TrendingUp, MapPin, Building } from 'lucide-react';
-
-interface BlogPost {
-  slug: string;
-  title: string;
-  excerpt: string;
-  category: string;
-  date: string;
-  author: string;
-  readTime: string;
-  image?: string;
-}
+import { api } from '../services/api';
 
 const Blog: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
-  // Sample blog posts data
-  const blogPosts: BlogPost[] = [
-    {
-      slug: 'douala-market-report-q4-2025',
-      title: 'Douala Market Report Q4 2025: Bonapriso Surges',
-      excerpt: 'Land prices in Bonapriso have hit a historic high of 97,000 XAF/m², driven by scarcity and a new wave of mixed-use developments.',
-      category: 'Market Report',
-      date: 'Jan 12, 2026',
-      author: 'StratAxis Analytics',
-      readTime: '5 min read',
-    },
-    {
-      slug: 'yaounde-rental-yields-2026',
-      title: 'Yaoundé Rental Yields: Best Neighborhoods for ROI',
-      excerpt: 'Discover which Yaoundé neighborhoods are delivering the highest rental yields for investors in 2026.',
-      category: 'Investment',
-      date: 'Jan 8, 2026',
-      author: 'StratAxis Analytics',
-      readTime: '7 min read',
-    },
-    {
-      slug: 'real-estate-trends-cameroon-2026',
-      title: 'Top 5 Real Estate Trends Shaping Cameroon in 2026',
-      excerpt: 'From digital transformation to infrastructure development, explore the key trends influencing the Cameroonian real estate market.',
-      category: 'Market Analysis',
-      date: 'Jan 5, 2026',
-      author: 'StratAxis Analytics',
-      readTime: '6 min read',
-    },
-    {
-      slug: 'land-investment-guide-beginners',
-      title: 'Land Investment Guide for First-Time Buyers',
-      excerpt: 'A comprehensive guide to making your first land purchase in Douala or Yaoundé with confidence.',
-      category: 'Investment',
-      date: 'Dec 28, 2025',
-      author: 'StratAxis Analytics',
-      readTime: '10 min read',
-    },
-    {
-      slug: 'bastos-vs-bonapriso-comparison',
-      title: 'Bastos vs Bonapriso: A Tale of Two Premium Markets',
-      excerpt: 'Comparing the dynamics, price trends, and investment potential of Yaoundé\'s Bastos and Douala\'s Bonapriso neighborhoods.',
-      category: 'Comparison',
-      date: 'Dec 22, 2025',
-      author: 'StratAxis Analytics',
-      readTime: '8 min read',
-    },
-    {
-      slug: 'infrastructure-impact-property-values',
-      title: 'How Infrastructure Projects Impact Property Values',
-      excerpt: 'Analyzing the correlation between new road construction and land price appreciation across Cameroon\'s major cities.',
-      category: 'Market Analysis',
-      date: 'Dec 15, 2025',
-      author: 'StratAxis Analytics',
-      readTime: '6 min read',
-    },
-  ];
+  // Dynamic blog posts data
+  const [blogPosts, setBlogPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const data: any = await api.get('/blogs?is_published=true');
+        setBlogPosts(data || []);
+      } catch (error) {
+        console.error("Error fetching blogs", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBlogs();
+  }, []);
 
   const categories = ['All', 'Market Report', 'Investment', 'Market Analysis', 'Comparison'];
 
   const filteredPosts = blogPosts.filter((post) => {
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || post.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+      post.content?.toLowerCase().includes(searchQuery.toLowerCase());
+    // For now ignoring category match since our backend model doesn't have categories yet
+    return matchesSearch;
   });
 
   const getCategoryIcon = (category: string) => {
@@ -140,8 +90,8 @@ const Blog: React.FC = () => {
                   key={category}
                   onClick={() => setSelectedCategory(category)}
                   className={`px-5 py-2 rounded-full font-medium text-sm transition-all ${selectedCategory === category
-                      ? 'bg-accent-gold text-primary-950 shadow-md'
-                      : 'bg-white dark:bg-primary-900 text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-700 hover:border-accent-gold'
+                    ? 'bg-accent-gold text-primary-950 shadow-md'
+                    : 'bg-white dark:bg-primary-900 text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-700 hover:border-accent-gold'
                     }`}
                 >
                   {category}
@@ -151,7 +101,9 @@ const Blog: React.FC = () => {
           </div>
 
           {/* Blog Posts Grid */}
-          {filteredPosts.length > 0 ? (
+          {loading ? (
+            <div className="text-center py-20 text-xl font-bold animate-pulse">Loading Insights...</div>
+          ) : filteredPosts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredPosts.map((post, index) => (
                 <motion.article
@@ -160,29 +112,28 @@ const Blog: React.FC = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="group bg-white dark:bg-primary-900 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 border border-primary-100 dark:border-primary-800"
+                  className="group flex flex-col bg-white dark:bg-primary-900 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 border border-primary-100 dark:border-primary-800"
                 >
                   {/* Featured Image Placeholder */}
                   <div className="h-48 bg-gradient-to-br from-accent-gold to-primary-700 relative overflow-hidden">
+                    {post.cover_image && <img src={post.cover_image} alt={post.title} className="absolute inset-0 w-full h-full object-cover" />}
                     <div className="absolute inset-0 bg-primary-900/20 group-hover:bg-primary-900/10 transition-colors" />
                     <div className="absolute bottom-4 left-4 flex items-center space-x-2 bg-white/90 dark:bg-primary-950/90 px-3 py-1.5 rounded-full">
-                      {getCategoryIcon(post.category)}
+                      {getCategoryIcon("Market Report")}
                       <span className="text-xs font-bold text-primary-900 dark:text-white uppercase tracking-wide">
-                        {post.category}
+                        MARKET INSIGHT
                       </span>
                     </div>
                   </div>
 
                   {/* Content */}
-                  <div className="p-6">
+                  <div className="p-6 flex flex-col flex-1">
                     {/* Meta Info */}
                     <div className="flex items-center space-x-4 text-xs text-primary-500 mb-3">
                       <span className="flex items-center">
                         <Calendar className="w-3.5 h-3.5 mr-1" />
-                        {post.date}
+                        {new Date(post.published_at || post.created_at).toLocaleDateString()}
                       </span>
-                      <span>•</span>
-                      <span>{post.readTime}</span>
                     </div>
 
                     {/* Title */}
@@ -192,14 +143,14 @@ const Blog: React.FC = () => {
 
                     {/* Excerpt */}
                     <p className="text-sm text-primary-600 dark:text-primary-400 mb-4 line-clamp-3">
-                      {post.excerpt}
+                      {post.content.substring(0, 120)}...
                     </p>
 
                     {/* Author and Read More */}
-                    <div className="flex items-center justify-between pt-4 border-t border-primary-100 dark:border-primary-800">
+                    <div className="mt-auto flex items-center justify-between pt-4 border-t border-primary-100 dark:border-primary-800">
                       <div className="flex items-center text-xs text-primary-500">
                         <User className="w-3.5 h-3.5 mr-1" />
-                        {post.author}
+                        Admin
                       </div>
                       <Link
                         to={`/blog/${post.slug}`}

@@ -1,90 +1,87 @@
-﻿import React from 'react';
-import PublicLayout from '../layouts/PublicLayout';
+﻿import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Calendar, User, Share2 } from 'lucide-react';
+import PublicLayout from '../layouts/PublicLayout';
+import { api } from '../services/api';
+import ReactMarkdown from 'react-markdown';
+import { Calendar, ArrowLeft } from 'lucide-react';
 
 const BlogArticle: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  const [blog, setBlog] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchBlog = async () => {
+      try {
+        const data: any = await api.get(`/blogs/${slug}`);
+        setBlog(data);
+      } catch (err: any) {
+        setError('Article not found or you do not have permission to view it.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBlog();
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <PublicLayout>
+        <div className="min-h-screen flex items-center justify-center bg-primary-50 dark:bg-primary-950">
+          <div className="animate-pulse text-2xl font-bold text-primary-900 dark:text-white">Loading Intelligence...</div>
+        </div>
+      </PublicLayout>
+    );
+  }
+
+  if (error || !blog) {
+    return (
+      <PublicLayout>
+        <div className="min-h-screen flex flex-col items-center justify-center bg-primary-50 dark:bg-primary-950 px-4 text-center">
+          <h1 className="text-3xl font-bold text-semantic-error mb-4">Error</h1>
+          <p className="text-primary-600 dark:text-primary-400 mb-8">{error}</p>
+          <Link to="/blog" className="btn btn-primary">
+            Back to Articles
+          </Link>
+        </div>
+      </PublicLayout>
+    );
+  }
 
   return (
     <PublicLayout>
-      <article className="bg-white dark:bg-primary-950 pb-20">
-        {/* Simple Cover Header */}
-        <div className="bg-primary-50 dark:bg-primary-900 py-16 md:py-24">
-          <div className="container-custom max-w-4xl mx-auto">
-            <Link to="/blog" className="inline-flex items-center text-sm font-bold text-accent-gold mb-8 hover:underline">
-              <ArrowLeft className="w-4 h-4 mr-2" /> Back to Insights
-            </Link>
+      <article className="bg-primary-50 dark:bg-primary-950 min-h-screen py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Link to="/blog" className="inline-flex items-center text-accent-gold font-bold mb-8 hover:underline">
+            <ArrowLeft className="w-4 h-4 mr-2" /> Back to Market Insights
+          </Link>
 
-            <div className="flex items-center space-x-4 text-sm text-primary-500 mb-6">
-              <span className="bg-primary-200 dark:bg-primary-800 text-primary-800 dark:text-primary-200 px-3 py-1 rounded-full font-bold uppercase text-xs tracking-wider">
-                Market Report
-              </span>
-              <span className="flex items-center">
-                <Calendar className="w-4 h-4 mr-1" /> Jan 12, 2026
-              </span>
-              <span className="flex items-center">
-                <User className="w-4 h-4 mr-1" /> StratAxis Analytics
-              </span>
+          <div className="bg-white dark:bg-primary-900 rounded-3xl overflow-hidden shadow-xl border border-primary-200 dark:border-primary-800">
+            {blog.cover_image && (
+              <div className="w-full h-64 md:h-96">
+                <img src={blog.cover_image} alt={blog.title} className="w-full h-full object-cover" />
+              </div>
+            )}
+            <div className="p-8 md:p-12">
+              <h1 className="text-3xl md:text-5xl font-extrabold text-primary-900 dark:text-white mb-6 leading-tight">
+                {blog.title}
+              </h1>
+              <div className="flex items-center text-sm font-semibold text-primary-500 mb-10 pb-6 border-b border-primary-100 dark:border-primary-800">
+                <Calendar className="w-5 h-5 mr-2" />
+                {new Date(blog.published_at || blog.created_at).toLocaleDateString(undefined, {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </div>
+
+              <div className="prose prose-lg dark:prose-invert prose-primary max-w-none text-primary-800 dark:text-primary-200">
+                <ReactMarkdown>
+                  {blog.content}
+                </ReactMarkdown>
+              </div>
             </div>
-
-            <h1 className="text-3xl md:text-5xl font-bold text-primary-900 dark:text-white leading-tight mb-6">
-              {slug
-                ? slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') // Mock title from slug
-                : "Douala Market Report Q4 2025: Bonapriso Surges"}
-            </h1>
-
-            <p className="text-xl text-primary-600 dark:text-primary-300 leading-relaxed">
-              Land prices in Bonapriso have hit a historic high of 97,000 XAF/m², driven by scarcity and a new wave of mixed-use developments. Here is what investors need to know.
-            </p>
-          </div>
-        </div>
-
-        {/* Article Body */}
-        <div className="container-custom max-w-3xl mx-auto mt-12">
-          <div className="prose prose-lg dark:prose-invert prose-primary max-w-none">
-            <p>
-              The Douala real estate market has shown resilience in Q4 2025, with the <strong>Compound Annual Growth Rate (CAGR)</strong> for prime residential land exceeding 12% in select neighborhoods.
-            </p>
-
-            <h3>The Bonapriso Anomaly</h3>
-            <p>
-              While broader Douala growth sits at 4-6%, Bonapriso continues to defy gravity. Analyzing over 50 listings from Q3 to Q4, we observed a tightening of supply which has pushed median asking prices from 88,500 XAF/m² to 97,632 XAF/m².
-            </p>
-
-            <blockquote>
-              "The scarcity of developable plots larger than 500m² is the primary driver. Developers are now competing for the same limited inventory."
-            </blockquote>
-
-            <h3>Key Drivers</h3>
-            <ul>
-              <li><strong>Infrastructure:</strong> Completion of the secondary access road has improved traffic flow.</li>
-              <li><strong>Zoning Changes:</strong> New permits for vertical density (G+4 to G+6) have increased land value utility.</li>
-              <li><strong>Expat Demand:</strong> Rental yields for furnished apartments in the zone remain the highest in the city.</li>
-            </ul>
-
-            <div className="bg-primary-50 dark:bg-primary-900 p-6 rounded-xl border-l-4 border-accent-gold my-8">
-              <h4 className="font-bold text-primary-900 dark:text-white mt-0 mb-2">Investor Tip</h4>
-              <p className="text-sm m-0">
-                Look for older villas with large setbacks. The tear-down value for redevelopment is currently outpacing the rental value of the existing structures.
-              </p>
-            </div>
-
-            <h3>Outlook for 2026</h3>
-            <p>
-              We project this trend to stabilize by Q2 2026 as buyers reach price resistance levels. However, look for spillover effects into adjacent neighborhoods like <strong>Bali</strong> and the southern edges of <strong>Akwa</strong>.
-            </p>
-          </div>
-
-          {/* Share / Footer */}
-          <div className="mt-12 pt-8 border-t border-primary-200 dark:border-primary-800 flex justify-between items-center">
-            <div className="text-sm text-primary-500">
-              Categories: <span className="font-medium text-primary-900 dark:text-white">Market Analysis, Investment</span>
-            </div>
-            <button className="flex items-center space-x-2 text-primary-600 dark:text-primary-400 hover:text-accent-gold transition-colors">
-              <Share2 className="w-4 h-4" />
-              <span className="text-sm font-medium">Share Report</span>
-            </button>
           </div>
         </div>
       </article>

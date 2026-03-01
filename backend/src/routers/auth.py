@@ -1,5 +1,6 @@
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, select
 from src.config.database import get_session
@@ -11,7 +12,7 @@ from src.utils.logger import logger
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
-@router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+@router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register(
     user_in: UserCreate,
     db: Session = Depends(get_session)
@@ -41,7 +42,11 @@ async def register(
         # Check if user already exists in local DB (race condition or partial failure retry)
         existing_user = db.get(User, sb_user.id)
         if existing_user:
-            return existing_user
+            return {
+                "user": existing_user,
+                "token": auth_response.session.access_token if auth_response.session else None,
+                "refresh_token": auth_response.session.refresh_token if auth_response.session else None,
+            }
 
         # Create new user locally
         db_obj = User(
@@ -58,7 +63,17 @@ async def register(
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
-        return db_obj
+
+        # If Supabase returned a session (email autoconfirm ON), log user in immediately
+        # Otherwise return no token — frontend will redirect to /login
+        access_token = auth_response.session.access_token if auth_response.session else None
+        refresh_token = auth_response.session.refresh_token if auth_response.session else None
+        return {
+            "user": db_obj,
+            "token": access_token,
+            "refresh_token": refresh_token,
+            "requires_login": access_token is None,
+        }
         
     except Exception as e:
         logger.error(f"Registration error: {e}")
@@ -73,16 +88,20 @@ async def register(
             detail=error_msg.replace("Signup failed: ", "")
         )
 
-@router.post("/login", response_model=Token)
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+@router.post("/login")
 async def login(
-    form_data: OAuth2PasswordRequestForm = Depends(),
+    credentials: UserLogin,
     db: Session = Depends(get_session)
 ):
     try:
         # Login with Supabase
         auth_response = await supabase.sign_in_with_password({
-            "email": form_data.username,
-            "password": form_data.password
+            "email": credentials.email,
+            "password": credentials.password
         })
         
         if not auth_response.session:
@@ -109,12 +128,15 @@ async def login(
             if meta:
                 user.first_name = meta.get('first_name')
                 user.last_name = meta.get('last_name')
-                
             db.add(user)
-            db.commit()
+        
+        user.last_login = datetime.utcnow()
+        db.commit()
+        db.refresh(user)
         
         return {
-            "access_token": auth_response.session.access_token,
+            "user": user,
+            "token": auth_response.session.access_token,
             "refresh_token": auth_response.session.refresh_token,
             "token_type": "bearer",
         }
@@ -168,3 +190,7 @@ async def forgot_password(email: str):
     except Exception as e:
         logger.error(f"Forgot password error: {e}")
         raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/verify")
+async def verify(current_user: User = Depends(get_current_user)):
+    return {"valid": True, "user": current_user}

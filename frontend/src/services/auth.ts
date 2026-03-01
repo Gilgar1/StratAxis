@@ -20,7 +20,8 @@ export const authService = {
 
             return response;
         } catch (error: any) {
-            throw new Error(error.response?.data?.message || 'Login failed');
+            const detail = error.response?.data?.detail || error.response?.data?.message || error.message || 'Login failed';
+            throw new Error(detail);
         }
     },
 
@@ -36,7 +37,8 @@ export const authService = {
 
             return response;
         } catch (error: any) {
-            throw new Error(error.response?.data?.message || 'Registration failed');
+            const detail = error.response?.data?.detail || error.response?.data?.message || error.message || 'Registration failed';
+            throw new Error(detail);
         }
     },
 

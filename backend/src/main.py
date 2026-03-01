@@ -10,7 +10,7 @@ from src.config.env import settings
 from src.config.database import init_db
 from src.utils.logger import logger
 from src.utils.exceptions import StratAxisException, strataxis_exception_handler, generic_exception_handler
-from src.routers import auth, users, properties, listings, analytics, predictions, bookings, admin
+from src.routers import auth, users, properties, listings, analytics, predictions, bookings, admin, payments, blogs, global_metrics
 
 # Rate Limiter setup
 limiter = Limiter(key_func=get_remote_address)
@@ -90,6 +90,9 @@ app.include_router(analytics.router, prefix="/api")
 app.include_router(predictions.router, prefix="/api")
 app.include_router(bookings.router, prefix="/api")
 app.include_router(admin.router, prefix="/api")
+app.include_router(payments.router, prefix="/api")
+app.include_router(blogs.router, prefix="/api")
+app.include_router(global_metrics.router, prefix="/api")
 
 @app.get("/api/health")
 @limiter.limit("5/minute")

@@ -42,7 +42,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                     // Verify token is still valid (skip for mock tokens)
                     if (!storedToken.startsWith('mock_token_')) {
                         try {
-                            await authService.verifyToken(storedToken);
+                            const verifyRes = await authService.verifyToken(storedToken) as any;
+                            if (verifyRes.user) {
+                                setUser(verifyRes.user);
+                                localStorage.setItem('strataxis_user', JSON.stringify(verifyRes.user));
+                            }
                         } catch (error) {
                             // Token invalid, clear auth
                             logout();
@@ -77,13 +81,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const register = async (data: RegisterData) => {
         try {
-            const response = await authService.register(data);
-            setUser(response.user);
-            setToken(response.token);
+            const response = await authService.register(data) as any;
 
-            // Persist to localStorage
-            localStorage.setItem('strataxis_token', response.token);
-            localStorage.setItem('strataxis_user', JSON.stringify(response.user));
+            // If a token was returned (autoconfirm on), log in immediately
+            if (response.token) {
+                setUser(response.user);
+                setToken(response.token);
+                localStorage.setItem('strataxis_token', response.token);
+                localStorage.setItem('strataxis_user', JSON.stringify(response.user));
+            }
+            // If no token, we still surface the user info for the caller
+            // The caller (Register page) will handle the redirect to /login
+            return response;
         } catch (error) {
             console.error('Registration error:', error);
             throw error;

@@ -43,12 +43,13 @@ const Payment: React.FC = () => {
             });
 
             if (response.ok) {
-                setShowSuccess(true);
-
-                // Redirect to dashboard after 5 seconds
-                setTimeout(() => {
-                    navigate('/dashboard');
-                }, 5000);
+                // Update local storage so that AuthContext sees the pending state if it re-reads
+                if (user) {
+                    const updatedUser = { ...user, payment_status: 'PENDING' };
+                    localStorage.setItem('strataxis_user', JSON.stringify(updatedUser));
+                }
+                // Redirect immediately to dashboard passing state
+                navigate('/dashboard', { state: { paymentSubmitted: true } });
             } else {
                 alert('Failed to submit payment. Please try again or contact support.');
             }
@@ -59,31 +60,6 @@ const Payment: React.FC = () => {
             setIsSubmitting(false);
         }
     };
-
-    if (showSuccess) {
-        return (
-            <AuthenticatedLayout>
-                <div className="min-h-screen flex items-center justify-center p-4">
-                    <div className="max-w-md w-full bg-white dark:bg-primary-900 p-8 rounded-2xl border border-primary-200 dark:border-primary-800 text-center">
-                        <CheckCircle className="w-16 h-16 text-semantic-success mx-auto mb-4" />
-                        <h2 className="text-2xl font-bold text-primary-900 dark:text-white mb-4">
-                            Payment Submitted!
-                        </h2>
-                        <p className="text-primary-600 dark:text-primary-300 mb-6">
-                            Your access to Investor Pro will be available in less than an hour from now.
-                            Our team is verifying your payment.
-                        </p>
-                        <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-                            <p className="text-sm text-blue-700 dark:text-blue-200">
-                                You'll receive an email confirmation once your payment is approved.
-                                Redirecting to dashboard...
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </AuthenticatedLayout>
-        );
-    }
 
     return (
         <AuthenticatedLayout>

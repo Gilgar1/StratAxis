@@ -1,0 +1,12 @@
+C:\Users\ander\Desktop\StratAxis\backend\src\routers\properties.py:28: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+  sort_by: str = Query("created_at", regex="^(price|size|date_added|price_per_m2|created_at)$"),
+C:\Users\ander\Desktop\StratAxis\backend\src\routers\properties.py:29: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+  sort_order: str = Query("desc", regex="^(asc|desc)$"),
+C:\Users\ander\Desktop\StratAxis\backend\src\routers\analytics.py:136: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+  period_type: str = Query("monthly", regex="^(monthly|quarterly)$", description="Aggregation period"),
+INFO:     Started server process [11784]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8081): [winerror 10048] only one usage of each socket address (protocol/network address/port) is normally permitted
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.

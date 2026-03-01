@@ -1,25 +1,68 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
 import StatCard from '../components/dashboard/StatCard';
-import { TrendingUp, Map, DollarSign, Activity, AlertCircle, Lock, Crown, Users, Settings, Database, Shield } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { TrendingUp, Map, DollarSign, Activity, AlertCircle, Lock, Crown, Users, Settings, Database, Shield, Edit2, Save } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 import { ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../contexts/AuthContext';
-
-// Mock chart data
-const CHART_DATA = [
-    { p: 'Jan', douala: 88000, yaounde: 95000, listings: 120 },
-    { p: 'Feb', douala: 89500, yaounde: 96000, listings: 135 },
-    { p: 'Mar', douala: 91000, yaounde: 97500, listings: 140 },
-    { p: 'Apr', douala: 92500, yaounde: 99000, listings: 155 },
-    { p: 'May', douala: 95000, yaounde: 102000, listings: 180 },
-    { p: 'Jun', douala: 97500, yaounde: 104000, listings: 210 },
-    { p: 'Jul', douala: 97632, yaounde: 108000, listings: 250 },
-];
+import { authService } from '../services/auth';
+import { useMetrics } from '../contexts/MetricsContext';
 
 const Dashboard: React.FC = () => {
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
+    const location = useLocation();
     const userRole = user?.role || 'FREE_USER';
+
+    const { metrics, bulkUpdateMetrics } = useMetrics();
+    const [editMode, setEditMode] = useState(false);
+    const [editedMetrics, setEditedMetrics] = useState<Record<string, string>>({});
+
+    useEffect(() => {
+        setEditedMetrics(metrics);
+    }, [metrics]);
+
+    const handleSaveMetrics = async () => {
+        await bulkUpdateMetrics(editedMetrics);
+        setEditMode(false);
+    };
+
+    const handleMetricChange = (key: string, value: string) => {
+        setEditedMetrics(prev => ({ ...prev, [key]: value }));
+    };
+
+    let chartData = [];
+    try {
+        chartData = JSON.parse(metrics.chart_data_json || '[]');
+    } catch (e) {
+        chartData = [];
+    }
+
+    const [showPendingPopup, setShowPendingPopup] = useState(false);
+    const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+
+    useEffect(() => {
+        // Did we just submit a payment? Or is the status pending? 
+        if (location.state?.paymentSubmitted || user?.payment_status === 'PENDING') {
+            setShowPendingPopup(true);
+
+            // Start polling to detect when admin validates
+            const interval = setInterval(async () => {
+                const token = localStorage.getItem('strataxis_token');
+                if (token) {
+                    try {
+                        const res = await authService.verifyToken(token) as any;
+                        if (res.user && res.user.role === 'PAID_USER') {
+                            setShowPendingPopup(false);
+                            setShowSuccessPopup(true);
+                            clearInterval(interval);
+                        }
+                    } catch (err) { }
+                }
+            }, 10000); // 10s poll 
+
+            return () => clearInterval(interval);
+        }
+    }, [location.state, user]);
 
     // Role-based welcome message
     const getWelcomeMessage = () => {
@@ -45,9 +88,85 @@ const Dashboard: React.FC = () => {
 
     const welcome = getWelcomeMessage();
 
+    // Editable Stat Card for Admin
+    const EditableStatCard = ({ title, metricKey, changeKey, icon: Icon }: any) => {
+        if (!editMode && userRole !== 'ADMIN') return null; // Used in admin section only
+
+        return (
+            <div className="bg-white dark:bg-primary-900 border border-primary-200 dark:border-primary-800 rounded-xl p-6 shadow-sm flex flex-col items-center">
+                <div className="w-12 h-12 bg-primary-50 dark:bg-primary-800 text-accent-gold rounded-full flex items-center justify-center mb-4">
+                    <Icon className="w-6 h-6" />
+                </div>
+                <h4 className="text-sm font-bold text-primary-500 mb-2">{title}</h4>
+                {editMode ? (
+                    <div className="w-full space-y-2">
+                        <input
+                            type="text"
+                            value={editedMetrics[metricKey] || ''}
+                            onChange={(e) => handleMetricChange(metricKey, e.target.value)}
+                            className="input text-center font-bold text-lg w-full"
+                        />
+                        <input
+                            type="text"
+                            value={editedMetrics[changeKey] || ''}
+                            onChange={(e) => handleMetricChange(changeKey, e.target.value)}
+                            className="input text-center text-sm w-full"
+                        />
+                    </div>
+                ) : (
+                    <div className="text-center">
+                        <div className="text-2xl font-bold text-primary-900 dark:text-white mb-1">
+                            {metrics[metricKey]}
+                        </div>
+                        <div className={`text-sm font-semibold rounded-full px-2 py-0.5 inline-flex items-center space-x-1 ${metrics[changeKey]?.startsWith('-') ? 'text-semantic-error bg-semantic-error/10' : 'text-semantic-success bg-semantic-success/10'}`}>
+                            {metrics[changeKey]}
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+    };
+
     return (
         <AuthenticatedLayout>
             <div className="p-8 max-w-7xl mx-auto space-y-8">
+
+                {/* Pending Payment Popup */}
+                {showPendingPopup && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                        <div className="bg-white dark:bg-primary-900 rounded-2xl p-8 max-w-md w-full border border-primary-200 dark:border-primary-800 shadow-2xl text-center">
+                            <div className="w-16 h-16 bg-accent-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Activity className="w-8 h-8 text-accent-gold animate-pulse" />
+                            </div>
+                            <h2 className="text-2xl font-bold text-primary-900 dark:text-white mb-2">Payment Verifying</h2>
+                            <p className="text-primary-600 dark:text-primary-300 mb-6">
+                                You will be granted Pro access as soon as your payment is validated. Please wait while our team reviews it. This usually takes less than an hour.
+                            </p>
+                            <button onClick={() => setShowPendingPopup(false)} className="btn btn-outline w-full">
+                                Close & Explore Free Version
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Success Payment Popup */}
+                {showSuccessPopup && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                        <div className="bg-white dark:bg-primary-900 rounded-2xl p-8 max-w-md w-full border border-primary-200 dark:border-primary-800 shadow-2xl text-center">
+                            <div className="w-16 h-16 bg-semantic-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Crown className="w-8 h-8 text-semantic-success" />
+                            </div>
+                            <h2 className="text-2xl font-bold text-primary-900 dark:text-white mb-2">Congratulations!</h2>
+                            <p className="text-primary-600 dark:text-primary-300 mb-6">
+                                Your payment has been approved! You are now a PRO UNLOCKED INVESTOR. Please log out and back in to load all your premium data.
+                            </p>
+                            <button onClick={() => logout()} className="btn bg-accent-gold text-primary-950 font-bold w-full hover:bg-accent-gold-light">
+                                Log Out Now
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 {/* Welcome Section - Role Based */}
                 <div className="flex justify-between items-center bg-gradient-to-r from-primary-900 to-primary-800 p-8 rounded-2xl text-white shadow-xl">
                     <div>
@@ -81,7 +200,51 @@ const Dashboard: React.FC = () => {
                 {/* ADMIN DASHBOARD */}
                 {userRole === 'ADMIN' && (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {/* New Editable Platform Metrics Section */}
+                        <div className="bg-white dark:bg-primary-900 p-6 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm mt-8">
+                            <div className="flex justify-between items-center mb-6">
+                                <div>
+                                    <h3 className="font-bold text-xl text-primary-900 dark:text-white flex items-center">
+                                        <TrendingUp className="w-6 h-6 mr-2 text-accent-gold" />
+                                        Platform Global Metrics Manager
+                                    </h3>
+                                    <p className="text-sm text-primary-500 mt-1">These values are immediately reflected on all free and paid user dashboards.</p>
+                                </div>
+                                <div>
+                                    {!editMode ? (
+                                        <button onClick={() => setEditMode(true)} className="btn btn-outline flex items-center">
+                                            <Edit2 className="w-4 h-4 mr-2" />
+                                            Edit View Content
+                                        </button>
+                                    ) : (
+                                        <button onClick={handleSaveMetrics} className="btn btn-primary bg-semantic-success hover:bg-green-600 text-white flex items-center border-none">
+                                            <Save className="w-4 h-4 mr-2" />
+                                            Save Changes
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                <EditableStatCard title="Avg Land Price (Douala)" metricKey="avg_land_price_douala" changeKey="avg_land_price_douala_change" icon={TrendingUp} />
+                                <EditableStatCard title="Avg Land Price (Yaoundé)" metricKey="avg_land_price_yaounde" changeKey="avg_land_price_yaounde_change" icon={TrendingUp} />
+                                <EditableStatCard title="Rental Yield (Prime)" metricKey="rental_yield_prime" changeKey="rental_yield_prime_change" icon={DollarSign} />
+                                <EditableStatCard title="Active Listings" metricKey="active_listings" changeKey="active_listings_change" icon={Activity} />
+                            </div>
+
+                            {editMode && (
+                                <div className="mt-6 border-t border-primary-100 dark:border-primary-800 pt-6">
+                                    <h4 className="font-bold text-md text-primary-900 dark:text-white mb-4">Edit Sub-Chart Data JSON</h4>
+                                    <textarea
+                                        className="input w-full h-48 font-mono text-sm"
+                                        value={editedMetrics['chart_data_json'] || ''}
+                                        onChange={(e) => handleMetricChange('chart_data_json', e.target.value)}
+                                    />
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
                             <StatCard
                                 label="Total Users"
                                 value="1,247"
@@ -170,33 +333,33 @@ const Dashboard: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             <StatCard
                                 label="Avg Land Price (Douala)"
-                                value="97,500 FCFA/m²"
-                                change="+12.3%"
-                                trend="up"
+                                value={metrics.avg_land_price_douala + " FCFA/m²"}
+                                change={metrics.avg_land_price_douala_change}
+                                trend={metrics.avg_land_price_douala_change?.startsWith('-') ? 'down' : 'up'}
                                 period="last year"
                                 icon={TrendingUp}
                             />
                             <StatCard
                                 label="Avg Land Price (Yaoundé)"
-                                value="108,000 FCFA/m²"
-                                change="+8.1%"
-                                trend="up"
+                                value={metrics.avg_land_price_yaounde + " FCFA/m²"}
+                                change={metrics.avg_land_price_yaounde_change}
+                                trend={metrics.avg_land_price_yaounde_change?.startsWith('-') ? 'down' : 'up'}
                                 period="last year"
                                 icon={TrendingUp}
                             />
                             <StatCard
                                 label="Rental Yield (Prime)"
-                                value="7.8%"
-                                change="+0.5%"
-                                trend="up"
+                                value={metrics.rental_yield_prime}
+                                change={metrics.rental_yield_prime_change}
+                                trend={metrics.rental_yield_prime_change?.startsWith('-') ? 'down' : 'up'}
                                 period="last quarter"
                                 icon={DollarSign}
                             />
                             <StatCard
                                 label="Active Listings"
-                                value="510"
-                                change="+45"
-                                trend="up"
+                                value={metrics.active_listings}
+                                change={metrics.active_listings_change}
+                                trend={metrics.active_listings_change?.startsWith('-') ? 'down' : 'up'}
                                 period="last month"
                                 icon={Activity}
                             />
@@ -214,7 +377,7 @@ const Dashboard: React.FC = () => {
                                 </div>
                                 <div className="h-[350px] w-full">
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <ComposedChart data={CHART_DATA}>
+                                        <ComposedChart data={chartData}>
                                             <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.1} />
                                             <XAxis dataKey="p" axisLine={false} tickLine={false} tick={{ fill: '#6B7280' }} dy={10} />
                                             <YAxis yAxisId="left" orientation="left" axisLine={false} tickLine={false} tick={{ fill: '#6B7280' }} />
@@ -283,9 +446,9 @@ const Dashboard: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             <StatCard
                                 label="Avg Land Price (Douala)"
-                                value="97,500 FCFA/m²"
-                                change="+12.3%"
-                                trend="up"
+                                value={metrics.avg_land_price_douala + " FCFA/m²"}
+                                change={metrics.avg_land_price_douala_change}
+                                trend={metrics.avg_land_price_douala_change?.startsWith('-') ? 'down' : 'up'}
                                 period="last year"
                                 icon={TrendingUp}
                             />

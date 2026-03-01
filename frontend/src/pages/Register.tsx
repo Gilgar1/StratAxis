@@ -2,12 +2,12 @@
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import PublicLayout from '../layouts/PublicLayout';
-// import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { Mail, Lock, User, Building, AlertCircle } from 'lucide-react';
 import { isValidEmail, isValidPassword } from '../utils/validators';
 
 const Register: React.FC = () => {
-  // const { login } = useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   const [step, setStep] = useState(1);
@@ -58,16 +58,19 @@ const Register: React.FC = () => {
     setError(null);
 
     try {
-      // Since backend isn't fully connected yet, we'll simulate a success or call the mock
-      // In a real scenario: await register(formData);
-      // For now, let's pretend we registered and redirect to login or dashboard
-
-      // Simulating loading delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Register logic from AuthContext would go here
-      // For MVP Demo purposes, we can redirect to Login
-      navigate('/login', { state: { message: "Account created successfully! Please login." } });
+      const response: any = await register({
+        email: formData.email,
+        password: formData.password,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        user_type: formData.userType,
+        intended_use: formData.intendedUse
+      });
+      if (response?.token) {
+        navigate('/dashboard');
+      } else {
+        navigate('/login', { state: { message: 'Account created! Please sign in to access your free dashboard.' } });
+      }
     } catch (err: any) {
       setError(err.message || "Registration failed. Please try again.");
     } finally {

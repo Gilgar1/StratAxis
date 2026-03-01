@@ -11,6 +11,7 @@ from .prediction import (
     PricePredictionRequest, PricePredictionResponse, TrendForecastRequest,
     TrendForecastResponse, FeatureImportance, ForecastDataPoint
 )
+from .global_metric import GlobalMetric, GlobalMetricCreate, GlobalMetricUpdate, GlobalMetricBulkUpdate
 
 __all__ = [
     "UserBase", "UserCreate", "UserUpdate", "UserRead", "Token", "TokenPayload",
@@ -21,5 +22,7 @@ __all__ = [
     "PropertyCountByType", "PropertyCountByCity", "PriceStatistics", "NeighborhoodStats",
     "TrendDataPoint", "AnalyticsQueryParams",
     "PricePredictionRequest", "PricePredictionResponse", "TrendForecastRequest",
-    "TrendForecastResponse", "FeatureImportance", "ForecastDataPoint"
+    "TrendForecastResponse", "FeatureImportance", "ForecastDataPoint",
+    "GlobalMetric", "GlobalMetricCreate", "GlobalMetricUpdate", "GlobalMetricBulkUpdate"
 ]
+

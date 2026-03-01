@@ -37,52 +37,7 @@ const Login: React.FC = () => {
       await login(formData);
       navigate('/dashboard');
     } catch (err: any) {
-      if (err.message) {
-        // Mock Demo Users - Fallback when backend is unavailable
-        const mockUsers = [
-          {
-            email: "free@strataxis.com",
-            password: "Free@123",
-            role: "FREE_USER",
-            name: "Free User"
-          },
-          {
-            email: "paid@strataxis.com",
-            password: "Paid@123",
-            role: "PAID_USER",
-            name: "Paid User"
-          },
-          {
-            email: "admin@strataxis.com",
-            password: "Admin@123",
-            role: "ADMIN",
-            name: "Admin User"
-          }
-        ];
-
-        const mockUser = mockUsers.find(
-          u => u.email === formData.email && u.password === formData.password
-        );
-
-        if (mockUser) {
-          // Mock manual login if API fails locally without backend
-          localStorage.setItem('strataxis_token', 'mock_token_' + mockUser.role);
-          localStorage.setItem('strataxis_user', JSON.stringify({
-            id: String(Math.floor(Math.random() * 1000)),
-            email: mockUser.email,
-            role: mockUser.role,
-            first_name: mockUser.name.split(' ')[0],
-            last_name: mockUser.name.split(' ')[1] || '',
-            created_at: new Date().toISOString()
-          }));
-
-          // Redirect to dashboard - Dashboard will handle role-based display
-          window.location.href = '/dashboard';
-          return;
-        }
-
-        setError(err.message || "Invalid credentials");
-      }
+      setError(err.message || "Invalid credentials. Please try again.");
     } finally {
       setLoading(false);
     }

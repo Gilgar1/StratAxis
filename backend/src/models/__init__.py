@@ -6,6 +6,8 @@ from .listing import Listing, ListingPeriod, TrendDirection
 from .booking import Booking, ConsultationType, BookingStatus
 from .ml_model import MLModel, ModelStatus, ModelType
 from .price_prediction import PricePrediction
+from .blog import BlogPost
+from .global_metric import GlobalMetric
 
 __all__ = [
     "User", "UserRole",
@@ -15,5 +17,5 @@ __all__ = [
     "Listing", "ListingPeriod", "TrendDirection",
     "Booking", "ConsultationType", "BookingStatus",
     "MLModel", "ModelStatus", "ModelType",
-    "PricePrediction"
+    "PricePrediction", "BlogPost", "GlobalMetric"
 ]

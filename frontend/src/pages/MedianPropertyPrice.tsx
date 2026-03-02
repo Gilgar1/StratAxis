@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
 import { TrendingUp, MapPin } from 'lucide-react';
 import ExportBar from '../components/common/ExportBar';
-import { LAND_PRICES, LAND_TYPES, CITIES, LAND_TYPE_COLORS, fmt, City } from '../data/marketData';
+import { LAND_TYPES, CITIES, LAND_TYPE_COLORS, fmt, City } from '../data/marketData';
+import { useMetrics } from '../contexts/MetricsContext';
 
 const clsx = (...c: (string | boolean | undefined)[]) => c.filter(Boolean).join(' ');
 
 const MedianPropertyPrice: React.FC = () => {
     const [selectedCity, setSelectedCity] = useState<City | 'All'>('All');
+    const { landPrices } = useMetrics();
 
-    const filtered = LAND_PRICES.filter(r => selectedCity === 'All' || r.city === selectedCity);
+    const filtered = landPrices.filter(r => selectedCity === 'All' || r.city === selectedCity);
 
     const csvRows = filtered.map(r => ({
         City: r.city,
@@ -56,7 +58,7 @@ const MedianPropertyPrice: React.FC = () => {
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {LAND_TYPES.map(lt => {
-                                const row = LAND_PRICES.find(r => r.city === city && r.landType === lt);
+                                const row = landPrices.find(r => r.city === city && r.landType === lt);
                                 if (!row) return null;
                                 return (
                                     <div key={lt} className="bg-white dark:bg-primary-900 p-5 rounded-xl border-l-4 shadow-sm"

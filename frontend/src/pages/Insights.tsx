@@ -1,43 +1,27 @@
 import React from 'react';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
-import { Lightbulb, ArrowRight } from 'lucide-react';
-// import { Link } from 'react-router-dom';
+import { Lightbulb, ArrowRight, TrendingUp, AlertTriangle, Activity } from 'lucide-react';
+import { useMetrics } from '../contexts/MetricsContext';
+
+const TYPE_CONFIG = {
+    opportunity: { color: 'bg-emerald-500', label: 'OPPORTUNITY', icon: TrendingUp, badgeCls: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400', borderCls: 'border-l-emerald-500' },
+    trend: { color: 'bg-blue-500', label: 'TREND', icon: Activity, badgeCls: 'bg-blue-500/10 text-blue-600 dark:text-blue-400', borderCls: 'border-l-blue-500' },
+    risk: { color: 'bg-red-500', label: 'RISK', icon: AlertTriangle, badgeCls: 'bg-red-500/10 text-red-600 dark:text-red-400', borderCls: 'border-l-red-500' },
+};
+
+const IMPACT_COLOR: Record<string, string> = {
+    High: 'text-red-500',
+    Medium: 'text-amber-500',
+    Low: 'text-primary-400',
+};
 
 const Insights: React.FC = () => {
-    // Mock insights engine output
-    const insights = [
-        {
-            id: 1,
-            type: 'opportunity',
-            title: 'Undervalued Zone: Makepe',
-            description: 'Makepe is trading at 52,900 XAF/m², which is 15% below the expected value given its rental yield potential. This suggests a strong buy opportunity.',
-            impact: 'High',
-            confidence: 0.85,
-            date: '2 days ago'
-        },
-        {
-            id: 2,
-            type: 'trend',
-            title: 'Rental Demand Shift',
-            description: 'Search volume for "Studio" apartments in Youndé has increased by 40% month-over-month, outpacing 2-bedroom requests.',
-            impact: 'Medium',
-            confidence: 0.92,
-            date: '1 week ago'
-        },
-        {
-            id: 3,
-            type: 'risk',
-            title: 'Price Plateau in Bonanjo',
-            description: 'Asking prices in Bonanjo have remained flat for 3 consecutive quarters, indicating a possible market ceiling has been reached.',
-            impact: 'Medium',
-            confidence: 0.78,
-            date: '2 weeks ago'
-        }
-    ];
+    const { smartInsights } = useMetrics();
 
     return (
         <AuthenticatedLayout>
             <div className="p-8 max-w-5xl mx-auto">
+                {/* Header */}
                 <div className="flex items-center space-x-3 mb-2">
                     <div className="p-2 bg-accent-gold/10 rounded-lg">
                         <Lightbulb className="w-6 h-6 text-accent-gold" />
@@ -45,50 +29,73 @@ const Insights: React.FC = () => {
                     <h1 className="text-3xl font-bold text-primary-900 dark:text-white">Smart Insights</h1>
                 </div>
                 <p className="text-primary-600 dark:text-primary-400 mb-8 ml-11 max-w-2xl">
-                    AI-generated analysis highlighting disparate market signals you might miss.
+                    AI-generated analysis highlighting key market signals and investment opportunities.
                 </p>
 
-                <div className="space-y-6">
-                    {insights.map((insight) => (
-                        <div key={insight.id} className="bg-white dark:bg-primary-900 p-6 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
-                            {/* Color Strip */}
-                            <div className={`absolute left-0 top-0 bottom-0 w-1 ${insight.type === 'opportunity' ? 'bg-semantic-success' :
-                                insight.type === 'risk' ? 'bg-semantic-error' : 'bg-semantic-info'
-                                }`}></div>
+                {/* Summary strip */}
+                <div className="grid grid-cols-3 gap-4 mb-8">
+                    {(['opportunity', 'trend', 'risk'] as const).map(type => {
+                        const count = smartInsights.filter(s => s.type === type).length;
+                        const cfg = TYPE_CONFIG[type];
+                        const Icon = cfg.icon;
+                        return (
+                            <div key={type} className={`bg-white dark:bg-primary-900 p-4 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm flex items-center gap-3`}>
+                                <div className={`p-2 rounded-lg ${cfg.badgeCls.replace('text-', 'bg-').split(' ')[0]}/10`}>
+                                    <Icon className={`w-5 h-5 ${cfg.badgeCls.split(' ')[1]}`} />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-primary-400 uppercase font-bold">{type}</p>
+                                    <p className="text-2xl font-bold text-primary-900 dark:text-white">{count}</p>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
 
-                            <div className="ml-4">
-                                <div className="flex justify-between items-start mb-2">
+                {/* Insight cards */}
+                <div className="space-y-5">
+                    {smartInsights.map(insight => {
+                        const cfg = TYPE_CONFIG[insight.type];
+                        return (
+                            <div key={insight.id}
+                                className={`bg-white dark:bg-primary-900 p-6 rounded-xl border border-primary-200 dark:border-primary-800 border-l-4 ${cfg.borderCls} shadow-sm hover:shadow-md transition-shadow relative overflow-hidden`}>
+                                <div className="flex justify-between items-start mb-3">
                                     <div className="flex items-center space-x-2">
-                                        <span className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded ${insight.type === 'opportunity' ? 'bg-semantic-success/10 text-semantic-success' :
-                                            insight.type === 'risk' ? 'bg-semantic-error/10 text-semantic-error' : 'bg-semantic-info/10 text-semantic-info'
-                                            }`}>
-                                            {insight.type}
+                                        <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${cfg.badgeCls}`}>
+                                            {cfg.label}
                                         </span>
                                         <span className="text-xs text-primary-400">{insight.date}</span>
                                     </div>
-                                    <span className="text-sm font-medium text-primary-500">
-                                        Confidence: {(insight.confidence * 100).toFixed(0)}%
-                                    </span>
+                                    <div className="flex items-center gap-3 text-xs text-primary-500">
+                                        <span>Impact: <span className={`font-bold ${IMPACT_COLOR[insight.impact]}`}>{insight.impact}</span></span>
+                                        <span className="text-primary-300 dark:text-primary-600">|</span>
+                                        <span>Confidence: <span className="font-bold text-primary-700 dark:text-primary-200">{(insight.confidence * 100).toFixed(0)}%</span></span>
+                                    </div>
                                 </div>
 
                                 <h3 className="text-lg font-bold text-primary-900 dark:text-white mb-2">{insight.title}</h3>
-                                <p className="text-primary-600 dark:text-primary-300 leading-relaxed mb-4">
-                                    {insight.description}
-                                </p>
+                                <p className="text-primary-600 dark:text-primary-300 leading-relaxed mb-4">{insight.description}</p>
 
-                                <div className="flex items-center justify-between pt-4 border-t border-primary-100 dark:border-primary-800">
-                                    <div className="flex items-center space-x-4 text-sm">
-                                        <span className="text-primary-500">
-                                            Impact: <span className="font-medium text-primary-900 dark:text-white">{insight.impact}</span>
-                                        </span>
+                                {/* Confidence bar */}
+                                <div className="flex items-center gap-3 pt-4 border-t border-primary-100 dark:border-primary-800">
+                                    <div className="flex-1 bg-primary-100 dark:bg-primary-800 rounded-full h-1.5 overflow-hidden">
+                                        <div className="h-full rounded-full bg-accent-gold" style={{ width: `${insight.confidence * 100}%` }} />
                                     </div>
-                                    <button className="text-sm font-medium text-accent-gold hover:text-accent-gold-dark flex items-center">
-                                        View Data Details <ArrowRight className="w-4 h-4 ml-1" />
+                                    <button className="text-sm font-medium text-accent-gold hover:text-accent-gold/80 flex items-center gap-1 transition-colors shrink-0">
+                                        View Data Details <ArrowRight className="w-4 h-4" />
                                     </button>
                                 </div>
                             </div>
+                        );
+                    })}
+
+                    {smartInsights.length === 0 && (
+                        <div className="text-center py-16 text-primary-400">
+                            <Lightbulb className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                            <p className="font-semibold">No insights available yet.</p>
+                            <p className="text-sm mt-1">An admin can add insights from the Admin Panel → Metrics Editor.</p>
                         </div>
-                    ))}
+                    )}
                 </div>
             </div>
         </AuthenticatedLayout>

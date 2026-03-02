@@ -3,14 +3,16 @@ import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
 import { Maximize2, MapPin } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import ExportBar from '../components/common/ExportBar';
-import { LAND_PRICES, LAND_TYPES, CITIES, LAND_TYPE_COLORS, YEARS, fmt, City } from '../data/marketData';
+import { LAND_TYPES, CITIES, LAND_TYPE_COLORS, YEARS, fmt, City } from '../data/marketData';
+import { useMetrics } from '../contexts/MetricsContext';
 
 const clsx = (...c: (string | boolean | undefined)[]) => c.filter(Boolean).join(' ');
 
 const PricePerSquareMeter: React.FC = () => {
     const [selectedCity, setSelectedCity] = useState<City>('Douala');
+    const { landPrices } = useMetrics();
 
-    const cityData = LAND_PRICES.filter(r => r.city === selectedCity);
+    const cityData = landPrices.filter(r => r.city === selectedCity);
 
     const csvRows = cityData.map(r => ({
         City: r.city,
@@ -25,7 +27,7 @@ const PricePerSquareMeter: React.FC = () => {
     const trendData = YEARS.map((year, i) => {
         const row: Record<string, string | number> = { year };
         LAND_TYPES.forEach(lt => {
-            const entry = LAND_PRICES.find(r => r.city === selectedCity && r.landType === lt);
+            const entry = landPrices.find(r => r.city === selectedCity && r.landType === lt);
             row[lt] = entry ? entry.trend[i] : 0;
         });
         return row;

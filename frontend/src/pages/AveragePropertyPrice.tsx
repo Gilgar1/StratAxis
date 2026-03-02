@@ -3,15 +3,17 @@ import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
 import { BarChart3, MapPin, ChevronDown } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import ExportBar from '../components/common/ExportBar';
-import { LAND_PRICES, LAND_TYPES, CITIES, LAND_TYPE_COLORS, fmt, LandType, City } from '../data/marketData';
+import { LAND_TYPES, CITIES, LAND_TYPE_COLORS, fmt, LandType, City } from '../data/marketData';
+import { useMetrics } from '../contexts/MetricsContext';
 
 const clsx = (...c: (string | boolean | undefined)[]) => c.filter(Boolean).join(' ');
 
 const AveragePropertyPrice: React.FC = () => {
     const [selectedCity, setSelectedCity] = useState<City | 'All'>('All');
     const [selectedLandType, setSelectedLandType] = useState<LandType | 'All'>('All');
+    const { landPrices } = useMetrics();
 
-    const filtered = LAND_PRICES.filter(r =>
+    const filtered = landPrices.filter(r =>
         (selectedCity === 'All' || r.city === selectedCity) &&
         (selectedLandType === 'All' || r.landType === selectedLandType)
     );
@@ -28,7 +30,7 @@ const AveragePropertyPrice: React.FC = () => {
     const chartData = LAND_TYPES.map(lt => {
         const d: Record<string, string | number> = { landType: lt };
         CITIES.forEach(c => {
-            const row = LAND_PRICES.find(r => r.city === c && r.landType === lt);
+            const row = landPrices.find(r => r.city === c && r.landType === lt);
             d[c] = row ? row.avgPricePerSqm : 0;
         });
         return d;

@@ -1,12 +1,13 @@
 ﻿import React, { useState } from 'react';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
-import { Activity, Users, Search, AlertTriangle, CheckCircle, Server, Edit, Ban, Terminal, CreditCard } from 'lucide-react';
+import { Activity, Users, Search, AlertTriangle, CheckCircle, Server, Edit, Ban, Terminal, CreditCard, BarChart3 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { formatCurrency } from '../utils/formatters';
+import MetricsEditor from '../components/admin/MetricsEditor';
 
 const AdminPanel: React.FC = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'users' | 'payments' | 'system' | 'overrides'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'payments' | 'system' | 'overrides' | 'metrics'>('users');
 
   // --- MOCK DATA ---
   const [users, setUsers] = useState([
@@ -40,7 +41,6 @@ const AdminPanel: React.FC = () => {
 
   const handleApprovePayment = async (paymentId: number) => {
     if (confirm('Approve this payment and upgrade user to PAID_USER?')) {
-      // In real app, call API: await approvePayment(paymentId)
       setPendingPayments(pendingPayments.filter(p => p.id !== paymentId));
       alert('Payment approved! User has been upgraded to PRO INVESTOR.');
     }
@@ -49,7 +49,6 @@ const AdminPanel: React.FC = () => {
   const handleRejectPayment = async (paymentId: number) => {
     const reason = prompt('Enter rejection reason:');
     if (reason) {
-      // In real app, call API: await rejectPayment(paymentId, reason)
       setPendingPayments(pendingPayments.filter(p => p.id !== paymentId));
       alert('Payment rejected and user notified.');
     }
@@ -82,17 +81,17 @@ const AdminPanel: React.FC = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex space-x-6 border-b border-primary-200 dark:border-primary-800 mb-8">
+        <div className="flex space-x-1 border-b border-primary-200 dark:border-primary-800 mb-8 overflow-x-auto">
           <button
             onClick={() => setActiveTab('users')}
-            className={`pb-4 px-2 font-medium transition-colors border-b-2 flex items-center ${activeTab === 'users' ? 'border-accent-gold text-accent-gold' : 'border-transparent text-primary-500 hover:text-primary-700'}`}
+            className={`pb-4 px-3 font-medium transition-colors border-b-2 flex items-center whitespace-nowrap ${activeTab === 'users' ? 'border-accent-gold text-accent-gold' : 'border-transparent text-primary-500 hover:text-primary-700'}`}
           >
             <Users className="w-4 h-4 mr-2" />
             User Management
           </button>
           <button
             onClick={() => setActiveTab('payments')}
-            className={`pb-4 px-2 font-medium transition-colors border-b-2 flex items-center relative ${activeTab === 'payments' ? 'border-accent-gold text-accent-gold' : 'border-transparent text-primary-500 hover:text-primary-700'}`}
+            className={`pb-4 px-3 font-medium transition-colors border-b-2 flex items-center whitespace-nowrap relative ${activeTab === 'payments' ? 'border-accent-gold text-accent-gold' : 'border-transparent text-primary-500 hover:text-primary-700'}`}
           >
             <CreditCard className="w-4 h-4 mr-2" />
             Payment Verification
@@ -104,17 +103,25 @@ const AdminPanel: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('system')}
-            className={`pb-4 px-2 font-medium transition-colors border-b-2 flex items-center ${activeTab === 'system' ? 'border-accent-gold text-accent-gold' : 'border-transparent text-primary-500 hover:text-primary-700'}`}
+            className={`pb-4 px-3 font-medium transition-colors border-b-2 flex items-center whitespace-nowrap ${activeTab === 'system' ? 'border-accent-gold text-accent-gold' : 'border-transparent text-primary-500 hover:text-primary-700'}`}
           >
             <Server className="w-4 h-4 mr-2" />
             System & Scraper
           </button>
           <button
             onClick={() => setActiveTab('overrides')}
-            className={`pb-4 px-2 font-medium transition-colors border-b-2 flex items-center ${activeTab === 'overrides' ? 'border-accent-gold text-accent-gold' : 'border-transparent text-primary-500 hover:text-primary-700'}`}
+            className={`pb-4 px-3 font-medium transition-colors border-b-2 flex items-center whitespace-nowrap ${activeTab === 'overrides' ? 'border-accent-gold text-accent-gold' : 'border-transparent text-primary-500 hover:text-primary-700'}`}
           >
             <Edit className="w-4 h-4 mr-2" />
             Data Overrides
+          </button>
+          <button
+            onClick={() => setActiveTab('metrics')}
+            className={`pb-4 px-3 font-medium transition-colors border-b-2 flex items-center whitespace-nowrap ${activeTab === 'metrics' ? 'border-accent-gold text-accent-gold' : 'border-transparent text-primary-500 hover:text-primary-700'}`}
+          >
+            <BarChart3 className="w-4 h-4 mr-2" />
+            Metrics Editor
+            <span className="ml-2 bg-accent-gold/20 text-accent-gold text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide">Live</span>
           </button>
         </div>
 
@@ -398,6 +405,11 @@ const AdminPanel: React.FC = () => {
               </table>
             </div>
           </div>
+        )}
+
+        {/* --- METRICS EDITOR --- */}
+        {activeTab === 'metrics' && (
+          <MetricsEditor />
         )}
 
       </div>

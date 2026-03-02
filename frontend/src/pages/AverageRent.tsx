@@ -3,15 +3,17 @@ import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
 import { Home, ChevronDown } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import ExportBar from '../components/common/ExportBar';
-import { RENT_BY_TYPE, PROPERTY_TYPES, CITIES, PROPERTY_TYPE_COLORS, fmt, PropertyType, City } from '../data/marketData';
+import { PROPERTY_TYPES, CITIES, PROPERTY_TYPE_COLORS, fmt, PropertyType, City } from '../data/marketData';
+import { useMetrics } from '../contexts/MetricsContext';
 
 const clsx = (...c: (string | boolean | undefined)[]) => c.filter(Boolean).join(' ');
 
 const AverageRent: React.FC = () => {
     const [selectedCity, setSelectedCity] = useState<City>('Douala');
     const [selectedType, setSelectedType] = useState<PropertyType | 'All'>('All');
+    const { rentByType } = useMetrics();
 
-    const filtered = RENT_BY_TYPE.filter(r =>
+    const filtered = rentByType.filter(r =>
         r.city === selectedCity &&
         (selectedType === 'All' || r.propertyType === selectedType)
     );
@@ -24,7 +26,7 @@ const AverageRent: React.FC = () => {
         'Sample Size': r.sampleSize,
     }));
 
-    const chartData = RENT_BY_TYPE.filter(r => r.city === selectedCity).map(r => ({
+    const chartData = rentByType.filter(r => r.city === selectedCity).map(r => ({
         type: r.propertyType,
         rent: r.avgMonthlyRent,
         fill: PROPERTY_TYPE_COLORS[r.propertyType],

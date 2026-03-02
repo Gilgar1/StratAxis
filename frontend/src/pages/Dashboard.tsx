@@ -5,6 +5,7 @@ import { TrendingUp, Map, DollarSign, Activity, AlertCircle, Lock, Crown, Users,
 import { Link } from 'react-router-dom';
 import { ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../contexts/AuthContext';
+import { useMetrics } from '../contexts/MetricsContext';
 
 // Mock chart data
 const CHART_DATA = [
@@ -19,6 +20,7 @@ const CHART_DATA = [
 
 const Dashboard: React.FC = () => {
     const { user } = useAuth();
+    const { dashboardStats } = useMetrics();
     const userRole = user?.role || 'FREE_USER';
 
     // Role-based welcome message
@@ -83,35 +85,35 @@ const Dashboard: React.FC = () => {
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             <StatCard
-                                label="Total Users"
-                                value="1,247"
-                                change="+23"
+                                label={dashboardStats.admin_totalUsers.label}
+                                value={dashboardStats.admin_totalUsers.value}
+                                change={dashboardStats.admin_totalUsers.change}
                                 trend="up"
-                                period="this month"
+                                period={dashboardStats.admin_totalUsers.period}
                                 icon={Users}
                             />
                             <StatCard
-                                label="Active Sessions"
-                                value="342"
-                                change="+12"
+                                label={dashboardStats.admin_activeSessions.label}
+                                value={dashboardStats.admin_activeSessions.value}
+                                change={dashboardStats.admin_activeSessions.change}
                                 trend="up"
-                                period="currently"
+                                period={dashboardStats.admin_activeSessions.period}
                                 icon={Activity}
                             />
                             <StatCard
-                                label="Database Size"
-                                value="2.4 GB"
-                                change="+150 MB"
+                                label={dashboardStats.admin_dbSize.label}
+                                value={dashboardStats.admin_dbSize.value}
+                                change={dashboardStats.admin_dbSize.change}
                                 trend="up"
-                                period="this week"
+                                period={dashboardStats.admin_dbSize.period}
                                 icon={Database}
                             />
                             <StatCard
-                                label="System Health"
-                                value="98.5%"
-                                change="+1.2%"
+                                label={dashboardStats.admin_systemHealth.label}
+                                value={dashboardStats.admin_systemHealth.value}
+                                change={dashboardStats.admin_systemHealth.change}
                                 trend="up"
-                                period="uptime"
+                                period={dashboardStats.admin_systemHealth.period}
                                 icon={Settings}
                             />
                         </div>
@@ -169,35 +171,35 @@ const Dashboard: React.FC = () => {
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             <StatCard
-                                label="Avg Land Price (Douala)"
-                                value="97,500 FCFA/m²"
-                                change="+12.3%"
+                                label={dashboardStats.paid_avgLandDouala.label}
+                                value={dashboardStats.paid_avgLandDouala.value}
+                                change={dashboardStats.paid_avgLandDouala.change}
                                 trend="up"
-                                period="last year"
+                                period={dashboardStats.paid_avgLandDouala.period}
                                 icon={TrendingUp}
                             />
                             <StatCard
-                                label="Avg Land Price (Yaoundé)"
-                                value="108,000 FCFA/m²"
-                                change="+8.1%"
+                                label={dashboardStats.paid_avgLandYaounde.label}
+                                value={dashboardStats.paid_avgLandYaounde.value}
+                                change={dashboardStats.paid_avgLandYaounde.change}
                                 trend="up"
-                                period="last year"
+                                period={dashboardStats.paid_avgLandYaounde.period}
                                 icon={TrendingUp}
                             />
                             <StatCard
-                                label="Rental Yield (Prime)"
-                                value="7.8%"
-                                change="+0.5%"
+                                label={dashboardStats.paid_rentalYield.label}
+                                value={dashboardStats.paid_rentalYield.value}
+                                change={dashboardStats.paid_rentalYield.change}
                                 trend="up"
-                                period="last quarter"
+                                period={dashboardStats.paid_rentalYield.period}
                                 icon={DollarSign}
                             />
                             <StatCard
-                                label="Active Listings"
-                                value="510"
-                                change="+45"
+                                label={dashboardStats.paid_activeListings.label}
+                                value={dashboardStats.paid_activeListings.value}
+                                change={dashboardStats.paid_activeListings.change}
                                 trend="up"
-                                period="last month"
+                                period={dashboardStats.paid_activeListings.period}
                                 icon={Activity}
                             />
                         </div>
@@ -282,11 +284,11 @@ const Dashboard: React.FC = () => {
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             <StatCard
-                                label="Avg Land Price (Douala)"
-                                value="97,500 FCFA/m²"
-                                change="+12.3%"
+                                label={dashboardStats.free_avgLandDouala.label}
+                                value={dashboardStats.free_avgLandDouala.value}
+                                change={dashboardStats.free_avgLandDouala.change}
                                 trend="up"
-                                period="last year"
+                                period={dashboardStats.free_avgLandDouala.period}
                                 icon={TrendingUp}
                             />
                             <div className="relative">

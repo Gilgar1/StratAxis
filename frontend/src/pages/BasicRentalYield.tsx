@@ -3,14 +3,16 @@ import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
 import { Percent, MapPin, Info } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import ExportBar from '../components/common/ExportBar';
-import { RENT_BY_TYPE, CITIES, PROPERTY_TYPE_COLORS, fmt, City } from '../data/marketData';
+import { CITIES, PROPERTY_TYPE_COLORS, fmt, City } from '../data/marketData';
+import { useMetrics } from '../contexts/MetricsContext';
 
 const clsx = (...c: (string | boolean | undefined)[]) => c.filter(Boolean).join(' ');
 
 const BasicRentalYield: React.FC = () => {
     const [selectedCity, setSelectedCity] = useState<City>('Douala');
+    const { rentByType } = useMetrics();
 
-    const cityData = RENT_BY_TYPE.filter(r => r.city === selectedCity);
+    const cityData = rentByType.filter(r => r.city === selectedCity);
 
     const csvRows = cityData.map(r => ({
         City: r.city,
@@ -27,7 +29,9 @@ const BasicRentalYield: React.FC = () => {
     }));
 
     // City aggregate
-    const cityAvgYield = (cityData.reduce((s, r) => s + r.grossYield, 0) / cityData.length).toFixed(1);
+    const cityAvgYield = cityData.length > 0
+        ? (cityData.reduce((s, r) => s + r.grossYield, 0) / cityData.length).toFixed(1)
+        : '0.0';
 
     return (
         <AuthenticatedLayout>

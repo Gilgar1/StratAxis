@@ -3,14 +3,16 @@ import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
 import { TrendingUp, MapPin } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import ExportBar from '../components/common/ExportBar';
-import { LAND_PRICES, LAND_TYPES, CITIES, LAND_TYPE_COLORS, City } from '../data/marketData';
+import { LAND_TYPES, CITIES, LAND_TYPE_COLORS, City } from '../data/marketData';
+import { useMetrics } from '../contexts/MetricsContext';
 
 const clsx = (...c: (string | boolean | undefined)[]) => c.filter(Boolean).join(' ');
 
 const AnnualAppreciation: React.FC = () => {
     const [selectedCity, setSelectedCity] = useState<City>('Douala');
+    const { landPrices } = useMetrics();
 
-    const cityData = LAND_PRICES.filter(r => r.city === selectedCity);
+    const cityData = landPrices.filter(r => r.city === selectedCity);
 
     const csvRows = cityData.map(r => ({
         City: r.city,
@@ -27,7 +29,9 @@ const AnnualAppreciation: React.FC = () => {
     }));
 
     // City-weighted average
-    const cityAvg = (cityData.reduce((s, r) => s + r.yoyChange, 0) / cityData.length).toFixed(1);
+    const cityAvg = cityData.length > 0
+        ? (cityData.reduce((s, r) => s + r.yoyChange, 0) / cityData.length).toFixed(1)
+        : '0.0';
 
     return (
         <AuthenticatedLayout>

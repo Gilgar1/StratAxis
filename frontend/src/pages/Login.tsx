@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import PublicLayout from '../layouts/PublicLayout';
@@ -166,6 +166,7 @@ const Login: React.FC = () => {
                 </Link>
               </div>
 
+              {/* Demo Test Accounts - commented out for production
               <div className="mt-8 pt-6 border-t border-primary-100 dark:border-primary-800 text-xs text-primary-400 space-y-2">
                 <p className="font-bold text-center mb-3 text-primary-600 dark:text-primary-300">Demo Test Accounts</p>
                 <div className="space-y-2">
@@ -186,6 +187,7 @@ const Login: React.FC = () => {
                   </div>
                 </div>
               </div>
+              */}
             </div>
           </motion.div>
         </div>
